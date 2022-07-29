@@ -1,0 +1,17 @@
+extends layout 
+block content
+    table
+        caption=title
+            tbody
+                tr
+                    each property in encabezado
+                        th=property
+                    if(Array.isArray(results))
+                        each value in results
+                            tr
+                                each property in encabezado
+                                    td=value[property]
+                    else
+                            tr
+                                each property in encabezado
+                                    td=results[property]
