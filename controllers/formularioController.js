@@ -20,3 +20,7 @@ exports.preguntasOpciones = (req, res) => {
     .withGraphJoined("Pregunta")
     .then((OpcionesPregunta) => res.json(OpcionesPregunta));
 };
+
+exports.crearFormulario = (req, res) => {
+  res.render("Formulario/CrearFormulario");
+};

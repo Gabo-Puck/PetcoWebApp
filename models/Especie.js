@@ -1,5 +1,7 @@
 var BaseModel = require("./BaseModel");
+var knex = require("../knex");
 var { Model } = require("objection");
+Model.knex(knex);
 
 class Especie extends BaseModel {
   static get tableName() {
