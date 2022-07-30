@@ -28,7 +28,15 @@ exports.crearFormulario = (req, res) => {
 };
 
 exports.verSolicitud = (req, res) => {
-  Solicitud.query()
-    .withGraphJoined("RespuestasFormulario")
-    .then((Solicitudes) => res.json(Solicitudes));
+  // Solicitud.query()
+  //   .withGraphJoined("RespuestasFormulario.[Pregunta]")
+  //   .then((Solicitudes) => res.json(Solicitudes));
+
+  // Formulario.query()
+  //   .withGraphJoined("Preguntas.[Respuestas]")
+  //   .where("Preguntas:Respuestas.ID_Solicitud", "=", 2)
+  //   .then((resultado) => res.json(resultado));
+  Usuario.query()
+    .withGraphJoined("Solicitudes")
+    .then((Sol) => res.json(Sol));
 };

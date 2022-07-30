@@ -10,6 +10,7 @@ class Solicitudes extends BaseModel {
 
   static get relationMappings() {
     const Respuestas = require("./Respuestas");
+    const Usuario = require("./Usuario");
     return {
       RespuestasFormulario: {
         relation: Model.HasManyRelation,
@@ -17,6 +18,14 @@ class Solicitudes extends BaseModel {
         join: {
           from: "Solicitudes.ID",
           to: "Respuestas.ID_Solicitud",
+        },
+      },
+      Usuario: {
+        relation: Model.HasOneRelation,
+        modelClass: Usuario,
+        join: {
+          from: "Solicitudes.ID_Usuario",
+          to: "Usuario.ID",
         },
       },
     };
