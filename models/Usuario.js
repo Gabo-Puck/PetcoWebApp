@@ -8,6 +8,7 @@ class Usuario extends BaseModel {
 
   static get relationMappings() {
     const Especie = require("./Especie");
+    const Formulario = require("./Formulario");
     return {
       Especies: {
         relation: Model.ManyToManyRelation,
@@ -19,6 +20,14 @@ class Usuario extends BaseModel {
             to: "Intereses.ID_Especie",
           },
           to: "Especie.ID",
+        },
+      },
+      Formularios: {
+        relation: Model.HasManyRelation,
+        modelClass: Formulario,
+        join: {
+          from: "Usuario.ID",
+          to: "Formulario.ID_Usuario",
         },
       },
     };
