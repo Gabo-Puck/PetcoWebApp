@@ -147,7 +147,6 @@ const hacerRegistroMiddleware = [
 
 exports.registro_list = (req, res) => {
   Registro.query()
-    .where("Registro.Contrasena", "=", "12341")
     .then((Result) => {
       res.json(Result);
     });

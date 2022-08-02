@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogIn</title>
+    <link rel="stylesheet" , href="/stylesheets/style.css" />
+</head>
+
+<style>
+    body {
+        background-image: url('https://img.freepik.com/p-seamless-pattern-with-pets-medicines-food-cat-collar-dog-with-bandaged-paw_192280-216.jpg');
+    }
+</style>
+
+<body>
+
+
+
+
+
+
+    <div class="container h-100">
+
+
+        <div class="row align-items-center h-100">
+
+            <div class="col-4 mx-auto">
+
+                <div class="card h-100 border-primary justify-content-center" style="text-align: center;">
+
+                    
+
+
+                    <div class="card-header">Iniciar Sesión</div>
+
+                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+                    <div class="card-body">
+                        <form action="/login/CheckLogin" method="post">
+                            <div class="form-group">
+                                <input type="text" name="Correo" placeholder="Correo" class="form-control" required>
+                            </div>
+
+                            <br>
+
+                            <div class="form-group">
+                                <input type="password" name="Password" placeholder="Contraseña" class="form-control"
+                                    required>
+                            </div>
+
+                            <br>
+
+                            <button type="submit" class="btn btn-primary">Acceder</button>
+
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <% if (typeof alert !="undefined" ) { %>
+        <script>
+            Swal.fire({
+                title: '<%= alertTitle %>',
+                text: '<%= alertMessage %>',
+                icon: '<%= alertIcon %>',
+                showConfirmButton: <%= showCofirmButton %>,
+                timer: <%= timer %>
+     }).then(() => {
+                    window.location = '/<%= ruta %>'
+                })
+        </script>
+        <% } %>
+
+
+
+
+
+
+</body>
+
+</html>
