@@ -9,23 +9,22 @@ const {
 } = require("express-json-validator-middleware");
 
 var indexRouter = require("./routes/index");
-var usersRouter = require("./routes/users"); 
+var usersRouter = require("./routes/users");
 var registroRouter = require("./routes/registro");
 var vacunasRouter = require("./routes/vacunas");
-<<<<<<< HEAD
 var formulariosRouter = require("./routes/formulariosRouter");
-=======
-var loginRouter = require("./routes/login")
->>>>>>> a122a41bb0947a267eac6e8c4b95e519d9ae2ae7
+var loginRouter = require("./routes/login");
 
 var app = express();
 
-const session = require('express-session');
-app.use(session({
-  secret: 'secrete',
-  resave: true,
-  saveUninitialized: true
-}))
+const session = require("express-session");
+app.use(
+  session({
+    secret: "secrete",
+    resave: true,
+    saveUninitialized: true,
+  })
+);
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
@@ -40,12 +39,8 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/registro", registroRouter);
 app.use("/ve", vacunasRouter);
-<<<<<<< HEAD
 app.use("/formulario", formulariosRouter);
-=======
 app.use("/login", loginRouter);
-
->>>>>>> a122a41bb0947a267eac6e8c4b95e519d9ae2ae7
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
