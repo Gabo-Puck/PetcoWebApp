@@ -1,33 +1,25 @@
-[
-  {
-    "FK_Registro": 1,
-    "Foto_Perfil": "1231",
-    "ID": 1,
-    "Reputacion": 11,
-    "Solicitudes": [
-      { "ID": 2, "ID_Mascota": 8, "ID_Usuario": 1 },
-      { "ID": 1, "ID_Mascota": 7, "ID_Usuario": 1 }
-    ]
-  },
-  {
-    "FK_Registro": 2,
-    "Foto_Perfil": "1232",
-    "ID": 2,
-    "Reputacion": 12,
-    "Solicitudes": []
-  },
-  {
-    "FK_Registro": 3,
-    "Foto_Perfil": "1233",
-    "ID": 3,
-    "Reputacion": 13,
-    "Solicitudes": []
-  },
-  {
-    "FK_Registro": 4,
-    "Foto_Perfil": "1234",
-    "ID": 4,
-    "Reputacion": 14,
-    "Solicitudes": []
-  }
-]
+{
+  "titulo": { "tituloText": "", "formID": "titulo" },
+  "abiertas": [
+    { "preguntaText": "", "tipo": 1, "opcional": true, "formID": "pregunta0" },
+    { "preguntaText": "", "tipo": 1, "opcional": true, "formID": "pregunta3" }
+  ],
+  "cerradas": [
+    {
+      "preguntaText": "",
+      "tipo": 2,
+      "opcional": true,
+      "respuestas": [{ "respuesta": "", "formID": "resp0" }],
+      "formID": "pregunta1"
+    }
+  ],
+  "multiples": [
+    {
+      "preguntaText": "",
+      "tipo": 3,
+      "opcional": true,
+      "respuestas": [{ "respuesta": "", "formID": "resp1" }],
+      "formID": "pregunta2"
+    }
+  ]
+}

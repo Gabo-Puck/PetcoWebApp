@@ -8,5 +8,6 @@ router.get("/preguntas", formularioController.formularioPreguntas);
 router.get("/opcionesPreg", formularioController.preguntasOpciones);
 router.get("/crear", formularioController.crearFormulario);
 router.get("/Solicitud", formularioController.verSolicitud);
+router.post("/verify", formularioController.verifyFormulario);
 
 module.exports = router;
