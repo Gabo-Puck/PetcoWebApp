@@ -82,6 +82,24 @@ var loadingScreen = Swal.mixin({
     loadingScreen.showLoading();
   },
 });
+
+function responseFetch(res, preguntasFetched) {
+  if (res == "ok") {
+    return new Promise(function (resolve, reject) {
+      resolve(
+        fetch("http://localhost:3000/formulario/crear", {
+          method: "POST",
+          body: JSON.stringify(preguntasFetched),
+          headers: { "Content-Type": "application/json" },
+        })
+      );
+    });
+  } else {
+    return new Promise(function (resolve, reject) {
+      throw new Error("Campos incorrectos");
+    });
+  }
+}
 function bindPreguntas() {
   var preguntasAbiertas = document.querySelectorAll(".preguntaAbierta");
   var preguntasCerradas = document.querySelectorAll(".preguntaCerrada");
@@ -135,7 +153,7 @@ function bindPreguntas() {
   // xhr.open("POST", "http://localhost:3000/formulario/verify", true);
   // xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
   // xhr.send(JSON.stringify(preguntasFetched));
-  //Post with fetch
+  //Post with fetch and promises
   const header = new Headers();
   setTimeout(() => {
     var response = fetch("http://localhost:3000/formulario/verify", {
@@ -145,15 +163,24 @@ function bindPreguntas() {
     })
       .then((res) => res.json())
       .then((res) => renderMessages(res))
+      .then((res) => responseFetch(res, preguntasFetched))
+      .then((res) => res.json())
       .then((res) => {
-        if (res == "ok") {
-          fetch("http://localhost:3000/formulario/crear", {
-            method: "POST",
-            body: JSON.stringify(preguntasFetched),
-            headers: { "Content-Type": "application/json" },
+        if (res.response == "ok") {
+          loadingScreen.close();
+          Swal.fire({
+            title: "Listo!",
+            text: `Se ha guardado de manera exitosa tu formulario: '${titulo.value}'`,
+            icon: "success",
+            confirmButtonText: "Siguiente",
+          }).then((sweetResult) => {
+            if (sweetResult.isConfirmed) {
+              window.location = "http://localhost:3000/formulario/info";
+            }
           });
-        } else console.log("aaaax");
-      });
+        }
+      })
+      .catch((reason) => console.log(reason));
   }, 1300);
 }
 
@@ -242,8 +269,22 @@ function renderMessages(response) {
     //     window.location = "http://localhost:3000/registro/info";
     //   }
     // });
+
     return "ok";
   } else {
+    if (response.correct.length >= 1) {
+      response.correct.forEach((correctFeedback) => {
+        var newCorrectMessage = document.createElement("div");
+        newCorrectMessage.classList.add("valid-feedback", "d-block");
+        newCorrectMessage.innerText = correctFeedback.msg;
+        addMessageFeedback(correctFeedback, newCorrectMessage, "is-valid");
+        if (correctFeedback.formID == "titulo") {
+          document.querySelector("#titulo").classList.add("is-valid");
+          insertAfter(document.querySelector("#titulo"), newCorrectMessage);
+        }
+      });
+    }
+    loadingScreen.close();
     response.errors.forEach((error) => {
       var newErrorMessage = document.createElement("div");
       newErrorMessage.classList.add("invalid-feedback", "d-block");
@@ -254,20 +295,18 @@ function renderMessages(response) {
         insertAfter(document.querySelector("#titulo"), newErrorMessage);
       }
     });
+    loadingScreen.close();
+    if (response.globalError.length >= 1) {
+      Swal.fire({
+        title: "Atención!",
+        text: response.globalError[0],
+        icon: "warning",
+        confirmButtonText: "Entendido",
+      });
+    }
+
+    return "not";
   }
-  if (response.correct.length >= 1) {
-    response.correct.forEach((correctFeedback) => {
-      var newCorrectMessage = document.createElement("div");
-      newCorrectMessage.classList.add("valid-feedback", "d-block");
-      newCorrectMessage.innerText = correctFeedback.msg;
-      addMessageFeedback(correctFeedback, newCorrectMessage, "is-valid");
-      if (correctFeedback.formID == "titulo") {
-        document.querySelector("#titulo").classList.add("is-valid");
-        insertAfter(document.querySelector("#titulo"), newCorrectMessage);
-      }
-    });
-  }
-  loadingScreen.close();
 }
 
 function addMessageFeedback(response, newMessage, validationInput) {

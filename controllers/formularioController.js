@@ -47,6 +47,18 @@ exports.verifyFormulario = (req, res) => {
   console.log(req.body);
   var errors = [];
   var correct = [];
+  var globalError = [];
+  var total =
+    req.body.abiertas.length +
+    req.body.cerradas.length +
+    req.body.multiples.length;
+  var min = 5;
+
+  if (total < min) {
+    globalError.push(
+      `El formulario debe de tener por lo menos ${min} preguntas`
+    );
+  }
 
   if (req.body.titulo.tituloText.replace(/ /g, "").length < 6) {
     errors.push({
@@ -70,7 +82,7 @@ exports.verifyFormulario = (req, res) => {
   });
   validateCerradaMultiple(req.body.cerradas, errors, correct);
   validateCerradaMultiple(req.body.multiples, errors, correct);
-  res.json({ errors: errors, correct: correct });
+  res.json({ errors: errors, correct: correct, globalError: globalError });
 };
 
 /**
@@ -92,10 +104,10 @@ function validateCerradaMultiple(preguntas, errors, correct) {
     }
     pregunta.respuestas.forEach((respuesta) => {
       console.log(respuesta.respuestaText.length);
-      if (respuesta.respuestaText.replace(/ /g, "").length < 2) {
+      if (respuesta.respuestaText.replace(/ /g, "").length < 1) {
         errors.push({
           formID: respuesta.formID,
-          msg: "La respuesta debe tener por lo menos 2 caracteres",
+          msg: "La respuesta debe tener por lo menos 1 caracter",
         });
       } else {
         correct.push({ formID: respuesta.formID, msg: "Bien!" });
@@ -245,5 +257,10 @@ exports.formulario_crear_post = (req, res) => {
         formulario.ID
       )
     )
-    .then((promises) => Promise.all(promises));
+    .then((promises) => Promise.all(promises))
+    .then(() => res.json({ response: "ok" }));
+};
+
+exports.formDashboard = (req, res) => {
+  res.json({ res: "AQUI SE SUPONE QUE VA EL DASHBOARD XD" });
 };
