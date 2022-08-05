@@ -10,8 +10,8 @@ module.exports = {
       host: "localhost",
       port: 3306,
       user: "root",
-      password: "nuevopass",
-      database: "petcodbv3",
+      password: "halo1234",
+      database: "petcodbv2",
     },
   },
 
