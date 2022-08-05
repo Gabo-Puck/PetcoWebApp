@@ -3,7 +3,9 @@ var Formulario = require("../models/Formulario");
 var Preguntas = require("../models/Preguntas");
 var Opciones = require("../models/Opciones_Respuestas_Preguntas");
 var Solicitud = require("../models/Solicitudes");
+var Preguntas_Formulario = require("../models/Preguntas_Formulario");
 const Solicitudes = require("../models/Solicitudes");
+const Opciones_Respuestas_Preguntas = require("../models/Opciones_Respuestas_Preguntas");
 
 exports.formularioList = (req, res) => {
   Usuario.query()
@@ -71,7 +73,12 @@ exports.verifyFormulario = (req, res) => {
   res.json({ errors: errors, correct: correct });
 };
 
-exports.formulario_crear_post = (req, res) => {};
+/**
+ * Funcion que permite validar un array de preguntas con posibles respuestas, y generar mensajes para inputs correctos e incorrectos
+ * @param {*} preguntas Array de preguntas del mismo tipo a validar
+ * @param {*} errors Array el cual contiene los mensajes de error para input incorrecto y el id del elemento html asociado a dicho input
+ * @param {*} correct Array el cual contiene los mensajes de input correcto y el id del elemento html asociado a dicho input
+ */
 
 function validateCerradaMultiple(preguntas, errors, correct) {
   preguntas.forEach((pregunta) => {
@@ -101,3 +108,142 @@ function validateCerradaMultiple(preguntas, errors, correct) {
     }
   });
 }
+
+// Post de preguntas con promises
+/**
+ *Crea una promise que se resuelve con el resultado de insertar una respuesta de una pregunta a la tabla "Opciones_Respuestas_Preguntas"
+  Insert no devuelve nada, sin embargo al retornar la promise podemos hacer uso de ella más adelante en un método como Promise.all para ejecutar un conjunto de promises
+ * @param {*} respuesta Respuesta posible a una pregunta
+ * @param {*} idPregunta ID de la pregunta a la que pertenece la respuesta
+ * @returns Una promise que permite subir la respuesta a la base de datos
+ */
+function createRespuestaPromise(respuesta, idPregunta) {
+  return new Promise(function (resolve, reject) {
+    resolve(
+      Opciones_Respuestas_Preguntas.query().insert({
+        ID_Pregunta: idPregunta,
+        Opcion_Respuesta: respuesta.respuestaText,
+      })
+    );
+  });
+}
+/*createRespuestasPromiseArray */
+
+/**
+ * Crea un array que contiene promises de cada una de las respuestas de una pregunta. Al retornar el array podemos hacer uso de estas promises en
+   otros métodos como Promise.all para ejecutar todas todas las promises
+ * @param {*} respuestas Array de respuestas posibles a una pregunta
+ * @param {*} idPregunta ID de la pregunta a la cual pertenecen todas las respuestas
+ * @returns Un array que contiene las promises para crear cada una de las respuestas
+ */
+
+function createRespuestasPromiseArray(respuestas, idPregunta) {
+  var respuestasPromises = [];
+  respuestas.forEach((respuesta) =>
+    respuestasPromises.push(createRespuestaPromise(respuesta, idPregunta))
+  );
+  return respuestasPromises;
+}
+
+/**
+ *
+ * @param {*} pregunta Pregunta la cual se desea agregar a la base de datos
+ * @param {*} idFormulario ID del formulario al cual pertenece la pregunta
+ * @returns Una promise para subir la pregunta a la base de datos
+ */
+
+function createPreguntaPromise(pregunta, idFormulario) {
+  if (pregunta.tipo == 1) {
+    return new Promise(function (resolve, reject) {
+      resolve(
+        Preguntas.query().insertAndFetch({
+          Pregunta: pregunta.preguntaText,
+          Tipo: pregunta.tipo,
+          Opcional: pregunta.opcional,
+        })
+      );
+    }).then((res) =>
+      Preguntas_Formulario.query().insertAndFetch({
+        ID_Pregunta: res.ID,
+        ID_Formulario: idFormulario,
+      })
+    );
+  }
+  if (pregunta.tipo == 2 || pregunta.tipo == 3) {
+    return new Promise(function (resolve, reject) {
+      resolve(
+        Preguntas.query().insertAndFetch({
+          Pregunta: pregunta.preguntaText,
+          Tipo: pregunta.tipo,
+          Opcional: pregunta.opcional,
+        })
+      );
+    })
+      .then((res) =>
+        Preguntas_Formulario.query().insertAndFetch({
+          ID_Pregunta: res.ID,
+          ID_Formulario: idFormulario,
+        })
+      )
+      .then((res) =>
+        createRespuestasPromiseArray(pregunta.respuestas, res.ID_Pregunta)
+      )
+      .then((res) => Promise.all(res));
+  }
+}
+
+/**
+ * Crea un array de promises para cada tipo de pregunta que se tenga en el req.body
+ * @param {*} abiertas Array de preguntas abiertas en el request
+ * @param {*} cerradas Array de preguntas cerradas en el request
+ * @param {*} multiples Array de preguntas multiples en el request
+ * @param {*} formularioID ID (int) del formulario al cual pertenecen las preguntas
+ * @returns Un array que contiene todos los promises necesarios para subir una pregunta de cualquier tipo a la base de datos
+ */
+function createPreguntasBodyArray(abiertas, cerradas, multiples, formularioID) {
+  var promisesPreguntasBody = [];
+  promisesPreguntasBody.push(
+    createPreguntasPromiseArray(abiertas, formularioID)
+  );
+  promisesPreguntasBody.push(
+    createPreguntasPromiseArray(cerradas, formularioID)
+  );
+  promisesPreguntasBody.push(
+    createPreguntasPromiseArray(multiples, formularioID)
+  );
+  return promisesPreguntasBody;
+}
+
+/**
+ * Esta función nos permite crear un array de promises dada una pregunta que se haya mandado en el request
+ * @param {*} preguntas Un array de preguntas al que se desea agregar a la base de datos
+ * @param {*} idFormulario El id del formulario al que pertenecen las preguntas
+ * @returns Un array de promises que permite subir las preguntas a la base de datos
+ */
+
+function createPreguntasPromiseArray(preguntas, idFormulario) {
+  var preguntasPromises = [];
+  preguntas.forEach((pregunta) =>
+    preguntasPromises.push(createPreguntaPromise(pregunta, idFormulario))
+  );
+  return preguntasPromises;
+}
+
+exports.formulario_crear_post = (req, res) => {
+  var IdSession = req.session.IdSession;
+
+  var formularioCreado = Formulario.query()
+    .insertAndFetch({
+      Titulo: req.body.titulo.tituloText,
+      ID_Usuario: IdSession,
+    })
+    .then((formulario) =>
+      createPreguntasBodyArray(
+        req.body.abiertas,
+        req.body.cerradas,
+        req.body.multiples,
+        formulario.ID
+      )
+    )
+    .then((promises) => Promise.all(promises));
+};

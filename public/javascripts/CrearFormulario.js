@@ -144,7 +144,16 @@ function bindPreguntas() {
       headers: { "Content-Type": "application/json" },
     })
       .then((res) => res.json())
-      .then((res) => renderMessages(res));
+      .then((res) => renderMessages(res))
+      .then((res) => {
+        if (res == "ok") {
+          fetch("http://localhost:3000/formulario/crear", {
+            method: "POST",
+            body: JSON.stringify(preguntasFetched),
+            headers: { "Content-Type": "application/json" },
+          });
+        } else console.log("aaaax");
+      });
   }, 1300);
 }
 
@@ -222,18 +231,18 @@ function renderMessages(response) {
     .forEach((element) => element.remove());
 
   if (response.errors.length == 0) {
-    loadingScreen.close();
-    Swal.fire({
-      title: "Listo!",
-      text: "Se ha guardado de manera exitosa tu formulario",
-      icon: "success",
-      confirmButtonText: "Siguiente",
-    }).then((sweetResult) => {
-      if (sweetResult.isConfirmed) {
-        window.location = "http://localhost:3000/registro/info";
-      }
-    });
-    return;
+    // loadingScreen.close();
+    // Swal.fire({
+    //   title: "Listo!",
+    //   text: "Se ha guardado de manera exitosa tu formulario",
+    //   icon: "success",
+    //   confirmButtonText: "Siguiente",
+    // }).then((sweetResult) => {
+    //   if (sweetResult.isConfirmed) {
+    //     window.location = "http://localhost:3000/registro/info";
+    //   }
+    // });
+    return "ok";
   } else {
     response.errors.forEach((error) => {
       var newErrorMessage = document.createElement("div");
