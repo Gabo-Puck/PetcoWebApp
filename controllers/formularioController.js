@@ -6,6 +6,9 @@ var Solicitud = require("../models/Solicitudes");
 var Preguntas_Formulario = require("../models/Preguntas_Formulario");
 const Solicitudes = require("../models/Solicitudes");
 const Opciones_Respuestas_Preguntas = require("../models/Opciones_Respuestas_Preguntas");
+const fetch = require("node-fetch");
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
 
 exports.formularioList = (req, res) => {
   Usuario.query()
@@ -16,6 +19,7 @@ exports.formularioList = (req, res) => {
 exports.formularioPreguntas = (req, res) => {
   Formulario.query()
     .withGraphJoined("Preguntas.[Opciones_Respuestas_Pregunta,Respuestas]")
+    .where("Formulario.ID", "=", "18")
     .then((FormWPreguntas) => res.json(FormWPreguntas));
 };
 
@@ -264,9 +268,57 @@ exports.formulario_crear_post = (req, res) => {
 exports.formDashboard = (req, res) => {
   res.json({ res: "AQUI SE SUPONE QUE VA EL DASHBOARD XD" });
 };
+function promiseFetchDoc(html) {
+  return new Promise(function (resolve, reject) {
+    var parserDOM = new JSDOM(html);
+    // var a = parserDOM.serialize();
 
-exports.formTest = (req, res) => {
-  res.render("Formulario/EditarFormulario");
+    // var doc = new DOMParser().parseFromString(html, "text/html");
+    var response = {};
+    response.doc = parserDOM.serialize().replace(/(\r\n|\n|\r)/gm, "");
+    // console.log(response.doc.abiertaTemplate.cloneNode(true));
+    resolve(response);
+  });
+}
+function promiseFetchTemplate(Formulario) {
+  return new Promise(function (resolve, reject) {
+    resolve(fetch("http://localhost:3000/formulario/preguntaTemplate"));
+    // .then((res) => res.text())
+    // .then((html) => {});
+  })
+    .then((res) => res.text())
+    .then(
+      (html) => promiseFetchDoc(html)
+
+      // var parserDOM = new DOMParser();
+      // var doc = new DOMParser().parseFromString(html, "text/html");
+
+      // preguntaAbierta = doc.querySelector(".preguntaAbierta").cloneNode(true);
+      // preguntaCerrada = doc.querySelector(".preguntaCerrada").cloneNode(true);
+      // preguntaMultiple = doc.querySelector(".preguntaMultiple").cloneNode(true);
+      // respuestaCerrada = doc.querySelector(".respCerr").cloneNode(true);
+      // respuestaMultiple = doc.querySelector(".respMult").cloneNode(true);
+    )
+    .then((response) => {
+      response.Formulario = Formulario;
+      return response;
+    });
+}
+exports.formulario_edit_get = (req, res) => {
+  console.log("a");
+  Formulario.query()
+    .withGraphJoined("Preguntas.[Opciones_Respuestas_Pregunta,Respuestas]")
+    .where("Formulario.ID", "=", "16")
+    // .then((FormWPreguntas) => FormWPreguntas.json())
+    .then((Formulario) => promiseFetchTemplate(Formulario))
+    .then((response) => {
+      // console.log(FormWPreguntas);
+      console.log(response);
+      res.render("Formulario/EditarFormulario", {
+        Response: response,
+      });
+    });
+  // res.render("Formulario/EditarFormulario");
   // res.render("Formulario/PreguntasTemplate", {}, (err, html) => {
   //   res.send(html);
   // });

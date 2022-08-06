@@ -1,38 +1,55 @@
-{
-  "titulo": {
-    "tituloText": "Formulario de prueba ahora si final XD",
-    "formID": "titulo"
-  },
-  "abiertas": [
-    {
-      "preguntaText": "¿Como te llamas aaaaaaaaaaaaa?",
-      "tipo": 1,
-      "opcional": true,
-      "formID": "preg0"
-    }
-  ],
-  "cerradas": [
-    {
-      "preguntaText": "Que te gusta más de estas opciones",
-      "tipo": 2,
-      "opcional": true,
-      "respuestas": [
-        { "respuestaText": "Verde", "formID": "resp0" },
-        { "respuestaText": "Azul", "formID": "resp2" }
-      ],
-      "formID": "preg1"
-    }
-  ],
-  "multiples": [
-    {
-      "preguntaText": "De verdad te gusta el verde?",
-      "tipo": 3,
-      "opcional": true,
-      "respuestas": [
-        { "respuestaText": "verde", "formID": "resp1" },
-        { "respuestaText": "verde?", "formID": "resp3" }
-      ],
-      "formID": "preg2"
-    }
-  ]
-}
+[
+  {
+    "ID": 18,
+    "Titulo": "aaaaaaaaaaaaaaaaaaaaaaaa",
+    "ID_Usuario": null,
+    "Preguntas": [
+      {
+        "ID": 35,
+        "Pregunta": "aaaaaaaaaaaaaaaaaaaaaaaa",
+        "Tipo": 1,
+        "Opcional": 1,
+        "Opciones_Respuestas_Pregunta": [],
+        "Respuestas": []
+      },
+      {
+        "ID": 36,
+        "Pregunta": "aaaaaaaaaaaaaaaaaaaaaaaa",
+        "Tipo": 2,
+        "Opcional": 1,
+        "Opciones_Respuestas_Pregunta": [
+          {
+            "ID": 33,
+            "ID_Pregunta": 36,
+            "Opcion_Respuesta": "aaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          {
+            "ID": 34,
+            "ID_Pregunta": 36,
+            "Opcion_Respuesta": "aaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        ],
+        "Respuestas": []
+      },
+      {
+        "ID": 37,
+        "Pregunta": "aaaaaaaaaaaaaaaaaaaaaaaa",
+        "Tipo": 3,
+        "Opcional": 1,
+        "Opciones_Respuestas_Pregunta": [
+          {
+            "ID": 35,
+            "ID_Pregunta": 37,
+            "Opcion_Respuesta": "aaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          {
+            "ID": 36,
+            "ID_Pregunta": 37,
+            "Opcion_Respuesta": "aaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        ],
+        "Respuestas": []
+      }
+    ]
+  }
+]

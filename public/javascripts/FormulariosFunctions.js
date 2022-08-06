@@ -73,11 +73,12 @@ export function bindPreguntas(
   preguntasCerradas,
   preguntasMultiples,
   url,
-  document
+  document,
+  urlUpdate
 ) {
-  var preguntasAbiertas = document.querySelectorAll(".preguntaAbierta");
-  var preguntasCerradas = document.querySelectorAll(".preguntaCerrada");
-  var preguntasMultiples = document.querySelectorAll(".preguntaMultiple");
+  // var preguntasAbiertas = document.querySelectorAll(".preguntaAbierta");
+  // var preguntasCerradas = document.querySelectorAll(".preguntaCerrada");
+  // var preguntasMultiples = document.querySelectorAll(".preguntaMultiple");
   var error = [];
   var titulo = document.querySelector("#titulo");
   loadingScreen.fire();
@@ -130,7 +131,7 @@ export function bindPreguntas(
     })
       .then((res) => res.json())
       .then((res) => renderMessages(res, document))
-      .then((res) => responseFetch(res, preguntasFetched))
+      .then((res) => responseFetch(res, preguntasFetched, urlUpdate))
       .then((res) => res.json())
       .then((res) => {
         if (res.response == "ok") {
@@ -181,19 +182,7 @@ export function renderMessages(response, document) {
     .querySelectorAll(".valid-feedback")
     .forEach((element) => element.remove());
 
-  if (response.errors.length == 0) {
-    // loadingScreen.close();
-    // Swal.fire({
-    //   title: "Listo!",
-    //   text: "Se ha guardado de manera exitosa tu formulario",
-    //   icon: "success",
-    //   confirmButtonText: "Siguiente",
-    // }).then((sweetResult) => {
-    //   if (sweetResult.isConfirmed) {
-    //     window.location = "http://localhost:3000/registro/info";
-    //   }
-    // });
-
+  if (response.errors.length == 0 && response.globalError.length == 0) {
     return "ok";
   } else {
     if (response.correct.length >= 1) {
@@ -273,11 +262,11 @@ export function insertAfter(referenceNode, newNode) {
   referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 }
 
-export function responseFetch(res, preguntasFetched) {
+export function responseFetch(res, preguntasFetched, url) {
   if (res == "ok") {
     return new Promise(function (resolve, reject) {
       resolve(
-        fetch("http://localhost:3000/formulario/crear", {
+        fetch(url, {
           method: "POST",
           body: JSON.stringify(preguntasFetched),
           headers: { "Content-Type": "application/json" },
@@ -301,23 +290,44 @@ export function retrieveParent(child, parentNameclass) {
   }
 }
 
-export function addRespuestaCerrada(target, contRespuesta, respuestaCerrada) {
+export function addRespuestaCerrada(
+  target,
+  contRespuesta,
+  respuestaCerrada,
+  predefined = "",
+  id = ""
+) {
   contRespuesta = contRespuesta + 1;
   var respuestaCerradaClone = respuestaCerrada.cloneNode(true);
   respuestaCerradaClone.id = `resp${contRespuesta}`;
+  respuestaCerradaClone.querySelector("textarea").value = predefined;
+  if (id !== "") {
+    respuestaCerradaClone.classList.add(`respuestaLoaded${id}`);
+  }
   respuestaCerradaClone
     .querySelector(".eliminarButtonRespuesta")
     .addEventListener("click", (e) => {
       selectParent(e.target, "respuesta");
     });
   target.parentNode.insertBefore(respuestaCerradaClone, target);
+
   return contRespuesta;
 }
 
-export function addRespuestaMultiple(target, contRespuesta, respuestaMultiple) {
+export function addRespuestaMultiple(
+  target,
+  contRespuesta,
+  respuestaMultiple,
+  predefined = "",
+  id = ""
+) {
   contRespuesta = contRespuesta + 1;
   var respuestaMultipleClone = respuestaMultiple.cloneNode(true);
   respuestaMultipleClone.id = `resp${contRespuesta}`;
+  respuestaMultipleClone.querySelector("textarea").value = predefined;
+  if (id !== "") {
+    respuestaMultipleClone.classList.add(`respuestaLoaded${id}`);
+  }
   respuestaMultipleClone
     .querySelector(".eliminarButtonRespuesta")
     .addEventListener("click", (e) => {

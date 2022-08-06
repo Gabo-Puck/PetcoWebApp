@@ -25,7 +25,6 @@ $(function () {
       preguntaMultiple = doc.querySelector(".preguntaMultiple").cloneNode(true);
       respuestaCerrada = doc.querySelector(".respCerr").cloneNode(true);
       respuestaMultiple = doc.querySelector(".respMult").cloneNode(true);
-      //   console.log(doc);
     });
 });
 
@@ -47,7 +46,8 @@ const guardarButton = document
       document.querySelectorAll(".preguntaCerrada"),
       document.querySelectorAll(".preguntaMultiple"),
       "http://localhost:3000/formulario/info",
-      document
+      document,
+      "http://localhost:3000/formulario/crear"
     );
   });
 var contPregunta = 0;
