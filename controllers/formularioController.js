@@ -264,3 +264,16 @@ exports.formulario_crear_post = (req, res) => {
 exports.formDashboard = (req, res) => {
   res.json({ res: "AQUI SE SUPONE QUE VA EL DASHBOARD XD" });
 };
+
+exports.formTest = (req, res) => {
+  res.render("Formulario/EditarFormulario");
+  // res.render("Formulario/PreguntasTemplate", {}, (err, html) => {
+  //   res.send(html);
+  // });
+};
+
+exports.formTest2 = (req, res) => {
+  res.render("Formulario/PreguntasTemplate", {}, (err, html) => {
+    res.send(html);
+  });
+};

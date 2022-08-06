@@ -1,25 +1,38 @@
 {
-  "titulo": { "tituloText": "", "formID": "titulo" },
+  "titulo": {
+    "tituloText": "Formulario de prueba ahora si final XD",
+    "formID": "titulo"
+  },
   "abiertas": [
-    { "preguntaText": "", "tipo": 1, "opcional": true, "formID": "pregunta0" },
-    { "preguntaText": "", "tipo": 1, "opcional": true, "formID": "pregunta3" }
+    {
+      "preguntaText": "¿Como te llamas aaaaaaaaaaaaa?",
+      "tipo": 1,
+      "opcional": true,
+      "formID": "preg0"
+    }
   ],
   "cerradas": [
     {
-      "preguntaText": "",
+      "preguntaText": "Que te gusta más de estas opciones",
       "tipo": 2,
       "opcional": true,
-      "respuestas": [{ "respuesta": "", "formID": "resp0" }],
-      "formID": "pregunta1"
+      "respuestas": [
+        { "respuestaText": "Verde", "formID": "resp0" },
+        { "respuestaText": "Azul", "formID": "resp2" }
+      ],
+      "formID": "preg1"
     }
   ],
   "multiples": [
     {
-      "preguntaText": "",
+      "preguntaText": "De verdad te gusta el verde?",
       "tipo": 3,
       "opcional": true,
-      "respuestas": [{ "respuesta": "", "formID": "resp1" }],
-      "formID": "pregunta2"
+      "respuestas": [
+        { "respuestaText": "verde", "formID": "resp1" },
+        { "respuestaText": "verde?", "formID": "resp3" }
+      ],
+      "formID": "preg2"
     }
   ]
 }

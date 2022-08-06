@@ -1,0 +1,371 @@
+<form class="mx-3 my-5">
+  <div class="my-2">
+    <label class="" for="titulo">Titulo:</label>
+    <input
+      type="text"
+      id="titulo"
+      class="form-control"
+      placeholder="Titulo del formulario"
+    />
+  </div>
+
+  <!-- Pregunta abierta -->
+  <div class="form-row preguntaAbierta pregContainer mb-3 px-2 py-1" id="preg0">
+    <div class="input-group">
+      <div class="input-group-text d-none d-sm-flex">
+        <div class="form-check form-switch">
+          <input
+            class="form-check-input opcionalLg"
+            type="checkbox"
+            checked=""
+            name=""
+          />
+          <label for="isRequired" class="form-check-label">Opcional</label>
+        </div>
+      </div>
+      <div class="form-floating form-floating-group">
+        <input
+          type="text"
+          name=""
+          class="form-control preguntaText"
+          placeholder="Pregunta"
+        />
+
+        <label for="">Escribe tu pregunta aquí</label>
+      </div>
+      <div class="input-group-text d-none d-sm-flex eliminarBox">
+        <button type="button" class="btn btn-danger btn-sm eliminarButton">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+      <!-- View on mobile -->
+      <div class="input-group-text d-flex d-sm-none eliminarBox mobileView">
+        <button type="button" class="btn btn-info btn-sm configButton">
+          <!-- onclick="this.parentNode.parentNode.parentNode.remove()" -->
+          <i class="fa-solid fa-ellipsis-vertical"></i>
+        </button>
+        <!-- Modal -->
+        <div
+          class="modal fade"
+          id="exampleModal"
+          tabindex="-1"
+          aria-labelledby="exampleModalLabel"
+          data-bs-backdrop="static"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">
+                  Pregunta Configuración
+                </h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <div class="d-flex flex-column my-3">
+                  <button
+                    type="button"
+                    class="btn btn-danger btn-sm eliminarButton mb-5 mx-auto"
+                    style="width: 80%"
+                    data-bs-dismiss="modal"
+                  >
+                    Eliminar
+                  </button>
+                  <div
+                    class="form-check form-switch d-flex justify-content-center"
+                  >
+                    <div>
+                      <input
+                        class="form-check-input opcionalMb"
+                        type="checkbox"
+                        checked=""
+                        name=""
+                      />
+                      <label for="isRequired" class="form-check-label"
+                        >Opcional</label
+                      >
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                  >
+                    Cerrar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pregunta cerrada -->
+  <div class="form-row preguntaCerrada pregContainer mb-3 px-2 py-1" id="preg1">
+    <div class="input-group mb-3">
+      <div class="input-group-text d-none d-sm-flex">
+        <div class="form-check form-switch">
+          <input
+            class="form-check-input opcionalLg"
+            type="checkbox"
+            checked=""
+            name=""
+          />
+          <label for="isRequired" class="form-check-label">Opcional</label>
+        </div>
+      </div>
+      <div class="form-floating form-floating-group">
+        <input
+          type="text"
+          name=""
+          class="form-control preguntaText"
+          placeholder="Pregunta"
+        />
+        <label for="">Escribe tu pregunta aquí</label>
+      </div>
+      <div class="input-group-text d-none d-sm-flex eliminarBox">
+        <button type="button" class="btn btn-danger btn-sm eliminarButton">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+
+      <!-- View on mobile -->
+      <div class="input-group-text d-flex d-sm-none eliminarBox mobileView">
+        <button type="button" class="btn btn-info btn-sm configButton">
+          <!-- onclick="this.parentNode.parentNode.parentNode.remove()" -->
+          <i class="fa-solid fa-ellipsis-vertical"></i>
+        </button>
+        <!-- Modal -->
+        <div
+          class="modal fade"
+          id="exampleModal"
+          tabindex="-1"
+          aria-labelledby="exampleModalLabel"
+          data-bs-backdrop="static"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">
+                  Pregunta Configuración
+                </h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <div class="d-flex flex-column my-3">
+                  <button
+                    type="button"
+                    class="btn btn-danger btn-sm eliminarButton mb-5 mx-auto"
+                    style="width: 80%"
+                    data-bs-dismiss="modal"
+                  >
+                    Eliminar
+                  </button>
+                  <div
+                    class="form-check form-switch d-flex justify-content-center"
+                  >
+                    <div>
+                      <input
+                        class="form-check-input opcionalMb"
+                        type="checkbox"
+                        checked=""
+                        name=""
+                      />
+                      <label for="isRequired" class="form-check-label"
+                        >Opcional</label
+                      >
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                  >
+                    Cerrar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group ms-4 me-0 mb-4 respuestas" style="width: 90%">
+      <button
+        class="btn btn-outline-info agregarRespuesta"
+        type="button"
+        style="width: 100%"
+      >
+        Agregar respuesta
+      </button>
+    </div>
+  </div>
+
+  <!-- Pregunta Multiple -->
+  <div
+    class="form-row preguntaMultiple pregContainer mb-3 px-2 py-1"
+    id="preg2"
+  >
+    <div class="input-group mb-3">
+      <div class="input-group-text d-none d-sm-flex">
+        <div class="form-check form-switch">
+          <input
+            class="form-check-input opcionalLg"
+            type="checkbox"
+            checked=""
+            name=""
+          />
+          <label for="isRequired" class="form-check-label">Opcional</label>
+        </div>
+      </div>
+      <div class="form-floating form-floating-group">
+        <input
+          type="text"
+          name=""
+          class="form-control preguntaText"
+          placeholder="Pregunta"
+        />
+        <label for="">Escribe tu pregunta aquí</label>
+      </div>
+      <div class="input-group-text d-none d-sm-flex eliminarBox">
+        <button type="button" class="btn btn-danger btn-sm eliminarButton">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+      <!-- View on mobile -->
+      <div class="input-group-text d-flex d-sm-none eliminarBox mobileView">
+        <button type="button" class="btn btn-info btn-sm configButton">
+          <!-- onclick="this.parentNode.parentNode.parentNode.remove()" -->
+          <i class="fa-solid fa-ellipsis-vertical"></i>
+        </button>
+        <!-- Modal -->
+        <div
+          class="modal fade"
+          id="exampleModal"
+          tabindex="-1"
+          aria-labelledby="exampleModalLabel"
+          data-bs-backdrop="static"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">
+                  Pregunta Configuración
+                </h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <div class="d-flex flex-column my-3">
+                  <button
+                    type="button"
+                    class="btn btn-danger btn-sm eliminarButton mb-5 mx-auto"
+                    style="width: 80%"
+                    data-bs-dismiss="modal"
+                  >
+                    Eliminar
+                  </button>
+                  <div
+                    class="form-check form-switch d-flex justify-content-center"
+                  >
+                    <div>
+                      <input
+                        class="form-check-input opcionalMb"
+                        type="checkbox"
+                        checked=""
+                        name=""
+                      />
+                      <label for="isRequired" class="form-check-label"
+                        >Opcional</label
+                      >
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                  >
+                    Cerrar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group ms-4 me-0 mb-4 respuestas" style="width: 90%">
+      <button
+        class="btn btn-outline-info agregarRespuesta"
+        type="button"
+        style="width: 100%"
+      >
+        Agregar respuesta
+      </button>
+    </div>
+  </div>
+
+  <!-- Respuesta cerrada -->
+  <div class="input-group mb-3 respuesta respCerr">
+    <div class="input-group-text" style="background-color: transparent">
+      <i class="fa-regular fa-circle"></i>
+    </div>
+    <textarea
+      name=""
+      class="form-control"
+      placeholder="Hola! Soy una respuesta"
+    ></textarea>
+    <div class="input-group-text eliminarBox">
+      <button
+        type="button"
+        class="btn btn-danger btn-sm eliminarButtonRespuesta"
+      >
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Respuesta multiple -->
+  <div class="input-group mb-3 respuesta respMult">
+    <div class="input-group-text" style="background-color: transparent">
+      <i class="fa-regular fa-square"></i>
+    </div>
+    <textarea
+      name=""
+      class="form-control"
+      placeholder="Hola! Soy una respuesta"
+    ></textarea>
+    <div class="input-group-text eliminarBox">
+      <button
+        type="button"
+        class="btn btn-danger btn-sm eliminarButtonRespuesta"
+      >
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    </div>
+  </div>
+</form>
