@@ -12,6 +12,7 @@ router.post("/verify", formularioController.verifyFormulario);
 router.post("/crear", formularioController.formulario_crear_post);
 router.get("/info", formularioController.formDashboard);
 router.get("/editar", formularioController.formulario_edit_get);
+router.post("/editar", formularioController.formulario_edit_post);
 router.get("/preguntaTemplate", formularioController.formTest2);
 
 module.exports = router;

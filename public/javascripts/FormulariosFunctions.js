@@ -1,9 +1,47 @@
-export function addPregunta(preguntaPrototype, form, contPregunta) {
+function removeItemOnce(arr, value) {
+  var index = arr.indexOf(value);
+  if (index > -1) {
+    arr.splice(index, 1);
+  }
+  return arr;
+}
+
+export function addPregunta(
+  preguntaPrototype,
+  form,
+  contPregunta,
+  Formulario = "",
+  arrayPregElim = "",
+  arrayRespElim = ""
+) {
   var newPregunta = preguntaPrototype.cloneNode(true);
   contPregunta = contPregunta + 1;
   newPregunta.id = `preg${contPregunta}`;
   newPregunta.querySelectorAll(".eliminarButton").forEach((button) => {
     button.addEventListener("click", (e) => {
+      if (Formulario !== "") {
+        var parent = retrieveParent(e.target, "pregContainer");
+        // var a = document.querySelector("");
+        parent.classList.forEach((classItem) => {
+          if (classItem.length >= 3) {
+            var aa = "aa";
+            var classSlice = classItem.split("-", 2);
+            if (classSlice[0] == "pid") {
+              Formulario.Preguntas.forEach((Pregunta) => {
+                if (Pregunta.ID == classSlice[1]) {
+                  arrayPregElim.push(Pregunta);
+                  Formulario.Preguntas = removeItemOnce(
+                    Formulario.Preguntas,
+                    Pregunta
+                  );
+                }
+              });
+            }
+          }
+        });
+        parent.classList.contains;
+        console.log(arrayPregElim);
+      }
       selectParent(e.target, "pregContainer");
     });
   });
@@ -264,6 +302,7 @@ export function insertAfter(referenceNode, newNode) {
 
 export function responseFetch(res, preguntasFetched, url) {
   if (res == "ok") {
+    console.log(preguntasFetched);
     return new Promise(function (resolve, reject) {
       resolve(
         fetch(url, {
@@ -295,18 +334,47 @@ export function addRespuestaCerrada(
   contRespuesta,
   respuestaCerrada,
   predefined = "",
-  id = ""
+  id = "",
+  Pregunta = "",
+  arrayRespuestasEliminadas = ""
 ) {
   contRespuesta = contRespuesta + 1;
   var respuestaCerradaClone = respuestaCerrada.cloneNode(true);
   respuestaCerradaClone.id = `resp${contRespuesta}`;
   respuestaCerradaClone.querySelector("textarea").value = predefined;
   if (id !== "") {
-    respuestaCerradaClone.classList.add(`respuestaLoaded${id}`);
+    respuestaCerradaClone.classList.add("respuestaLoaded", `rid-${id}`);
+  } else {
+    respuestaCerradaClone.classList.add("newRespuesta");
   }
   respuestaCerradaClone
     .querySelector(".eliminarButtonRespuesta")
     .addEventListener("click", (e) => {
+      if (Formulario !== "") {
+        var parent = retrieveParent(e.target, "respuesta");
+        // var a = document.querySelector("");
+        var idPregunta;
+        parent.classList.forEach((classItem) => {
+          if (classItem.length >= 3) {
+            var aa = "aa";
+            var classSlice = classItem.split("-", 2);
+            if (classSlice[0] == "rid") {
+              Pregunta.Opciones_Respuestas_Pregunta.forEach((respuesta) => {
+                if (respuesta.ID == classSlice[1]) {
+                  arrayRespuestasEliminadas.push(respuesta);
+                  Pregunta.Opciones_Respuestas_Pregunta.Preguntas =
+                    removeItemOnce(
+                      Pregunta.Opciones_Respuestas_Pregunta,
+                      respuesta
+                    );
+                }
+              });
+            }
+          }
+        });
+        parent.classList.contains;
+        console.log(arrayRespuestasEliminadas);
+      }
       selectParent(e.target, "respuesta");
     });
   target.parentNode.insertBefore(respuestaCerradaClone, target);
@@ -319,20 +387,50 @@ export function addRespuestaMultiple(
   contRespuesta,
   respuestaMultiple,
   predefined = "",
-  id = ""
+  id = "",
+  Pregunta = "",
+  arrayRespuestasEliminadas = ""
 ) {
   contRespuesta = contRespuesta + 1;
   var respuestaMultipleClone = respuestaMultiple.cloneNode(true);
   respuestaMultipleClone.id = `resp${contRespuesta}`;
   respuestaMultipleClone.querySelector("textarea").value = predefined;
   if (id !== "") {
-    respuestaMultipleClone.classList.add(`respuestaLoaded${id}`);
+    respuestaMultipleClone.classList.add("respuestaLoaded", `rid-${id}`);
+  } else {
+    respuestaMultipleClone.classList.add("newRespuesta");
   }
   respuestaMultipleClone
     .querySelector(".eliminarButtonRespuesta")
     .addEventListener("click", (e) => {
+      if (Formulario !== "") {
+        var parent = retrieveParent(e.target, "respuesta");
+        // var a = document.querySelector("");
+        var idPregunta;
+        parent.classList.forEach((classItem) => {
+          if (classItem.length >= 3) {
+            var aa = "aa";
+            var classSlice = classItem.split("-", 2);
+            if (classSlice[0] == "rid") {
+              Pregunta.Opciones_Respuestas_Pregunta.forEach((respuesta) => {
+                if (respuesta.ID == classSlice[1]) {
+                  arrayRespuestasEliminadas.push(respuesta);
+                  Pregunta.Opciones_Respuestas_Pregunta.Preguntas =
+                    removeItemOnce(
+                      Pregunta.Opciones_Respuestas_Pregunta,
+                      respuesta
+                    );
+                }
+              });
+            }
+          }
+        });
+        parent.classList.contains;
+        console.log(arrayRespuestasEliminadas);
+      }
       selectParent(e.target, "respuesta");
     });
+
   target.parentNode.insertBefore(respuestaMultipleClone, target);
   return contRespuesta;
 }

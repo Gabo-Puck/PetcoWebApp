@@ -324,6 +324,11 @@ exports.formulario_edit_get = (req, res) => {
   // });
 };
 
+exports.formulario_edit_post = (req, res) => {
+  console.log(req.body);
+  res.json({ response: "ok" });
+};
+
 exports.formTest2 = (req, res) => {
   res.render("Formulario/PreguntasTemplate", {}, (err, html) => {
     res.send(html);
