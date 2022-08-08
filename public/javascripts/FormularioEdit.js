@@ -325,8 +325,12 @@ function fetchPreguntas(preguntasFetched, res) {
         });
       });
 
-      bindPreguntasConRespuestas(preguntasCerradasArray, preguntasCerradas);
-      bindPreguntasConRespuestas(preguntasMultiplesArray, preguntasMultiples);
+      bindPreguntasConRespuestas(preguntasCerradasArray, preguntasCerradas, 2);
+      bindPreguntasConRespuestas(
+        preguntasMultiplesArray,
+        preguntasMultiples,
+        3
+      );
 
       var preguntas = document.querySelectorAll(".preguntaLoaded");
       var preguntasMod = [];
