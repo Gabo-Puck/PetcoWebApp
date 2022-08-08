@@ -282,57 +282,63 @@ function promiseFetchDoc(html) {
     resolve(response);
   });
 }
-function promiseFetchTemplate(Formulario) {
+function promiseFetchTemplate(Formulario, res) {
   if (Formulario.length == 0) {
     return "";
   }
-  return new Promise(function (resolve, reject) {
-    resolve(fetch("http://localhost:3000/formulario/preguntaTemplate"));
-    // .then((res) => res.text())
-    // .then((html) => {});
-  })
-    .then((res) => res.text())
-    .then(
-      (html) => promiseFetchDoc(html)
+  return (
+    new Promise(function (resolve, reject) {
+      resolve(res.templatePreguntas);
+      // .then((res) => res.text())
+      // .then((html) => {});
+    })
+      // .then((res) => res.text())
+      .then(
+        (html) => promiseFetchDoc(html)
 
-      // var parserDOM = new DOMParser();
-      // var doc = new DOMParser().parseFromString(html, "text/html");
+        // var parserDOM = new DOMParser();
+        // var doc = new DOMParser().parseFromString(html, "text/html");
 
-      // preguntaAbierta = doc.querySelector(".preguntaAbierta").cloneNode(true);
-      // preguntaCerrada = doc.querySelector(".preguntaCerrada").cloneNode(true);
-      // preguntaMultiple = doc.querySelector(".preguntaMultiple").cloneNode(true);
-      // respuestaCerrada = doc.querySelector(".respCerr").cloneNode(true);
-      // respuestaMultiple = doc.querySelector(".respMult").cloneNode(true);
-    )
-    .then((response) => {
-      response.Formulario = Formulario;
-      return response;
-    });
+        // preguntaAbierta = doc.querySelector(".preguntaAbierta").cloneNode(true);
+        // preguntaCerrada = doc.querySelector(".preguntaCerrada").cloneNode(true);
+        // preguntaMultiple = doc.querySelector(".preguntaMultiple").cloneNode(true);
+        // respuestaCerrada = doc.querySelector(".respCerr").cloneNode(true);
+        // respuestaMultiple = doc.querySelector(".respMult").cloneNode(true);
+      )
+      .then((response) => {
+        response.Formulario = Formulario;
+        return response;
+      })
+  );
 }
-exports.formulario_edit_get = (req, res) => {
-  var IdSession = req.session.IdSession;
-  console.log("a");
-  Formulario.query()
-    .withGraphJoined("Preguntas.[Opciones_Respuestas_Pregunta,Respuestas]")
-    .where("Formulario.ID", "=", req.params.idFormulario)
-    .andWhere("Formulario.ID_Usuario", "=", IdSession)
-    // .then((FormWPreguntas) => FormWPreguntas.json())
-    .then((Formulario) => promiseFetchTemplate(Formulario))
-    .then((response) => {
-      // console.log(FormWPreguntas);
-      if (response == "") {
-        res.redirect(200, "/info");
-      }
-      console.log(response);
-      res.render("Formulario/EditarFormulario", {
-        Response: response,
+exports.formulario_edit_get = [
+  getTemplatePreguntas,
+  (req, res) => {
+    var IdSession = req.session.IdSession;
+    res.permiso = true;
+    // console.log("a");
+    Formulario.query()
+      .withGraphJoined("Preguntas.[Opciones_Respuestas_Pregunta,Respuestas]")
+      .where("Formulario.ID", "=", req.params.idFormulario)
+      .andWhere("Formulario.ID_Usuario", "=", IdSession)
+      // .then((FormWPreguntas) => FormWPreguntas.json())
+      .then((Formulario) => promiseFetchTemplate(Formulario, res))
+      .then((response) => {
+        // console.log(FormWPreguntas);
+        if (response == "") {
+          res.redirect(200, "/info");
+        }
+        console.log(response);
+        res.render("Formulario/EditarFormulario", {
+          Response: response,
+        });
       });
-    });
-  // res.render("Formulario/EditarFormulario");
-  // res.render("Formulario/PreguntasTemplate", {}, (err, html) => {
-  //   res.send(html);
-  // });
-};
+    // res.render("Formulario/EditarFormulario");
+    // res.render("Formulario/PreguntasTemplate", {}, (err, html) => {
+    //   res.send(html);
+    // });
+  },
+];
 
 exports.formulario_edit_post = (req, res) => {
   console.log(req.body);
@@ -366,12 +372,18 @@ exports.formulario_edit_post = (req, res) => {
       .then(res.json({ response: "ok" }));
   }
 };
+function getTemplatePreguntas(req, res, next) {
+  res.render("Formulario/PreguntasTemplate", {}, (err, html) => {
+    res.templatePreguntas = html;
+    console.log(`Este es html: \n${html}`);
+    next();
+  });
+}
 
 exports.formTest2 = (req, res) => {
   res.render("Formulario/PreguntasTemplate", {}, (err, html) => {
     res.send(html);
   });
-  Formulario.query().deleteById();
 };
 
 function deleteContenidos(contenidos, tabla) {

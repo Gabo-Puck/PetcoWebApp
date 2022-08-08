@@ -15,7 +15,7 @@ import {
 } from "/javascripts/FormulariosFunctions.js";
 
 $(function () {
-  fetch("http://localhost:3000/formulario/preguntaTemplate")
+  fetch("http://localhost:3000/petco/formulario/preguntaTemplate")
     .then((res) => res.text())
     .then((html) => {
       var parserDOM = new DOMParser();
@@ -45,9 +45,9 @@ const guardarButton = document
       document.querySelectorAll(".preguntaAbierta"),
       document.querySelectorAll(".preguntaCerrada"),
       document.querySelectorAll(".preguntaMultiple"),
-      "http://localhost:3000/formulario/info",
+      "http://localhost:3000/petco/formulario/info",
       document,
-      "http://localhost:3000/formulario/crear"
+      "http://localhost:3000/petco/formulario/crear"
     );
   });
 var contPregunta = 0;

@@ -47,7 +47,10 @@ function isLogged(req, res, next) {
   if (IdSession) {
     next();
   } else {
-    res.redirect("http://localhost:3000/login");
+    if (res.permiso == true) {
+      next();
+    }
+    return res.redirect("http://localhost:3000/login");
   }
 }
 // catch 404 and forward to error handler

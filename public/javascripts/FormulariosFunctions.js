@@ -162,7 +162,7 @@ export function bindPreguntas(
   //Post with fetch and promises
   const header = new Headers();
   setTimeout(() => {
-    var response = fetch("http://localhost:3000/formulario/verify", {
+    var response = fetch("http://localhost:3000/petco/formulario/verify", {
       method: "POST",
       body: JSON.stringify(preguntasFetched),
       headers: { "Content-Type": "application/json" },

@@ -41,19 +41,18 @@
       border-width: 0 !important;
     }
   </style>
+  <script>
+    const doc = new DOMParser();
+    const docTemplate = '<%-Response.doc%>'
+    const docParsed = doc.parseFromString(docTemplate,"text/html");
+    const Formulario = <%-JSON.stringify(Response.Formulario[0])%>;
+
+
+
+
+    console.log(Formulario);
+  </script>
   <body>
-    <script>
-      const doc = new DOMParser();
-      const docTemplate = '<%-Response.doc%>'
-      const docParsed = doc.parseFromString(docTemplate,"text/html");
-      const Formulario = <%-JSON.stringify(Response.Formulario[0])%>;
-
-
-
-
-      console.log(Formulario);
-    </script>
-
     <h1 class="d-flex justify-content-center">Crear formulario</h1>
     <form class="mx-3 my-5">
       <div class="my-2">
