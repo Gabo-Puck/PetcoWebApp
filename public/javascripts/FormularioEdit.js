@@ -419,6 +419,7 @@ function fetchPreguntas(preguntasFetched, res) {
       resolveValue["response"] = "ok";
       resolveValue["titulo"] = preguntasFetched.titulo;
       resolveValue["ID"] = Formulario.ID;
+      resolveValue["ID_Usuario"] = Formulario.ID_Usuario;
       console.log(preguntasFetched);
       resolve(resolveValue);
     } else {

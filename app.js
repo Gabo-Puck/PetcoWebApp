@@ -14,6 +14,7 @@ var registroRouter = require("./routes/registro");
 var vacunasRouter = require("./routes/vacunas");
 var formulariosRouter = require("./routes/formulariosRouter");
 var loginRouter = require("./routes/login");
+var authRequired = require("./routes/authRequired");
 
 var app = express();
 
@@ -35,13 +36,20 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/", indexRouter);
-app.use("/users", usersRouter);
+app.use("/inicio", indexRouter);
+app.use("/petco", isLogged, authRequired);
 app.use("/registro", registroRouter);
-app.use("/ve", vacunasRouter);
-app.use("/formulario", formulariosRouter);
+// app.use("/formulario", formulariosRouter);
 app.use("/login", loginRouter);
 
+function isLogged(req, res, next) {
+  var IdSession = req.session.IdSession;
+  if (IdSession) {
+    next();
+  } else {
+    res.redirect("http://localhost:3000/login");
+  }
+}
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));

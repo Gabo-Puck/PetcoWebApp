@@ -283,6 +283,9 @@ function promiseFetchDoc(html) {
   });
 }
 function promiseFetchTemplate(Formulario) {
+  if (Formulario.length == 0) {
+    return "";
+  }
   return new Promise(function (resolve, reject) {
     resolve(fetch("http://localhost:3000/formulario/preguntaTemplate"));
     // .then((res) => res.text())
@@ -307,14 +310,19 @@ function promiseFetchTemplate(Formulario) {
     });
 }
 exports.formulario_edit_get = (req, res) => {
+  var IdSession = req.session.IdSession;
   console.log("a");
   Formulario.query()
     .withGraphJoined("Preguntas.[Opciones_Respuestas_Pregunta,Respuestas]")
-    .where("Formulario.ID", "=", "46")
+    .where("Formulario.ID", "=", req.params.idFormulario)
+    .andWhere("Formulario.ID_Usuario", "=", IdSession)
     // .then((FormWPreguntas) => FormWPreguntas.json())
     .then((Formulario) => promiseFetchTemplate(Formulario))
     .then((response) => {
       // console.log(FormWPreguntas);
+      if (response == "") {
+        res.redirect(200, "/info");
+      }
       console.log(response);
       res.render("Formulario/EditarFormulario", {
         Response: response,
@@ -329,31 +337,34 @@ exports.formulario_edit_get = (req, res) => {
 exports.formulario_edit_post = (req, res) => {
   console.log(req.body);
 
-  deleteContenidos(req.body.contenidoEliminado.preguntas, Preguntas)
-    .then(
-      deleteContenidos(
-        req.body.contenidoEliminado.respuestas,
-        Opciones_Respuestas_Preguntas
+  var IdSession = req.session.IdSession;
+  if (req.body.ID_Usuario != IdSession) {
+    res.redirect(200, "/info");
+  } else {
+    deleteContenidos(req.body.contenidoEliminado.preguntas, Preguntas)
+      .then(
+        deleteContenidos(
+          req.body.contenidoEliminado.respuestas,
+          Opciones_Respuestas_Preguntas
+        )
       )
-    )
-    .then(updateContenidos(req.body.contenidoCambiado.preguntas, Preguntas))
-    .then(
-      updateContenidos(
-        req.body.contenidoCambiado.respuestas,
-        Opciones_Respuestas_Preguntas
+      .then(updateContenidos(req.body.contenidoCambiado.preguntas, Preguntas))
+      .then(
+        updateContenidos(
+          req.body.contenidoCambiado.respuestas,
+          Opciones_Respuestas_Preguntas
+        )
       )
-    )
-    .then(
-      addContenidosPreguntas(
-        req.body.titulo.tituloText,
-        req.body.ID,
-        req.body.contenidoAgregado.preguntas
+      .then(
+        addContenidosPreguntas(
+          req.body.titulo.tituloText,
+          req.body.ID,
+          req.body.contenidoAgregado.preguntas
+        )
       )
-    )
-    .then(addContenidosRespuestas(req.body.contenidoAgregado.respuestas))
-    .then(res.json({ response: "ok" }));
-
-  // res.json({ response: "ok" });
+      .then(addContenidosRespuestas(req.body.contenidoAgregado.respuestas))
+      .then(res.json({ response: "ok" }));
+  }
 };
 
 exports.formTest2 = (req, res) => {
