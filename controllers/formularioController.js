@@ -6,6 +6,11 @@ var Solicitud = require("../models/Solicitudes");
 var Preguntas_Formulario = require("../models/Preguntas_Formulario");
 const Solicitudes = require("../models/Solicitudes");
 const Opciones_Respuestas_Preguntas = require("../models/Opciones_Respuestas_Preguntas");
+const fetch = require("node-fetch");
+const jsdom = require("jsdom");
+const Respuestas = require("../models/Respuestas");
+const { response } = require("express");
+const { JSDOM } = jsdom;
 
 exports.formularioList = (req, res) => {
   Usuario.query()
@@ -16,6 +21,7 @@ exports.formularioList = (req, res) => {
 exports.formularioPreguntas = (req, res) => {
   Formulario.query()
     .withGraphJoined("Preguntas.[Opciones_Respuestas_Pregunta,Respuestas]")
+    .where("Formulario.ID", "=", "18")
     .then((FormWPreguntas) => res.json(FormWPreguntas));
 };
 
@@ -264,3 +270,191 @@ exports.formulario_crear_post = (req, res) => {
 exports.formDashboard = (req, res) => {
   res.json({ res: "AQUI SE SUPONE QUE VA EL DASHBOARD XD" });
 };
+function promiseFetchDoc(html) {
+  return new Promise(function (resolve, reject) {
+    var parserDOM = new JSDOM(html);
+    // var a = parserDOM.serialize();
+
+    // var doc = new DOMParser().parseFromString(html, "text/html");
+    var response = {};
+    response.doc = parserDOM.serialize().replace(/(\r\n|\n|\r)/gm, "");
+    // console.log(response.doc.abiertaTemplate.cloneNode(true));
+    resolve(response);
+  });
+}
+function promiseFetchTemplate(Formulario, res) {
+  if (Formulario.length == 0) {
+    return "";
+  }
+  return (
+    new Promise(function (resolve, reject) {
+      resolve(res.templatePreguntas);
+      // .then((res) => res.text())
+      // .then((html) => {});
+    })
+      // .then((res) => res.text())
+      .then(
+        (html) => promiseFetchDoc(html)
+
+        // var parserDOM = new DOMParser();
+        // var doc = new DOMParser().parseFromString(html, "text/html");
+
+        // preguntaAbierta = doc.querySelector(".preguntaAbierta").cloneNode(true);
+        // preguntaCerrada = doc.querySelector(".preguntaCerrada").cloneNode(true);
+        // preguntaMultiple = doc.querySelector(".preguntaMultiple").cloneNode(true);
+        // respuestaCerrada = doc.querySelector(".respCerr").cloneNode(true);
+        // respuestaMultiple = doc.querySelector(".respMult").cloneNode(true);
+      )
+      .then((response) => {
+        response.Formulario = Formulario;
+        return response;
+      })
+  );
+}
+exports.formulario_edit_get = [
+  getTemplatePreguntas,
+  (req, res) => {
+    var IdSession = req.session.IdSession;
+    res.permiso = true;
+    // console.log("a");
+    Formulario.query()
+      .withGraphJoined("Preguntas.[Opciones_Respuestas_Pregunta,Respuestas]")
+      .where("Formulario.ID", "=", req.params.idFormulario)
+      .andWhere("Formulario.ID_Usuario", "=", IdSession)
+      // .then((FormWPreguntas) => FormWPreguntas.json())
+      .then((Formulario) => promiseFetchTemplate(Formulario, res))
+      .then((response) => {
+        // console.log(FormWPreguntas);
+        if (response == "") {
+          res.redirect(200, "/info");
+        }
+        console.log(response);
+        res.render("Formulario/EditarFormulario", {
+          Response: response,
+        });
+      });
+    // res.render("Formulario/EditarFormulario");
+    // res.render("Formulario/PreguntasTemplate", {}, (err, html) => {
+    //   res.send(html);
+    // });
+  },
+];
+
+exports.formulario_edit_post = (req, res) => {
+  console.log(req.body);
+
+  var IdSession = req.session.IdSession;
+  if (req.body.ID_Usuario != IdSession) {
+    res.redirect(200, "/info");
+  } else {
+    deleteContenidos(req.body.contenidoEliminado.preguntas, Preguntas)
+      .then(
+        deleteContenidos(
+          req.body.contenidoEliminado.respuestas,
+          Opciones_Respuestas_Preguntas
+        )
+      )
+      .then(updateContenidos(req.body.contenidoCambiado.preguntas, Preguntas))
+      .then(
+        updateContenidos(
+          req.body.contenidoCambiado.respuestas,
+          Opciones_Respuestas_Preguntas
+        )
+      )
+      .then(
+        addContenidosPreguntas(
+          req.body.titulo.tituloText,
+          req.body.ID,
+          req.body.contenidoAgregado.preguntas
+        )
+      )
+      .then(addContenidosRespuestas(req.body.contenidoAgregado.respuestas))
+      .then(res.json({ response: "ok" }));
+  }
+};
+function getTemplatePreguntas(req, res, next) {
+  res.render("Formulario/PreguntasTemplate", {}, (err, html) => {
+    res.templatePreguntas = html;
+    console.log(`Este es html: \n${html}`);
+    next();
+  });
+}
+
+exports.formTest2 = (req, res) => {
+  res.render("Formulario/PreguntasTemplate", {}, (err, html) => {
+    res.send(html);
+  });
+};
+
+function deleteContenidos(contenidos, tabla) {
+  return new Promise((resolve, reject) => {
+    if (contenidos.length !== 0) {
+      contenidos.forEach((contenido) => {
+        resolve(tabla.query().deleteById(contenido.ID));
+        console.log(contenido.ID);
+      });
+    }
+  });
+}
+function updatePromises(contenido, tabla) {
+  return new Promise((resolve, reject) => {
+    resolve(tabla.query().findById(contenido.ID).patch(contenido));
+  });
+}
+
+function updateContenidos(contenidos, tabla) {
+  return new Promise((resolve, reject) => {
+    if (contenidos.length !== 0) {
+      var arrayUpdate = [];
+      contenidos.forEach((contenido) => {
+        if (contenido.Opcional) {
+          if (contenido.Opcional == true) {
+            contenido.Opcional = 1;
+          }
+          if (contenido.Opcional == false) {
+            contenidos.Opcional = 0;
+          }
+        }
+        arrayUpdate.push(updatePromises(contenido, tabla));
+      });
+      resolve(arrayUpdate);
+    }
+  }).then((response) => Promise.all(response));
+}
+
+function addContenidosPreguntas(titulo, formularioID, contenido) {
+  return new Promise((resolve, reject) => {
+    resolve(
+      Formulario.query().patchAndFetchById(formularioID, { Titulo: titulo })
+    );
+  })
+    .then((formulario) =>
+      createPreguntasBodyArray(
+        contenido.abiertas,
+        contenido.cerradas,
+        contenido.multiples,
+        formulario.ID
+      )
+    )
+    .then((promises) => Promise.all(promises));
+}
+
+function addRespuestasPromises(contenidos) {
+  var promisesRespuestas = [];
+
+  contenidos.forEach((contenido) => {
+    promisesRespuestas.push(
+      new Promise((resolve, reject) =>
+        resolve(Opciones_Respuestas_Preguntas.query().insert(contenido))
+      )
+    );
+  });
+  return promisesRespuestas;
+}
+
+function addContenidosRespuestas(contenidos) {
+  contenidos.forEach((element) => {});
+  return new Promise((resolve, reject) => {
+    resolve(addRespuestasPromises(contenidos));
+  }).then((res) => Promise.all(res));
+}

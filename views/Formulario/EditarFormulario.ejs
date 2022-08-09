@@ -27,7 +27,7 @@
     <!-- Sweetalert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <title>Crear Formulario</title>
+    <title>Editar Formulario</title>
   </head>
   <style>
     .form-row {
@@ -41,6 +41,17 @@
       border-width: 0 !important;
     }
   </style>
+  <script>
+    const doc = new DOMParser();
+    const docTemplate = '<%-Response.doc%>'
+    const docParsed = doc.parseFromString(docTemplate,"text/html");
+    const Formulario = <%-JSON.stringify(Response.Formulario[0])%>;
+
+
+
+
+    console.log(Formulario);
+  </script>
   <body>
     <h1 class="d-flex justify-content-center">Crear formulario</h1>
     <form class="mx-3 my-5">
@@ -51,6 +62,7 @@
           id="titulo"
           class="form-control"
           placeholder="Titulo del formulario"
+          value="<%= Response.Formulario[0].Titulo %>"
         />
       </div>
     </form>
@@ -109,6 +121,7 @@
       </div>
     </div>
   </body>
+  <script type="module" src="/javascripts/FormularioEdit.js"></script>
+
   <!-- JavaScript and dependencies -->
-  <script type="module" src="/javascripts/CrearFormulario.js"></script>
 </html>
