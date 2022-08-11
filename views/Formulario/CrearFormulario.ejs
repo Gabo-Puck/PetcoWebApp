@@ -42,70 +42,78 @@
     }
   </style>
   <body>
-    <h1 class="d-flex justify-content-center">Crear formulario</h1>
-    <form class="mx-3 my-5">
-      <div class="my-2">
-        <label class="" for="titulo">Titulo:</label>
-        <input
-          type="text"
-          id="titulo"
-          class="form-control"
-          placeholder="Titulo del formulario"
-        />
+    <div class="card border-info mx-auto my-5" style="width: 98%">
+      <div class="card-header bg-info">
+        <h2 class="d-flex justify-content-center">Crear formulario</h2>
       </div>
-    </form>
-    <div class="control-panel mx-auto" style="width: 80%">
-      <div class="dropup-center dropup">
-        <button
-          class="btn btn-secondary mb-3 dropdown-toggle"
-          style="width: 100%"
-          type="button"
-          data-bs-toggle="dropdown"
-          aria-expanded="false"
-        >
-          Agregar pregunta
-        </button>
-        <ul
-          class="dropdown-menu"
-          style="background-color: transparent; border: none; width: 100%"
-        >
-          <li>
-            <button
-              type="button"
-              class="btn btn-warning mb-3 agregarPreguntaAbierta"
-              style="width: 100%"
-            >
-              Abierta
-            </button>
-          </li>
-          <li>
-            <button
-              type="button"
-              class="btn btn-warning mb-3 agregarPreguntaCerrada"
-              style="width: 100%"
-            >
-              Cerrada
-            </button>
-          </li>
-          <li>
-            <button
-              type="button"
-              class="btn btn-warning agregarPreguntaMultiple"
-              style="width: 100%"
-            >
-              Multiple
-            </button>
-          </li>
-        </ul>
+      <div class="card-body">
+        <form class="mx-0 my-3">
+          <div class="my-2">
+            <label class="" for="titulo">Titulo:</label>
+            <input
+              type="text"
+              id="titulo"
+              class="form-control"
+              placeholder="Titulo del formulario"
+            />
+          </div>
+        </form>
       </div>
-      <div style="width: 100%">
-        <button
-          type="button"
-          class="btn btn-primary mx-auto guardarButton"
-          style="width: 100%"
-        >
-          Guardar
-        </button>
+      <div class="card-footer">
+        <div class="control-panel mx-auto" style="width: 80%">
+          <div class="dropup-center dropup">
+            <button
+              class="btn btn-secondary mb-3 dropdown-toggle"
+              style="width: 100%"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Agregar pregunta
+            </button>
+            <ul
+              class="dropdown-menu"
+              style="background-color: transparent; border: none; width: 100%"
+            >
+              <li>
+                <button
+                  type="button"
+                  class="btn btn-warning mb-3 agregarPreguntaAbierta"
+                  style="width: 100%"
+                >
+                  Abierta
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  class="btn btn-warning mb-3 agregarPreguntaCerrada"
+                  style="width: 100%"
+                >
+                  Cerrada
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  class="btn btn-warning agregarPreguntaMultiple"
+                  style="width: 100%"
+                >
+                  Multiple
+                </button>
+              </li>
+            </ul>
+          </div>
+          <div style="width: 100%">
+            <button
+              type="button"
+              class="btn btn-primary mx-auto guardarButton"
+              style="width: 100%"
+            >
+              Guardar
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </body>
