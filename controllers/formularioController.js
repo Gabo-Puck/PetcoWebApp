@@ -458,3 +458,31 @@ function addContenidosRespuestas(contenidos) {
     resolve(addRespuestasPromises(contenidos));
   }).then((res) => Promise.all(res));
 }
+
+exports.responder_formulario_get = [
+  getTemplateResponderPreguntas,
+  (req, res) => {
+    var idFormulario = req.params.idFormulario;
+    Formulario.query()
+      .withGraphJoined("Preguntas.[Opciones_Respuestas_Pregunta]")
+      .where("Formulario.ID", "=", idFormulario)
+      .then((response) => {
+        console.log(response);
+        if (response.length == 1) {
+          res.render("Formulario/ResponderFormulario", {
+            Response: response[0],
+            templatePreguntasRespuestas: res.templateHtml,
+          });
+        } else {
+          res.redirect("../login");
+        }
+      });
+  },
+];
+
+function getTemplateResponderPreguntas(req, res, next) {
+  res.render("Formulario/PreguntasResponderTemplate", {}, (err, html) => {
+    res.templateHtml = html.replace(/(\r\n|\n|\r)/gm, "");
+    next();
+  });
+}

@@ -44,14 +44,15 @@ app.use("/login", loginRouter);
 
 function isLogged(req, res, next) {
   var IdSession = req.session.IdSession;
-  if (IdSession) {
-    next();
-  } else {
-    if (res.permiso == true) {
-      next();
-    }
-    return res.redirect("http://localhost:3000/login");
-  }
+  // if (IdSession) {
+  //   next();
+  // } else {
+  //   if (res.permiso == true) {
+  //     next();
+  //   }
+  //   return res.redirect("http://localhost:3000/login");
+  // }
+  next();
 }
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
