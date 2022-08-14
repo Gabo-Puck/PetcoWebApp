@@ -46,7 +46,9 @@
       const domParser = new DOMParser();
       const docTemplate = '<%-templatePreguntasRespuestas%>';
       const docParsed = domParser.parseFromString(docTemplate,"text/html");
+      const Mascota = <%-JSON.stringify(idMascota)%>;
       const Formulario = <%-JSON.stringify(Response)%>;
+
     console.log(Formulario);
   </script>
   <body>

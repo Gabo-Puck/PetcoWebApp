@@ -472,6 +472,7 @@ exports.responder_formulario_get = [
           res.render("Formulario/ResponderFormulario", {
             Response: response[0],
             templatePreguntasRespuestas: res.templateHtml,
+            idMascota: req.params.idMascota,
           });
         } else {
           res.redirect("../login");
@@ -484,5 +485,273 @@ function getTemplateResponderPreguntas(req, res, next) {
   res.render("Formulario/PreguntasResponderTemplate", {}, (err, html) => {
     res.templateHtml = html.replace(/(\r\n|\n|\r)/gm, "");
     next();
+  });
+}
+
+exports.responder_formulario_post = (req, res) => {
+  // console.log("yes");
+  // console.log(req.body);
+  var IdSession = req.session.IdSession;
+  var arra = validateRespuestaAbierta(
+    req.body.bodyFetchAbiertas,
+    req.body.FormularioID
+  );
+  var arra2 = validateRespuestaOpcion(
+    req.body.bodyFetchOpciones,
+    req.body.FormularioID
+  );
+  var promises = [];
+  arra.forEach((prom) => {
+    promises.push(prom);
+  });
+  arra2.forEach((prom) => {
+    promises.push(prom);
+  });
+  Promise.allSettled(promises)
+    .then((response) => evaluateResult(response, res))
+    .then(
+      (response) =>
+        postRespuestas(req.body, IdSession, req.body.MascotaID, res),
+      (messages) => res.json(messages)
+    );
+};
+
+function generatePromisesRespuestas(Solicitud, respuestas) {
+  let promises = [];
+  respuestas.bodyFetchAbiertas.forEach((respuesta) => {
+    promises.push(
+      new Promise((resolve, reject) => {
+        resolve(
+          Respuestas.query().insert({
+            Respuesta: respuesta.Respuesta,
+            ID_Pregunta: respuesta.ID_Pregunta,
+            ID_Solicitud: Solicitud.ID,
+          })
+        );
+      })
+    );
+  });
+  for (const prop in respuestas.bodyFetchOpciones) {
+    if (Object.hasOwnProperty.call(respuestas.bodyFetchOpciones, prop)) {
+      const respuestaUsuario = respuestas.bodyFetchOpciones[prop];
+      console.log(respuestaUsuario);
+      respuestaUsuario.forEach((resp) => {
+        if (resp.check == true) {
+          promises.push(
+            new Promise((resolve, reject) => {
+              resolve(
+                Respuestas.query().insert({
+                  Respuesta: resp.Opcion_Respuesta,
+                  ID_Pregunta: resp.ID_Pregunta,
+                  ID_Solicitud: Solicitud.ID,
+                })
+              );
+            })
+          );
+        }
+      });
+    }
+  }
+  return promises;
+}
+
+function postRespuestas(respuestas, IdUsuario, IdMascota, res) {
+  return new Promise((resolve, reject) => {
+    resolve(
+      Solicitud.query().insertAndFetch({
+        ID_Usuario: IdUsuario,
+        ID_Mascota: IdMascota,
+      })
+    );
+  })
+    .then((Solicitud) => generatePromisesRespuestas(Solicitud, respuestas))
+    .then((promises) => Promise.all(promises))
+    .then(() => res.json("ok"));
+}
+
+function evaluateResult(res) {
+  return new Promise((resolve, reject) => {
+    let flag = false;
+    res.forEach((promise) => {
+      console.log(promise);
+      if (promise.value.error || promise.value.globalError) {
+        flag = true;
+      }
+    });
+    if (flag) {
+      reject(res);
+    } else {
+      resolve("Correcto");
+    }
+  });
+}
+
+function executePromises(res, nextPromise) {
+  return new Promise((resolve, reject) => {
+    console.log(res);
+    if (!res.messages) {
+      res.messages = {};
+      res.messages["errors"] = [];
+      res.messages["corrects"] = [];
+    }
+    res.forEach((response) => {
+      if (response.status == "rejected") {
+        res.messages["errors"].push(response.value);
+      }
+      if (response.status == "fullfiled") {
+        res.messages["corrects"].push(response.value);
+      }
+    });
+    resolve(res);
+  }).catch((err) => console.log(err));
+}
+
+function isOpcionDefined(res) {
+  return new Promise((resolve, reject) => {
+    if (res) {
+      if (res.error || res.globalError) {
+        resolve(res);
+      } else {
+        resolve({ msg: "Bien!", nameForm: res.Preguntas[0].ID });
+      }
+    } else {
+      resolve({
+        globalError: "Algo ha salido mal, intentalo más tarde",
+      });
+    }
+  });
+}
+
+function checkExistRespuestaOpcion(res) {
+  return new Promise((resolve, reject) => {
+    if (res.error || res.globalError) {
+      resolve(res);
+    } else {
+      resolve(
+        Formulario.query()
+          .withGraphJoined("Preguntas.[Opciones_Respuestas_Pregunta]")
+          .findOne({
+            "Preguntas:Opciones_Respuestas_Pregunta.ID": res.ID,
+            "Preguntas:Opciones_Respuestas_Pregunta.ID_Pregunta":
+              res.ID_Pregunta,
+            "Preguntas:Opciones_Respuestas_Pregunta.Opcion_Respuesta":
+              res.Opcion_Respuesta,
+          })
+      );
+    }
+  })
+    .then((res) => isOpcionDefined(res))
+    .catch((err) => console.log(err));
+}
+
+function validateRespuestas(respuestasOpcion, propiedad, res) {
+  return new Promise((resolve, reject) => {
+    var isAnswered = false;
+    var contador = 0;
+    var idRespuesta;
+    var idPregunta;
+    var opcionRespuesta;
+    respuestasOpcion[propiedad].forEach((respuesta) => {
+      if (respuesta.check) {
+        isAnswered = true;
+        contador++;
+      }
+      if (contador == 2 && respuesta.Tipo == 2) {
+        resolve({
+          globalError: "Algo ha salido mal, intentalo más tarde",
+        });
+      }
+      idPregunta = respuesta.ID_Pregunta;
+      idRespuesta = respuesta.ID;
+      opcionRespuesta = respuesta.Opcion_Respuesta;
+    });
+    if (!isAnswered) {
+      if (res.Preguntas[0].Opcional == 1) {
+        resolve({
+          ID: idRespuesta,
+          ID_Pregunta: idPregunta,
+          Opcion_Respuesta: opcionRespuesta,
+        });
+      } else
+        resolve({
+          error: "Esta pregunta es obligatoria",
+          nameForm: propiedad,
+        });
+    } else {
+      resolve({
+        ID: idRespuesta,
+        ID_Pregunta: idPregunta,
+        Opcion_Respuesta: opcionRespuesta,
+      });
+    }
+  });
+}
+
+function validateRespuestaOpcion(respuestasOpcion, idFormulario) {
+  var promises = [];
+
+  for (const propiedad in respuestasOpcion) {
+    if (Object.hasOwnProperty.call(respuestasOpcion, propiedad)) {
+      promises.push(
+        new Promise((resolve, reject) => {
+          resolve(
+            Formulario.query().withGraphJoined("Preguntas").findOne({
+              "Formulario.ID": idFormulario,
+              "Preguntas.ID": propiedad,
+            })
+          );
+        })
+          .then((res) => validateRespuestas(respuestasOpcion, propiedad, res))
+
+          .then((res) => checkExistRespuestaOpcion(res))
+          .catch((err) => console.log(err))
+      );
+    }
+  }
+  return promises;
+}
+
+function validateRespuestaAbierta(respuestasAbiertas, idFormulario) {
+  var promises = [];
+  respuestasAbiertas.forEach((respuesta) => {
+    promises.push(
+      new Promise((resolve, reject) => {
+        resolve(
+          Formulario.query()
+            .withGraphJoined("Preguntas.[Opciones_Respuestas_Pregunta]")
+            // .findOne("Preguntas.ID", "=", respuesta.ID_Pregunta)
+            .findOne({
+              "Formulario.ID": idFormulario,
+              "Preguntas.ID": respuesta.ID_Pregunta,
+            })
+        );
+      })
+        .then((res) => validateRespuestaAbiertaOpcional(res, respuesta))
+        .catch((err) => console.log(err))
+    );
+  });
+  return promises;
+  // return new Promise((resolve, reject) => {
+  //   resolve();
+  // });
+}
+
+function validateRespuestaAbiertaOpcional(res, respuesta) {
+  return new Promise((resolve, reject) => {
+    if (!res.Preguntas[0]) {
+      resolve({ globalError: "Algo ha salido mal, intentalo más tarde" });
+    }
+    if (res.Preguntas[0].Opcional == 0) {
+      if (respuesta.Respuesta.replace(/ /g, "") == "") {
+        resolve({
+          error: "Esta pregunta es obligatoria",
+          nameForm: respuesta.ID_Pregunta,
+        });
+      } else {
+        resolve({ msg: "Bien!", nameForm: respuesta.ID_Pregunta });
+      }
+    } else {
+      resolve({ msg: "Bien!", nameForm: respuesta.ID_Pregunta });
+    }
   });
 }
