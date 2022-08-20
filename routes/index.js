@@ -1,18 +1,17 @@
+
 var express = require("express");
 var router = express.Router();
 
+var feed_start = require("../controllers/InicioController");
+
 /* GET home page. */
-router.get("/", function (req, res, next) {
-  if (req.session.Logged)
-  {
-    console.log(req.session.IdSession);
-    
-    res.render('feed.ejs');
-  }
-  else
-  {
-    res.redirect('/login');
-  }
-});
+router.get("/",feed_start.Inicio);
+
+router.get("/intereses", feed_start.SeleccionarIntereses);
+
+router.post("/CrearI", feed_start.CrearIntereses);
+
+//router.post("/CheckLogin", registro_Login.CheckDB); 
 
 module.exports = router;
+

@@ -49,6 +49,19 @@ exports.verSolicitud = (req, res) => {
     .then((Sol) => res.json(Sol));
 };
 
+// function owo(req) {
+//   return new Promise((resolve, reject) => {
+//     resolve( Formulario.query()
+//     .deleteById(req.params.idFormulario))
+//   })
+// }
+
+exports.EliminarForm = (req, res) => {
+  Formulario.query()
+    .deleteById(req.params.idFormulario)
+    .then(res.redirect("/petco/formulario/info"));
+};
+
 exports.verifyFormulario = (req, res) => {
   console.log(req.body);
   var errors = [];
@@ -187,6 +200,7 @@ function createPreguntaPromise(pregunta, idFormulario) {
       })
     );
   }
+
   if (pregunta.tipo == 2 || pregunta.tipo == 3) {
     return new Promise(function (resolve, reject) {
       resolve(
@@ -268,7 +282,16 @@ exports.formulario_crear_post = (req, res) => {
 };
 
 exports.formDashboard = (req, res) => {
-  res.json({ res: "AQUI SE SUPONE QUE VA EL DASHBOARD XD" });
+  var IdSession = req.session.IdSession;
+
+  Formulario.query()
+    .where("Formulario.ID_Usuario", "=", IdSession)
+    .then((Formularios) => {
+      res.render("Formulario/FormDashboard.ejs", {
+        Elemento: Formularios,
+      });
+      console.log(Formularios);
+    });
 };
 function promiseFetchDoc(html) {
   return new Promise(function (resolve, reject) {
@@ -282,6 +305,7 @@ function promiseFetchDoc(html) {
     resolve(response);
   });
 }
+
 function promiseFetchTemplate(Formulario, res) {
   if (Formulario.length == 0) {
     return "";

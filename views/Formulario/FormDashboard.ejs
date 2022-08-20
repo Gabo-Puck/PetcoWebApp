@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formularios</title>
+    <link rel="stylesheet" href="/stylesheets/bootstrap-5.2.0-dist/themes/Lumen/bootstrap.css" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"
+        integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    
+
+</head>
+
+<body>
+
+  
+
+    <div class="container mt-5">
+
+
+        <table class="table table-hover">
+            
+            <thead class="table-info">
+                <th colspan="4" style="text-align: center;">
+                    <h3>Tus formularios.</h3>
+                </th>
+              
+            </thead>
+
+            <tr class="table table-primary">
+                <th scope="col">Numero.</th>
+                <th scope="col">Titulo</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+            <tbody>
+
+                <% for(var i=0; i < Elemento.length; i++) { %>
+                    <tr class="table-default ">
+                        <td>
+                            <%= i+1%>
+                        </td>
+                        <td>
+                            <%= Elemento[i].Titulo %>
+                        </td>
+                        <td>
+                            <a href="/petco/formulario/editar/ <%= Elemento[i].ID %>" class="btn btn-warning btn-block">
+                                <i class="fas fa-edit"></i>
+                            </a>
+
+                        </td>
+
+                        <td>
+                            <a onclick="confirmar(<%= Elemento[i].ID %>)" class="btn btn-danger btn-block">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+
+                        </td>
+                    </tr>
+                    <% } %>
+
+                        <tr>
+                            <th colspan="4" style="text-align: center;">
+                                <a href="/petco/formulario/crear/" class="btn btn-primary btn-block">
+                                    <i class="fas fa-plus"></i>
+                                </a>
+                            </th>
+                        </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script>
+    function confirmar(id) {
+        Swal.fire({
+            title: '¿Seguro que quieres eliminar el formulario?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Confirmar'
+          }).then((result) => {
+            if (result.isConfirmed) {   
+              window.location = '/petco/formulario/eliminar/'+id;                              
+            }
+        });
+      };
+      </script>
+</body>
+
+</html>

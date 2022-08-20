@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      const pasos = <%-JSON.stringify(pasos)%>;
+      const template = `<%-Response %>`;
+      const parse = new DOMParser();
+      const templatehtml = parse.parseFromString(template, "text/html");
+      const paso = templatehtml.querySelector(".Paso");
+    </script>
+    <script
+      src="https://kit.fontawesome.com/f0156fc078.js"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="/stylesheets/bootstrap-5.2.0-dist/themes/Lumen/bootstrap.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="/stylesheets/bootstrap-5.2.0-dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap theme Lumen from bootswatch -->
+    <!-- Bootstrap bundle -->
+    <!-- Jquery -->
+    <!-- Popper -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <!-- Sweetalert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>Document</title>
+  </head>
+
+  <body class="main">
+    <style>
+      .custom-loader {
+        animation: none !important;
+        border-width: 0 !important;
+      }
+      .custom-file-input ~ .custom-file-label::after {
+        content: "Subir";
+        background-color: cadetblue;
+        color: white;
+      }
+      .custom-file-label {
+        overflow: hidden;
+      }
+    </style>
+    <form class="ProtocoloHeader">
+      <div>
+        <input type="text" placeholder="Titulo Protocolo" id="Tprotocolo" />
+      </div>
+      <div>
+        <input
+          type="text"
+          placeholder="Descripcion del Protocolo"
+          id="Dprotocolo"
+        />
+      </div>
+
+      <select id="formU">
+        <% for(var i=0; i < formularios.length; i++) { %>
+
+        <option value=" <%=formularios[i].ID %>">
+          <%=formularios[i].Titulo %>
+        </option>
+
+        <% } %>
+      </select>
+      <div class="Enviar">
+        <button type="button" class="AddStep btn btn-primary">
+          Añadir Paso
+        </button>
+        <button type="button" class="agregar btn btn-success">Guardar</button>
+      </div>
+    </form>
+
+    <script type="module" src="/javascripts/CrearProtocolo.js"></script>
+  </body>
+</html>

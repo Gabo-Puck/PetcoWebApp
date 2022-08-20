@@ -11,6 +11,7 @@ const {
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var registroRouter = require("./routes/registro");
+var ProtocoloRouter =require("./routes/protocolos")
 var vacunasRouter = require("./routes/vacunas");
 var formulariosRouter = require("./routes/formulariosRouter");
 var loginRouter = require("./routes/login");
@@ -19,6 +20,7 @@ var authRequired = require("./routes/authRequired");
 var app = express();
 
 const session = require("express-session");
+const Protocolo = require("./models/Protocolo");
 app.use(
   session({
     secret: "secrete",
@@ -39,8 +41,10 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/inicio", indexRouter);
 app.use("/petco", isLogged, authRequired);
 app.use("/registro", registroRouter);
-// app.use("/formulario", formulariosRouter);
+//app.use("/formulario", formulariosRouter);
 app.use("/login", loginRouter);
+app.use("/protocolo", ProtocoloRouter)
+
 
 function isLogged(req, res, next) {
   var IdSession = req.session.IdSession;
