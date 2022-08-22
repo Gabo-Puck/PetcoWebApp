@@ -207,7 +207,7 @@ const fetchInput = (acceptedTypes, folderPath) => {
       //Usamos el listener de la instancia de busboy. Este listener se activará 1 vez por cada campo encontrado en la request
       busboy.on("field", function (key, value, keyTruncated, valueTruncated) {
         console.log("The value key: " + key + " is: " + value);
-        if (key == "Pasos") {
+        if (isJson(value)) {
           req.body[key] = JSON.parse(value);
         } else {
           req.body[key] = value;
@@ -217,6 +217,15 @@ const fetchInput = (acceptedTypes, folderPath) => {
     }
   };
 };
+
+function isJson(string) {
+  try {
+    JSON.parse(string);
+  } catch (error) {
+    return false;
+  }
+  return true;
+}
 
 /**
  * Esta función permite escribir archivos al servidor. Los stream encargados de escribir archivos deben estar dentro de un array en la propiedad "res.fileReadableStream"
@@ -310,6 +319,7 @@ function cleanInput(req, res, next) {
     delete paso["DiasEstimadosID"];
     delete paso["AceptaArchivoName"];
   });
+  req.body["ID_Usuario"] = req.session.IdSession;
   next();
 }
 
@@ -347,5 +357,28 @@ exports.ProtocoloCrear = [
       .then(() => uploadFiles(res))
       .then(() => res.json("ok"));
     // console.log(req.body);
+  },
+];
+
+exports.ProtocoloEditarGet = [
+  loadTemplate,
+  getFormularios,
+  getProtocolo,
+  (req, res) => {
+    Protocolo.query()
+      .withGraphJoined("Pasos")
+      .findOne({
+        "Protocolos.ID_Usuario": req.session.IdSession,
+        "Protocolos.ID": req.params.idProtocolo,
+      })
+      .then((protocolo) =>
+        res.render("Protocolo/EditarProtocolo", {
+          formularios: res.formularios,
+          protocolo: protocolo,
+          pasos: res.pasos,
+          Response: req.htmlTemplate,
+        })
+      );
+    // res.render("Protocolo/EditarProtocolo");
   },
 ];
