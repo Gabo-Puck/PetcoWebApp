@@ -412,7 +412,7 @@ function patchIntoBD(paso, req) {
           if (PasoFound.Archivo != "" && paso.Archivo != "") {
             // resolve(deleteFile(PasoFound.Archivo));
             // resolve(fs.promises.rm(PasoFound.Archivo));
-            if (!req.deleteFilesPath) {
+            if (!req.deleteFiles) {
               req.deleteFilesPath = [];
             }
             req.deleteFilesPath.push(PasoFound.Archivo);
@@ -438,10 +438,10 @@ function createPromiseInsert(paso) {
   });
 }
 
-function createPromisePatchArchivo(pasoID) {
+function createPromisePatchArchivo(paso) {
   return new Promise((resolve, reject) => {
-    resolve(Paso.query().findById(pasoID).patch({ Archivo: "" }));
-  });
+    resolve(Paso.query().)
+  })
 }
 
 function getPromisesUpsert(req, res, idProtocolo) {
@@ -457,31 +457,18 @@ function getPromisesUpsert(req, res, idProtocolo) {
       PromisesUpsert.push(createPromiseInsert(paso));
     }
   });
-  if (req.body.ArchivosEliminados) {
-    if (req.body.ArchivosEliminados.length > 0) {
-      if (!req.deleteFilesPath) {
-        req.deleteFilesPath = [];
-      }
-      req.body.ArchivosEliminados.forEach((ArchivoEliminado) => {
-        req.deleteFilesPath.push(ArchivoEliminado.path);
-        PromisesUpsert.push(createPromisePatchArchivo(ArchivoEliminado.ID));
-      });
-    }
-  }
   return PromisesUpsert;
 }
 
 function createDelete(path) {
   return new Promise((resolve, reject) => {
-    resolve(fs.promises.rm(path, { force: true }));
+    resolve(fs.promises.rm(path));
   }).catch();
 }
 
 function deleteFiles(req) {
   let deleteFilesPromises = [];
-
   if (req.deleteFilesPath) {
-    console.log(req.deleteFilesPath);
     if (req.deleteFilesPath.length > 0) {
       req.deleteFilesPath.forEach((filePath) => {
         deleteFilesPromises.push(createDelete(filePath));

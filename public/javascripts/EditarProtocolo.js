@@ -1,7 +1,19 @@
 import {
   removeItemOnce,
   loadingScreen,
+  retrieveParent,
 } from "/javascripts/FormulariosFunctions.js";
+
+import {
+  addPaso,
+  renderMessages,
+  handleResponse,
+  autoSizeTextarea,
+  insertAfter,
+} from "/javascripts/PasoFunctions.js";
+
+var pasoCount = 0;
+var archivosEliminados = [];
 
 const buttonAddStep = document.querySelector(
   //Se define el boton de añadir un paso
@@ -13,84 +25,63 @@ const buttonSaveProtocol = document.querySelector(
   ".agregar"
 );
 
-function autoSizeTextarea(textarea) {
-  textarea.setAttribute(
-    "style",
-    "height:" + textarea.scrollHeight + "px;overflow-y:hidden;"
-  );
-
-  textarea.addEventListener(
-    "input",
-    (e) => {
-      textarea.style.height = "auto";
-      textarea.style.height = textarea.scrollHeight + "px";
-    },
-    false
-  );
-}
 $(window).on("load", () => {
   pasos.forEach((paso) => {
     let newPaso = addPaso(
       document,
+      pasoCount,
       paso.Titulo_Paso,
       paso.Descripcion,
       paso.DiasEstimados,
       paso.Archivo
     );
-    newPaso.querySelectorAll("input,textarea").forEach((input) => {
+    newPaso.newPaso.querySelectorAll("input,textarea").forEach((input) => {
       input.disabled = true;
     });
-    newPaso.classList.add("default");
+    newPaso.newPaso.classList.add("default");
+    pasoCount = newPaso.pasoCount;
   });
   protocolo.Pasos.forEach((paso) => {
     let newPaso = addPaso(
       document,
+      pasoCount,
       paso.Titulo_Paso,
       paso.Descripcion,
       paso.DiasEstimados,
       paso.Archivo,
       paso.AceptaArchivo
     );
-    newPaso.classList.add(`pasoCargado-${paso.ID}`);
+    if (paso.Archivo != "") {
+      let publicFolder = paso.Archivo.split("\\", 2)[0];
+
+      let archivo = document.createElement("a");
+      archivo.classList.add("btn", "btn-info");
+      let ArchivoEliminarButton = document.createElement("button");
+      ArchivoEliminarButton.classList.add("btn", "btn-danger");
+      ArchivoEliminarButton.innerText = "Eliminar archivo subido";
+      ArchivoEliminarButton.type = "button";
+      ArchivoEliminarButton.addEventListener("click", (e) => {
+        let pasoDOM = retrieveParent(ArchivoEliminarButton, "Paso");
+        if (pasoDOM.querySelector("a") != null) {
+          archivosEliminados.push({ ID: paso.ID, path: paso.Archivo });
+          // archivosEliminados[`f-${paso.ID}`] = paso.Archivo;
+          pasoDOM.querySelector("a").remove();
+        }
+        console.log(archivosEliminados);
+      });
+
+      archivo.href = paso.Archivo.replace(`${publicFolder}\\`, "/");
+      archivo.innerText = "Descargar archivo subido";
+      archivo.download = "ArchivoPaso";
+      let inputFile = newPaso.newPaso.querySelector("input[type='file']");
+      // inputFile.value = "hola.pdf";
+      insertAfter(inputFile, ArchivoEliminarButton);
+      insertAfter(inputFile, archivo);
+    }
+    newPaso.newPaso.classList.add(`pasoCargado-${paso.ID}`);
+    pasoCount = newPaso.pasoCount;
   });
 });
-
-var pasoCount = 0;
-function addPaso(
-  document,
-  Titulo = "",
-  Descripcion = "",
-  DiasEstimados = 1,
-  Archivo = "",
-  AceptaArchivo = 0
-) {
-  var newPaso = paso.cloneNode(true);
-  newPaso.querySelector(".Titulo").id = `input${pasoCount}`;
-  newPaso.querySelector(".Titulo").value = Titulo;
-  pasoCount++;
-  newPaso.querySelector(".Descripcion").id = `input${pasoCount}`;
-  newPaso.querySelector(".Descripcion").value = Descripcion;
-  pasoCount++;
-
-  newPaso.querySelector(".DiasEstimados").id = `input${pasoCount}`;
-  newPaso.querySelector(".DiasEstimados").value = DiasEstimados;
-
-  pasoCount++;
-  newPaso.querySelector(".Archivo").id = `input${pasoCount}`;
-  newPaso.querySelector(".Archivo").value = "";
-  pasoCount++;
-
-  newPaso.querySelector(".AceptaArchivo").checked =
-    AceptaArchivo == 0 ? false : true;
-
-  document
-    .querySelector(".Enviar")
-    .insertBefore(newPaso, document.querySelector(".AddStep")); //Clona los elementos
-  autoSizeTextarea(newPaso.querySelector(".Descripcion"));
-  autoSizeTextarea(newPaso.querySelector(".Titulo"));
-
-  return newPaso;
-}
 
 buttonSaveProtocol.addEventListener("click", (e) => {
   var pasoguardado = []; //Se define un arreglo en el que se guardaran los pasos
@@ -98,45 +89,72 @@ buttonSaveProtocol.addEventListener("click", (e) => {
   var ProtocoloT = document.querySelector("#Tprotocolo");
   var ProtocoloD = document.querySelector("#Dprotocolo");
   var ProtocoloF = document.querySelector("#formU");
-
   var arreglo = document.querySelectorAll(".Paso:not(.default)"); //Se instancia una variable en la que se almacenan los elementos html con la clase css correspondiente
   arreglo.forEach(
     (
-      o //se recorre el arreglo para obtener los valores
+      paso //se recorre el arreglo para obtener los valores
     ) => {
-      //console.log(o);
+      //console.log(paso);
       //Se instancian las variables que obtendran los valores de la clase dentro del elemento html paso
-      let titulo = o.querySelector(".Titulo");
-      let descripcion = o.querySelector(".Descripcion");
-      let DiasEstimados = o.querySelector(".DiasEstimados");
-      let AceptaArchivo = o.querySelector(".AceptaArchivo");
-      let AceptaArchivoName = o.querySelector('input[type="file"]').id;
+      let titulo = paso.querySelector(".Titulo");
+      let descripcion = paso.querySelector(".Descripcion");
+      let DiasEstimados = paso.querySelector(".DiasEstimados");
+      let AceptaArchivo = paso.querySelector(".AceptaArchivo");
+      let AceptaArchivoName = paso.querySelector('input[type="file"]').id;
       AceptaArchivo = AceptaArchivo.checked ? 1 : 0;
+
       // var Archivo = o.querySelector(".Archivo");
+      let classList = paso.classList;
+      classList.forEach((item) => {
+        if (item.includes("pasoCargado")) {
+          console.log(item.split("-", 2)[1]);
+          pasoguardado.push({
+            ID: item.split("-", 2)[1],
+
+            Titulo_Paso: titulo.value,
+            Titulo_PasoID: titulo.id,
+
+            Descripcion: descripcion.value,
+            DescripcionID: descripcion.id,
+
+            DiasEstimados: DiasEstimados.value,
+            DiasEstimadosID: DiasEstimados.id,
+
+            AceptaArchivo: AceptaArchivo,
+            AceptaArchivoName: AceptaArchivoName,
+          });
+        }
+        if (item.includes("pasoNuevo")) {
+          pasoguardado.push({
+            Titulo_Paso: titulo.value,
+            Titulo_PasoID: titulo.id,
+
+            Descripcion: descripcion.value,
+            DescripcionID: descripcion.id,
+
+            DiasEstimados: DiasEstimados.value,
+            DiasEstimadosID: DiasEstimados.id,
+
+            AceptaArchivo: AceptaArchivo,
+            AceptaArchivoName: AceptaArchivoName,
+          });
+        }
+      });
 
       //Inserta los valores con push dentro del arreglo dinamicamente
-      pasoguardado.push({
-        Titulo_Paso: titulo.value,
-        Titulo_PasoID: titulo.id,
-
-        Descripcion: descripcion.value,
-        DescripcionID: descripcion.id,
-
-        DiasEstimados: DiasEstimados.value,
-        DiasEstimadosID: DiasEstimados.id,
-
-        AceptaArchivo: AceptaArchivo,
-        AceptaArchivoName: AceptaArchivoName,
-      });
     }
   );
+  var ContenidoEliminado = [];
   var formData = new FormData();
+  formData.append("ID", protocolo.ID);
   formData.append("Titulo", ProtocoloT.value);
   formData.append("TituloID", ProtocoloT.id);
   formData.append("Descripcion", ProtocoloD.value);
   formData.append("DescripcionID", ProtocoloD.id);
   formData.append("ID_Formulario", ProtocoloF.value);
   formData.append("Pasos", JSON.stringify(pasoguardado));
+  // formData.append("ContenidoEliminado", JSON.stringify(ContenidoEliminado));
+  formData.append("ArchivosEliminados", JSON.stringify(archivosEliminados));
   document
     .querySelectorAll("input[type='file']:not(input[disabled])")
     .forEach((element) => {
@@ -156,7 +174,7 @@ buttonSaveProtocol.addEventListener("click", (e) => {
   };
   loadingScreen.fire();
   fetch(
-    "/protocolo/guardar",
+    "/protocolo/guardarEditar",
     {
       method: "POST",
       body: formData,
@@ -165,86 +183,11 @@ buttonSaveProtocol.addEventListener("click", (e) => {
   )
     .then((res) => res.json())
     .then((res) => handleResponse(res))
-    .then((res) => renderMessages(res.errors, res.globalError));
+    .then((res) => renderMessages(document, res.errors, res.globalError));
 });
-
-function handleResponse(res) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      loadingScreen.close();
-      if (res == "ok") {
-        Swal.fire({
-          title: "Listo!",
-          text: "Se ha guardado tu protocolo correctamente!",
-          icon: "success",
-          confirmButtonText: "Siguiente",
-        }).then((sweetResult) => {
-          if (sweetResult.isConfirmed) {
-            window.location = "ok";
-          }
-        });
-      }
-      if (res.globalError) {
-        Swal.fire({
-          title: "Atención!",
-          text: res.globalError.gloabalMsg,
-          icon: "warning",
-          confirmButtonText: "Entendido",
-        });
-      }
-      resolve(res);
-    }, 1100);
-  });
-}
-function renderMessages(errors, globalError) {
-  console.log(errors);
-  let inputs = document
-    .querySelector("form")
-    .querySelectorAll(
-      "input:not(input:disabled):not(input[type='checkbox']),textarea:not(textarea:disabled)"
-    );
-
-  document.querySelectorAll(".invalid-feedback").forEach((node) => {
-    node.remove();
-  });
-  document.querySelectorAll(".valid-feedback").forEach((node) => {
-    node.remove();
-  });
-  document.querySelectorAll(".is-invalid").forEach((node) => {
-    node.classList.remove("is-invalid");
-  });
-  document.querySelectorAll(".is-valid").forEach((node) => {
-    node.classList.remove("is-valid");
-  });
-  if (errors) {
-    errors.forEach((element) => {
-      let input = document.querySelector(`#${element.formID}`);
-      let newMessage = document.createElement("div");
-      newMessage.innerText = element.msg;
-      newMessage.classList.add("d-block", "invalid-feedback");
-      insertAfter(input, newMessage);
-      // removeItemOnce(inputs, input);
-    });
-  }
-  inputs.forEach((input) => {
-    let feedback = input.nextElementSibling;
-    let newMessage = document.createElement("div");
-    newMessage.innerText = "Bien!";
-    newMessage.classList.add("d-block", "valid-feedback");
-    if (feedback) {
-      if (!feedback.classList.contains("invalid-feedback")) {
-        insertAfter(input, newMessage);
-      }
-    } else {
-      insertAfter(input, newMessage);
-    }
-  });
-}
 
 buttonAddStep.addEventListener("click", (e) => {
-  addPaso(document);
+  let newPaso = addPaso(document, pasoCount);
+  newPaso.newPaso.classList.add("pasoNuevo");
+  pasoCount = newPaso.pasoCount;
 });
-
-function insertAfter(referenceNode, newNode) {
-  referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
-}
