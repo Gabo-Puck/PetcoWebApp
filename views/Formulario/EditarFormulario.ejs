@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Font Awesome -->
+    <script
+      src="https://kit.fontawesome.com/f0156fc078.js"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="/stylesheets/bootstrap-5.2.0-dist/themes/Lumen/bootstrap.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="/stylesheets/bootstrap-5.2.0-dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap theme Lumen from bootswatch -->
+    <!-- Bootstrap bundle -->
+    <!-- Jquery -->
+    <!-- Popper -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <!-- Sweetalert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <title>Editar Formulario</title>
+  </head>
+  <style>
+    .form-row {
+      border-style: solid;
+      border-width: 1px;
+      border-radius: 9px;
+      border-color: gray;
+    }
+    .custom-loader {
+      animation: none !important;
+      border-width: 0 !important;
+    }
+  </style>
+  <script>
+    const doc = new DOMParser();
+    const docTemplate = '<%-Response.doc%>'
+    const docParsed = doc.parseFromString(docTemplate,"text/html");
+    const Formulario = <%-JSON.stringify(Response.Formulario[0])%>;
+
+
+
+
+    console.log(Formulario);
+  </script>
+  <body>
+    <h1 class="d-flex justify-content-center">Editar formulario</h1>
+    <form class="mx-3 my-5">
+      <div class="my-2">
+        <label class="" for="titulo">Titulo:</label>
+        <input
+          type="text"
+          id="titulo"
+          class="form-control"
+          placeholder="Titulo del formulario"
+          value="<%= Response.Formulario[0].Titulo %>"
+        />
+      </div>
+    </form>
+    <div class="control-panel mx-auto" style="width: 80%">
+      <div class="dropup-center dropup">
+        <button
+          class="btn btn-secondary mb-3 dropdown-toggle"
+          style="width: 100%"
+          type="button"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+        >
+          Agregar pregunta
+        </button>
+        <ul
+          class="dropdown-menu"
+          style="background-color: transparent; border: none; width: 100%"
+        >
+          <li>
+            <button
+              type="button"
+              class="btn btn-warning mb-3 agregarPreguntaAbierta"
+              style="width: 100%"
+            >
+              Abierta
+            </button>
+          </li>
+          <li>
+            <button
+              type="button"
+              class="btn btn-warning mb-3 agregarPreguntaCerrada"
+              style="width: 100%"
+            >
+              Cerrada
+            </button>
+          </li>
+          <li>
+            <button
+              type="button"
+              class="btn btn-warning agregarPreguntaMultiple"
+              style="width: 100%"
+            >
+              Multiple
+            </button>
+          </li>
+        </ul>
+      </div>
+      <div style="width: 100%">
+        <button
+          type="button"
+          class="btn btn-primary mx-auto guardarButton"
+          style="width: 100%"
+        >
+          Guardar
+        </button>
+      </div>
+    </div>
+  </body>
+  <script type="module" src="/javascripts/FormularioEdit.js"></script>
+
+  <!-- JavaScript and dependencies -->
+</html>

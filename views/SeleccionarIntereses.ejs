@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.0/css/all.css">
+    <link rel="stylesheet" , href="/stylesheets/style.css" />
+    <title>Document</title>
+
+    <style>
+        .container {
+            position: relative;
+
+        }
+
+        .image {
+            opacity: 1;
+            display: block;
+            width: 100%;
+            height: auto;
+            transition: .5s ease;
+            backface-visibility: hidden;
+        }
+
+        .middle {
+            transition: .5s ease;
+            opacity: 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .container:hover .image {
+            opacity: 0.3;
+        }
+
+        .container:hover .middle {
+            opacity: 1;
+        }
+
+        .text {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-size: 32px;
+            padding: 8px 16px;
+        }
+
+
+        body {
+            background-color: #eef5ff;
+            margin: 0;
+            font-family: Arial;
+        }
+
+
+        input[type="checkbox"] {
+            display: none;
+        }
+
+        label {
+            border-radius: 30px;
+            background-color: #fff;
+            padding: 10px;
+            display: block;
+            position: relative;
+            margin: 10px;
+            cursor: pointer;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        label::before {
+            background-color: white;
+            box-shadow: 0 0 5px #333;
+            color: white;
+            content: " ";
+            display: block;
+            border-radius: 50%;
+            border: 1px solid #478bfb;
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            width: 25px;
+            height: 25px;
+            text-align: center;
+            line-height: 28px;
+            transition-duration: 0.4s;
+            transform: scale(0);
+        }
+
+        label img {
+
+            transition-duration: 0.2s;
+            transform-origin: 50% 50%;
+        }
+
+        :checked+label {
+            border-color: #ddd;
+        }
+
+        :checked+label::before {
+            content: "✓";
+            background-color: #478bfb;
+            transform: scale(1);
+        }
+
+        :checked+label img {
+            transform: scale(0.9);
+            box-shadow: 0 0 5px #333;
+            z-index: -1;
+        }
+
+
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        .header {
+            text-align: center;
+            padding: 16px;
+        }
+
+        .row {
+            display: -ms-flexbox;
+            /* IE10 */
+            display: flex;
+            -ms-flex-wrap: wrap;
+            /* IE10 */
+            flex-wrap: wrap;
+            padding: 0 100px;
+        }
+
+        /* Create four equal columns that sits next to each other */
+        .column {
+            -ms-flex: 25%;
+            /* IE10 */
+            flex: 25%;
+            max-width: 25%;
+            padding: 4 4px;
+        }
+
+        .column img {
+
+            margin-top: 8px;
+            vertical-align: middle;
+            width: 100%;
+        }
+
+        /* Responsive layout - makes a two column-layout instead of four columns */
+        @media screen and (max-width: 800px) {
+            .column {
+                -ms-flex: 50%;
+                flex: 50%;
+                max-width: 50%;
+            }
+        }
+
+        /* Responsive layout - makes the two columns stack on top of each other instead of next to each other */
+        @media screen and (max-width: 600px) {
+            .column {
+                -ms-flex: 100%;
+                flex: 100%;
+                max-width: 100%;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="header">
+        
+        <h1>Selecciona los animales que te interesa adoptar.</h1>
+    </div>
+
+
+
+    <!-- Photo Grid -->
+    <form action="/inicio/CrearI" method="post" onsubmit=" return MinCheck();">
+        <div class="row">
+            <div class="column">
+                <% for(var i=0; i < 6; i++) { %>
+                    <!-- Primera Columna -->
+
+
+                    <input type="checkbox" id="<%=Animales[i].Nombre_Especie%>" name="Escogidos" class="check"
+                        value="<%=Animales[i].ID%>">
+
+                    <% switch (i) { case 0: %>
+                        <label for="Asno">
+                            <div class="container">
+                                <img src="https://www.hogarmania.com/archivos/202207/burros-668x400x80xX-1.jpg" />
+                                <div class="middle">
+                                    <div class="text">Asno</div>
+                                </div>
+                            </div>
+                        </label>
+
+                        <br>
+                        <% break; case 1: %>
+                            <label for="Pato">
+
+                                <div class="container">
+                                    <img
+                                        src="https://www.robotitus.com/wp-content/uploads/2017/12/tumblr_mwfez5l5zO1sl7dkbo4_500.jpg" />
+                                    <div class="middle">
+                                        <div class="text">Pato</div>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <% break; case 2: %>
+                                <label for="Buey">
+                                    <div class="container">
+                                        <img
+                                            src="https://static6.depositphotos.com/1134678/621/i/600/depositphotos_6212212-stock-photo-proud-ox-against-blue-sky.jpg" />
+                                        <div class="middle">
+                                            <div class="text">Buey</div>
+                                        </div>
+                                    </div>
+                                </label>
+
+                                <% break; case 3: %>
+                                    <label for="Caballo">
+                                        <div class="container">
+                                            <img
+                                                src="https://www.bioenciclopedia.com/wp-content/uploads/2016/07/caballo_galopando.jpg" />
+                                            <div class="middle">
+                                                <div class="text">Caballo</div>
+                                            </div>
+                                        </div>
+                                    </label>
+
+                                    <% break; case 4: %>
+                                        <label for="Cabra	">
+                                            <div class="container">
+                                                <img
+                                                    src="https://www.petalatino.com/wp-content/uploads/Goats-maximili.jpg" />
+                                                <div class="middle">
+                                                    <div class="text">Cabra</div>
+                                                </div>
+                                            </div>
+                                        </label>
+
+                                        <% break; case 5: %>
+                                            <label for="Cerdo">
+                                                <div class="container">
+                                                    <img
+                                                        src="https://www.larazon.es/resizer/ovTL2lHmV5itSPEbkO5Lp_JxoMs=/1800x1200/smart/filters:format(webp):quality(65)/cloudfront-eu-central-1.images.arcpublishing.com/larazon/O3R2UW7QVZDVXIXGMO7WCBRMOI.jpg" />
+                                                    <div class="middle">
+                                                        <div class="text">Cerdo</div>
+                                                    </div>
+                                                </div>
+                                            </label>
+
+                                            <% break; default: break; } %>
+
+                                                <% } %>
+
+            </div>
+            <div class="column">
+                <% for(var i=6; i < 12; i++) { %>
+                    <!-- Segunda Columna -->
+
+                    <input type="checkbox" id="<%=Animales[i].Nombre_Especie%>" name="Escogidos" class="check"
+                        value="<%=Animales[i].ID%>">
+
+                    <% switch (i) { case 6: %>
+                        <label for="Chinchilla">
+                            <div class="container">
+                                <img
+                                    src="https://www.vetcon.es/wp-content/uploads/2020/05/mamiferos-exoticos-CHINCHILLA.jpg" />
+                                <div class="middle">
+                                    <div class="text">Chinchilla</div>
+                                </div>
+                            </div>
+                        </label>
+
+                        <br>
+                        <% break; case 7: %>
+                            <label for="Codorniz">
+                                <div class="container">
+                                    <img
+                                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Quaglia.jpg/250px-Quaglia.jpg" />
+                                    <div class="middle">
+                                        <div class="text">Codorniz</div>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <% break; case 8: %>
+                                <label for="Conejillo de indias">
+                                    <div class="container">
+                                        <img
+                                            src="https://okdiario.com/img/2019/07/23/conejillo-de-indias-una-mascota-exotica-1-655x368.jpg" />
+                                        <div class="middle">
+                                            <div class="text">Conejillo de indias</div>
+                                        </div>
+                                    </div>
+                                </label>
+
+                                <% break; case 9: %>
+                                    <label for="Gallina">
+                                        <div class="container">
+                                            <img
+                                                src="https://www.mundogallina.net/wp-content/uploads/2021/01/GallinaConPollos.jpg" />
+                                            <div class="middle">
+                                                <div class="text">Gallina</div>
+                                            </div>
+                                        </div>
+                                    </label>
+
+                                    <% break; case 10: %>
+                                        <label for="Ganso">
+                                            <div class="container">
+                                                <img
+                                                    src="https://cdni.russiatoday.com/actualidad/public_images/2021.12/article/61c8ee5a59bf5b2aab1d39bc.jpg" />
+                                                <div class="middle">
+                                                    <div class="text">Ganso</div>
+                                                </div>
+                                            </div>
+                                        </label>
+
+                                        <% break; case 11: %>
+                                            <label for="Gato">
+                                                <div class="container">
+                                                    <img
+                                                        src="https://www.zooplus.es/magazine/wp-content/uploads/2018/07/Parasitos-en-gatos.jpeg" />
+                                                    <div class="middle">
+                                                        <div class="text">Gato</div>
+                                                    </div>
+                                                </div>
+                                            </label>
+
+                                            <% break; default: break; } %>
+
+                                                <% } %>
+            </div>
+            <div class="column">
+                <% for(var i=12; i < 18; i++) { %>
+                    <!-- Tercera Columna -->
+
+                    <input type="checkbox" id="<%=Animales[i].Nombre_Especie%>" name="Escogidos" class="check"
+                        value="<%=Animales[i].ID%>">
+
+                    <% switch (i) { case 12: %>
+                        <label for="Hurón">
+                            <div class="container">
+                                <img src="https://chimuelo.cl/wp-content/uploads/2018/05/20171210_154142.jpg" />
+                                <div class="middle">
+                                    <div class="text">Hurón</div>
+                                </div>
+                            </div>
+                        </label>
+
+                        <br>
+                        <% break; case 13: %>
+                            <label for="Hámster">
+                                <div class="container">
+                                    <img
+                                        src="https://s1.eestatic.com/2019/04/16/como/mascotas-ninos-remedios_caseros_391471590_120559780_1706x960.jpg" />
+                                    <div class="middle">
+                                        <div class="text">Hámster</div>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <% break; case 14: %>
+                                <label for="Iguana">
+                                    <div class="container">
+                                        <img
+                                            src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Portrait_of_an_Iguana.jpg/800px-Portrait_of_an_Iguana.jpg" />
+                                        <div class="middle">
+                                            <div class="text">Iguana</div>
+                                        </div>
+                                    </div>
+                                </label>
+
+                                <% break; case 15: %>
+                                    <label for="Mulo">
+                                        <div class="container">
+                                            <img
+                                                src="https://www.eltiempo.com/files/article_main/uploads/2022/01/20/61e9bc4f772bd.jpeg" />
+                                            <div class="middle">
+                                                <div class="text">Mulo</div>
+                                            </div>
+                                        </div>
+                                    </label>
+
+                                    <% break; case 16: %>
+                                        <label for="Ovejas">
+                                            <div class="container">
+                                                <img
+                                                    src="https://i1.wp.com/pizarraytiza.com/wp-content/uploads/2021/08/oveja-caracteristicas.jpg?fit=500%2C334&ssl=1" />
+
+                                                <div class="middle">
+                                                    <div class="text">Ovejas</div>
+                                                </div>
+                                            </div>
+                                        </label>
+
+                                        <% break; case 17: %>
+                                            <label for="Paloma">
+                                                <div class="container">
+                                                    <img
+                                                        src="https://www.rentokil.com/cl/blog/wp-content/uploads/2021/06/danos-que-causan-las-palomas--1280x720.jpg" />
+                                            </label>
+                                            <div class="middle">
+                                                <div class="text">Paloma</div>
+                                            </div>
+            </div>
+
+
+            <% break; default: break; } %>
+
+                <% } %>
+        </div>
+        <div class="column">
+            <% for(var i=18; i < 24; i++) { %>
+                <!-- Segunda Columna -->
+
+                <input type="checkbox" id="<%=Animales[i].Nombre_Especie%>" name="Escogidos" class="check"
+                    value="<%=Animales[i].ID%>">
+
+                <% switch (i) { case 18: %>
+                    <label for="Perro">
+                        <div class="container">
+                            <img
+                                src="https://estaticos.muyinteresante.es/uploads/images/gallery/6124cf315cafe8c3101f8bab/perro_redes.jpg" />
+                            <div class="middle">
+                                <div class="text">Perro</div>
+                            </div>
+                        </div>
+                    </label>
+
+                    <br>
+                    <% break; case 19: %>
+                        <label for="Ratón">
+                            <div class="container">
+                                <img
+                                    src="https://i.pinimg.com/originals/9a/d9/84/9ad9840d4ffb12de9ba5e0c287ba78b7.jpg" />
+                                <div class="middle">
+                                    <div class="text">Ratón</div>
+                                </div>
+                            </div>
+                        </label>
+
+                        <% break; case 20: %>
+                            <label for="Serpiente">
+                                <div class="container">
+                                    <img
+                                        src="https://imagenes.20minutos.es/files/image_990_v3/uploads/imagenes/2012/09/21/77364.jpg" />
+                                    <div class="middle">
+                                        <div class="text">Serpiente</div>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <% break; case 21: %>
+                                <label for="Tortuga">
+                                    <div class="container">
+                                        <img
+                                            src="https://www.abc.com.py/resizer/fREtpzzQ93sha9AiMTJrrL8kU5M=/fit-in/770xorig/smart/cloudfront-us-east-1.images.arcpublishing.com/abccolor/3MBK2DYNHVEQVPFHSKOBXRTIKE.jpeg" />
+                                        <div class="middle">
+                                            <div class="text">Tortuga</div>
+                                        </div>
+                                    </div>
+                                </label>
+
+                                <% break; case 22: %>
+                                    <label for="Vaca">
+                                        <div class="container">
+                                            <img src="https://img2.rtve.es/i/?w=1600&i=1242660432107.jpg" />
+                                            <div class="middle">
+                                                <div class="text">Vaca</div>
+                                            </div>
+                                        </div>
+                                    </label>
+
+                                    <% break; case 23: %>
+                                        <label for="Toro">
+                                            <div class="container">
+                                                <img
+                                                    src="https://t1.ea.ltmcdn.com/es/posts/6/2/6/por_que_los_toros_odian_el_color_rojo_23626_600_square.jpg" />
+                                                <div class="middle">
+                                                    <div class="text">Toro</div>
+                                                </div>
+                                            </div>
+                                        </label>
+
+                                        <% break; default: break; } %>
+
+                                            <% } %>
+
+
+        </div>
+
+        <div class=" justify-content-center" style="text-align: center;">
+
+
+            <button type="submit" class="btn btn-primary col-12" style="margin-bottom: 5%; margin-top: 5%;">Listo</button>
+        </div>
+
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+        <script>
+            var checks = document.querySelectorAll(".check");
+            var max = 3;
+            for (var i = 0; i < checks.length; i++)
+                checks[i].onclick = selectiveCheck;
+
+            function selectiveCheck(event) {
+                var checkedChecks = document.querySelectorAll(".check:checked");
+                if (checkedChecks.length >= max + 1) {
+                    Swal.fire(
+                        '¡No tan rápido!',
+                        'Solo puedes seleccionar tres animales.',
+                        'info'
+                    )
+                    return false;
+                }
+            }
+
+
+            function MinCheck(event) {
+                var checkedChecks = document.querySelectorAll(".check:checked");
+
+                if (checkedChecks.length < 3) {
+                    Swal.fire(
+                        '¡Espera un momento!',
+                        'Selecciona al meos tres animales',
+                        'info'
+                    )
+
+                    return false;
+                }
+                else {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Se seleccionó correctamente',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(function (result) {
+                        return true;
+
+                    });
+
+                }
+
+
+            }
+        </script>
+
+
+
+
+
+    </form>
+
+
+
+
+
+
+
+
+</body>
+
+</html>
