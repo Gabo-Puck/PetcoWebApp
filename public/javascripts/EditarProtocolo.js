@@ -2,6 +2,7 @@ import {
   removeItemOnce,
   loadingScreen,
   retrieveParent,
+  selectParent,
 } from "/javascripts/FormulariosFunctions.js";
 
 import {
@@ -14,6 +15,7 @@ import {
 
 var pasoCount = 0;
 var archivosEliminados = [];
+var pasosEliminados = [];
 
 const buttonAddStep = document.querySelector(
   //Se define el boton de añadir un paso
@@ -38,6 +40,7 @@ $(window).on("load", () => {
     newPaso.newPaso.querySelectorAll("input,textarea").forEach((input) => {
       input.disabled = true;
     });
+    newPaso.newPaso.querySelector(".eliminarButtonPaso").remove();
     newPaso.newPaso.classList.add("default");
     pasoCount = newPaso.pasoCount;
   });
@@ -55,11 +58,17 @@ $(window).on("load", () => {
       let publicFolder = paso.Archivo.split("\\", 2)[0];
 
       let archivo = document.createElement("a");
-      archivo.classList.add("btn", "btn-info");
+      archivo.classList.add("btn", "btn-info", "d-block", "verArchivo");
       let ArchivoEliminarButton = document.createElement("button");
-      ArchivoEliminarButton.classList.add("btn", "btn-danger");
+      ArchivoEliminarButton.classList.add(
+        "btn",
+        "btn-danger",
+        "d-block",
+        "archivoEliminar"
+      );
       ArchivoEliminarButton.innerText = "Eliminar archivo subido";
       ArchivoEliminarButton.type = "button";
+
       ArchivoEliminarButton.addEventListener("click", (e) => {
         let pasoDOM = retrieveParent(ArchivoEliminarButton, "Paso");
         if (pasoDOM.querySelector("a") != null) {
@@ -71,6 +80,8 @@ $(window).on("load", () => {
       });
 
       archivo.href = paso.Archivo.replace(`${publicFolder}\\`, "/");
+      archivo.style.width = "50%";
+
       archivo.innerText = "Descargar archivo subido";
       archivo.download = "ArchivoPaso";
       let inputFile = newPaso.newPaso.querySelector("input[type='file']");
@@ -79,6 +90,20 @@ $(window).on("load", () => {
       insertAfter(inputFile, archivo);
     }
     newPaso.newPaso.classList.add(`pasoCargado-${paso.ID}`);
+
+    let buttonDelete = newPaso.newPaso.querySelector(".eliminarButtonPaso");
+
+    buttonDelete.addEventListener("click", () => {
+      pasosEliminados.push({
+        ID: paso.ID,
+        Titulo_Paso: paso.Titulo_Paso,
+        Descripcion: paso.Descripcion,
+        DiasEstimados: paso.DiasEstimados,
+        Archivo: paso.Archivo,
+        AceptaArchivo: paso.AceptaArchivo,
+      });
+      selectParent(buttonDelete, "Paso");
+    });
     pasoCount = newPaso.pasoCount;
   });
 });
@@ -153,7 +178,7 @@ buttonSaveProtocol.addEventListener("click", (e) => {
   formData.append("DescripcionID", ProtocoloD.id);
   formData.append("ID_Formulario", ProtocoloF.value);
   formData.append("Pasos", JSON.stringify(pasoguardado));
-  // formData.append("ContenidoEliminado", JSON.stringify(ContenidoEliminado));
+  formData.append("pasosEliminados", JSON.stringify(pasosEliminados));
   formData.append("ArchivosEliminados", JSON.stringify(archivosEliminados));
   document
     .querySelectorAll("input[type='file']:not(input[disabled])")
