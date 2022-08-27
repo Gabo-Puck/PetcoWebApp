@@ -213,7 +213,6 @@ const fetchInput = (acceptedTypes, folderPath) => {
           });
           file.on("end", () => {
             readable.push(null);
-
             res.fileReadableStream.push({ path: saveTo, stream: readable });
             req.body[fieldname] = saveTo;
           });
