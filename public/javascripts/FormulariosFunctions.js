@@ -1,7 +1,9 @@
-function removeItemOnce(arr, value) {
-  var index = arr.indexOf(value);
+export function removeItemOnce(arr, value) {
+  var index = Array.prototype.indexOf.call(arr, value);
+  // var index = arr.indexOf(value);
   if (index > -1) {
-    arr.splice(index, 1);
+    Array.prototype.splice.call(arr, index, 1);
+    // arr.splice(index, 1);
   }
   return arr;
 }

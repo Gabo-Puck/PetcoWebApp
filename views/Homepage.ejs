@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" , href="/stylesheets/style.css" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #categories {
+            overflow: hidden;
+            width: 90%;
+            margin: 0 auto;
+        }
+
+        .clr:after {
+            content: "";
+            display: block;
+            clear: both;
+        }
+
+        #categories li {
+            position: relative;
+            list-style-type: none;
+            float: left;
+            overflow: hidden;
+            visibility: hidden;
+            transform: rotate(-60deg) skewY(30deg);
+        }
+
+        #categories li * {
+            position: absolute;
+            visibility: visible;
+        }
+
+        #categories li>div {
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            color: #fff;
+            overflow: hidden;
+            transform: skewY(-30deg) rotate(60deg);
+            backface-visibility: hidden;
+
+        }
+
+        /* HEX CONTENT */
+        #categories li img {
+            left: -100%;
+            right: -100%;
+            width: auto;
+            height: 100%;
+            margin: 0 auto;
+        }
+
+        #categories div h1,
+        #categories div p {
+            width: 90%;
+            padding: 0 5%;
+
+            font-family: 'Raleway', sans-serif;
+            transition: top .2s ease-out, bottom .2s ease-out, .2s padding .2s ease-out;
+        }
+
+        #categories li h1 {
+            bottom: 110%;
+            font-style: italic;
+            font-weight: normal;
+            font-size: 1.5em;
+            padding-top: 100%;
+            padding-bottom: 100%;
+        }
+
+        #categories li h1:after {
+            content: '';
+            display: block;
+            position: absolute;
+            bottom: -1px;
+            left: 45%;
+            width: 10%;
+            text-align: center;
+            z-index: 1;
+            border-bottom: 2px solid #fff;
+        }
+
+        #categories li p {
+            padding-top: 50%;
+            top: 110%;
+            padding-bottom: 50%;
+        }
+
+
+        /* HOVER EFFECT  */
+
+        #categories li div:hover h1 {
+            bottom: 50%;
+            padding-bottom: 10%;
+        }
+
+        #categories li div:hover p {
+            top: 50%;
+            padding-top: 10%;
+        }
+
+        @media (min-width:1201px) {
+            #categories li {
+                width: 19.2%;
+                /* = (100-4) / 5 */
+                padding-bottom: 22.17%;
+                /* =  width /0.866 */
+            }
+
+            #categories li:nth-child(9n+6),
+            #categories li:nth-child(9n+7),
+            #categories li:nth-child(9n+8),
+            #categories li:nth-child(9n+9) {
+                margin-top: -4.2%;
+                margin-bottom: -4.2%;
+                transform: translateX(50%) rotate(-60deg) skewY(30deg);
+            }
+
+            #categories li:nth-child(9n+6):last-child,
+            #categories li:nth-child(9n+7):last-child,
+            #categories li:nth-child(9n+8):last-child,
+            #categories li:nth-child(9n+9):last-child {
+                margin-bottom: 0;
+            }
+
+            #categories li:nth-child(9n+6) {
+                margin-left: 0.5%;
+                clear: left;
+            }
+
+            #categories li:nth-child(9n+10) {
+                clear: left;
+            }
+
+            #categories li:nth-child(9n+2),
+            #categories li:nth-child(9n+ 7) {
+                margin-left: 1%;
+                margin-right: 1%;
+            }
+
+            #categories li:nth-child(9n+3),
+            #categories li:nth-child(9n+4),
+            #categories li:nth-child(9n+8) {
+                margin-right: 1%;
+            }
+        }
+
+        @media (max-width: 1200px) and (min-width:901px) {
+            #categories li {
+                width: 24.25%;
+                /* = (100-3) / 4 */
+                padding-bottom: 28.002%;
+                /* =  width /0.866 */
+            }
+
+            #categories li:nth-child(7n+5),
+            #categories li:nth-child(7n+6),
+            #categories li:nth-child(7n+7) {
+                margin-top: -6.1%;
+                margin-bottom: -6.1%;
+                transform: translateX(50%) rotate(-60deg) skewY(30deg);
+            }
+
+            #categories li:nth-child(7n+5):last-child,
+            #categories li:nth-child(7n+6):last-child,
+            #categories li:nth-child(7n+7):last-child {
+                margin-bottom: 0;
+            }
+
+            #categories li:nth-child(7n+2),
+            #categories li:nth-child(7n+6) {
+                margin-left: 1%;
+                margin-right: 1%;
+            }
+
+            #categories li:nth-child(7n+3) {
+                margin-right: 1%;
+            }
+
+            #categories li:nth-child(7n+8) {
+                clear: left;
+            }
+
+            #categories li:nth-child(7n+5) {
+                clear: left;
+                margin-left: 0.5%;
+            }
+        }
+
+
+        @media (max-width: 900px) and (min-width:601px) {
+            #categories li {
+                width: 32.666%;
+                /* = (100-2) / 3 */
+                padding-bottom: 37.721%;
+                /* =  width /0.866 */
+            }
+
+            #categories li:nth-child(5n+4),
+            #categories li:nth-child(5n+5) {
+                margin-top: -8.622%;
+                margin-bottom: -8.622%;
+                transform: translateX(50%) rotate(-60deg) skewY(30deg);
+            }
+
+            #categories li:nth-child(5n+4):last-child,
+            #categories li:nth-child(5n+5):last-child {
+                margin-bottom: 0;
+            }
+
+            #categories li:nth-child(5n+4) {
+                margin-right: 1%;
+                margin-left: 0.5%;
+            }
+
+            #categories li:nth-child(5n+2) {
+                margin-left: 1%;
+                margin-right: 1%;
+            }
+
+            #categories li:nth-child(5n+6) {
+                clear: left;
+            }
+
+        }
+
+        @media (max-width: 600px) {
+            #categories li {
+                width: 49.5%;
+                /* = (100-1) / 2 */
+                padding-bottom: 57.16%;
+                /* =  width /0.866 */
+            }
+
+            #categories li:nth-child(3n+3) {
+                margin-top: -13.392%;
+                margin-bottom: -13.392%;
+                transform: translateX(50%) rotate(-60deg) skewY(30deg);
+            }
+
+            #categories li:nth-child(3n+3):last-child {
+                margin-bottom: 0;
+            }
+
+            #categories li:nth-child(3n+3) {
+                margin-left: 0.5%;
+            }
+
+            #categories li:nth-child(3n+2) {
+                margin-left: 1%;
+            }
+
+            #categories li:nth-child(3n+4) {
+                clear: left;
+            }
+        }
+
+        #fork {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            color: #000;
+            text-decoration: none;
+            border: 1px solid #000;
+            padding: .5em .7em;
+            margin: 1%;
+            transition: color .5s;
+            overflow: hidden;
+        }
+
+        #fork:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 130%;
+            height: 100%;
+            background: #000;
+            z-index: -1;
+            transform-origin: 0 0;
+            transform: translateX(-100%) skewX(-45deg);
+            transition: transform .5s;
+        }
+
+        #fork:hover {
+            color: #fff;
+        }
+
+        #fork:hover:before {
+            transform: translateX(0) skewX(-45deg);
+        }
+
+
+
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Create two equal columns that floats next to each other */
+        .column {
+            float: inherit;
+            width: 50%;
+            padding: 10px;
+
+            /* Should be removed. Only for demonstration */
+        }
+
+        /* Clear floats after the columns */
+        .row:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        /* Responsive layout - makes the two columns stack on top of each other instead of next to each other */
+        @media screen and (max-width: 00px) {
+            .column {
+                width: 100%;
+            }
+        }
+
+        body {
+            background-image: "images/HomepageImage/tiger.jpg";
+        }
+
+        div.transbox {
+            margin: 30px;
+            background-color: #000000;
+            border: 1px solid black;
+            opacity: 0.6;
+        }
+
+        div.transbox p {
+            margin: 5%;
+            font-weight: bold;
+            color: #000000;
+        }
+    </style>
+</head>
+
+<body>
+
+    <script>
+        window.onload = choosePic;
+
+        var myPix = new Array("images/HomepageImage/tiger.jpg", "images/HomepageImage/perro.jpg", "images/HomepageImage/vengala.jpg");
+
+        function choosePic() {
+            randomNum = Math.floor((Math.random() * myPix.length));
+            randomNum2 = Math.floor((Math.random() * myPix.length));
+            const randomNumb = [];
+            for (var i = 1; i <= 23; i++) {
+                randomNumb[i] = Math.floor((Math.random() * myPix.length));
+            }
+
+
+
+            for (var j = 1; j <= 23; j++) {
+                document.getElementById("myPicture" + j).src = myPix[randomNumb[j]];
+            }
+
+
+        }
+
+    </script>
+
+   
+
+        <div class="row">
+            <div class="column">
+                <ul id="categories" class="clr">
+
+                    <% for(var i=1; i <=23; i++) { %>
+                        <li>
+                            <div>
+                                <img src="images/HomepageImage/spacer.gif" id="myPicture<%= i%>" alt="some image" />
+
+                            </div>
+                        </li>
+                        <% } %>
+
+            </div>
+            <div class="column" >
+
+                <div class="container">
+
+                    <h1 style="font-size: 80px;">Texto de Titulo.</h1>
+                    <p>Descripción descripción descripción descripción descripción descripción descripción descripción
+                        descripción descripción descripción descripción descripción</p>
+
+                </div>
+            </div>
+        </div>
+</body>
+
+</html>
+
+
+
+</html>

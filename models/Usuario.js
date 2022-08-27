@@ -12,6 +12,7 @@ class Usuario extends BaseModel {
     const Especie = require("./Especie");
     const Formulario = require("./Formulario");
     const Solicitudes = require("./Solicitudes");
+    const Protocolo = require("./Protocolo");
     return {
       Especies: {
         relation: Model.ManyToManyRelation,
@@ -39,6 +40,14 @@ class Usuario extends BaseModel {
         join: {
           from: "Usuario.ID",
           to: "Solicitudes.ID_Usuario",
+        },
+      },
+      Protocolos: {
+        relaton: Model.HasManyRelation,
+        modelClass: Protocolo,
+        join: {
+          from: "Usuario.ID",
+          to: "Protocolo.ID_Usuario",
         },
       },
     };

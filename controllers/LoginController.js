@@ -50,7 +50,7 @@ exports.CheckDB = (req, res) => {
                                 alertIcon: "success",
                                 showCofirmButton: false,
                                 timer: 2500,
-                                ruta: ''
+                                ruta: './inicio'
 
                             });
                         }
