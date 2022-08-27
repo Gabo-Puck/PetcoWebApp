@@ -148,9 +148,9 @@ const guardarButton = document
       document.querySelectorAll(".preguntaAbierta"),
       document.querySelectorAll(".preguntaCerrada"),
       document.querySelectorAll(".preguntaMultiple"),
-      "http://localhost:3000/petco/formulario/info",
+      "/petco/formulario/info",
       document,
-      "http://localhost:3000/petco/formulario/editar"
+      "/petco/formulario/editar"
     );
   });
 
@@ -254,7 +254,7 @@ function bindPreguntas(
 
   const header = new Headers();
   setTimeout(() => {
-    var response = fetch("http://localhost:3000/petco/formulario/verify", {
+    var response = fetch("/petco/formulario/verify", {
       method: "POST",
       body: JSON.stringify(preguntasFetched),
       headers: { "Content-Type": "application/json" },

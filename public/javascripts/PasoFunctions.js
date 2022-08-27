@@ -7,6 +7,7 @@ import {
 export function addPaso(
   document,
   pasoCount,
+
   Titulo = "",
   Descripcion = "",
   DiasEstimados = 1,
@@ -37,6 +38,19 @@ export function addPaso(
     .insertBefore(newPaso, document.querySelector(".AddStep")); //Clona los elementos
   autoSizeTextarea(newPaso.querySelector(".Descripcion"));
   autoSizeTextarea(newPaso.querySelector(".Titulo"));
+
+  // let buttonDelete = newPaso.querySelector(".eliminarButtonPaso");
+
+  // buttonDelete.addEventListener("click", () => {
+  //   eliminadosPasos.push({
+  //     Titulo_Paso: Titulo,
+  //     Descripcion: Descripcion,
+  //     DiasEstimados: DiasEstimados,
+  //     Archivo: Archivo,
+  //     AceptaArchivo: AceptaArchivo,
+  //   });
+  //   selectParent(buttonDelete, "Paso");
+  // });
 
   return { newPaso: newPaso, pasoCount: pasoCount };
 }

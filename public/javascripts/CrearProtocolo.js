@@ -1,6 +1,7 @@
 import {
   removeItemOnce,
   loadingScreen,
+  selectParent,
 } from "/javascripts/FormulariosFunctions.js";
 
 const buttonAddStep = document.querySelector(
@@ -41,6 +42,7 @@ $(window).on("load", () => {
       input.disabled = true;
     });
     newPaso.classList.add("default");
+    newPaso.querySelector(".eliminarButtonPaso").remove();
   });
 });
 
@@ -49,7 +51,7 @@ function addPaso(
   document,
   Titulo = "",
   Descripcion = "",
-  DiasEstimados = 1,
+  DiasEstimados = "",
   Archivo = ""
 ) {
   var newPaso = paso.cloneNode(true);
@@ -73,6 +75,12 @@ function addPaso(
     .insertBefore(newPaso, document.querySelector(".AddStep")); //Clona los elementos
   autoSizeTextarea(newPaso.querySelector(".Descripcion"));
   autoSizeTextarea(newPaso.querySelector(".Titulo"));
+
+  let buttonDelete = newPaso.querySelector(".eliminarButtonPaso");
+
+  buttonDelete.addEventListener("click", () => {
+    selectParent(buttonDelete, "Paso");
+  });
 
   return newPaso;
 }

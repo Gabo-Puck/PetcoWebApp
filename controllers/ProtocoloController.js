@@ -9,7 +9,7 @@ const { check, validationResult } = require("express-validator");
 const _ = require("lodash");
 const Busboy = require("busboy");
 var path = require("path");
-const { PassThrough } = require("stream");
+const { PassThrough, Readable } = require("stream");
 var fs = require("fs");
 var os = require("os");
 const Paso = require("../models/Paso");
@@ -133,75 +133,92 @@ const fetchInput = (acceptedTypes, folderPath) => {
       //Inicializamos errors
       res.errors = [];
 
+      // //Usamos el listener de la instancia de busboy. Este listener se activará 1 vez por cada archivo encontrado en la request
       //Usamos el listener de la instancia de busboy. Este listener se activará 1 vez por cada archivo encontrado en la request
-      busboy.on(
-        "file",
-        function (fieldname, file, fileData, encoding, mimetype) {
-          const stream = new PassThrough();
-          console.log(fileData);
-          // console.log(fieldname);
-          //Usamos el listener del archivo encontrado. Este listener se activará su el archivo supera el limite que se establece en limits
-          file.on("limit", function (data) {
-            console.log("Limit reached");
-            res.errors.push({
-              msg: "El limite de tamaño para archivos es de 10mb",
-              formID: fieldname,
-            });
+      // busboy.on("file", (name, file, info) => {
+      //   const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      //   // const nombreArchivo = fileData.fileData.replace(/\s/g, "");
+      //   //Le agregamos la extensión
+      //   const pathFile = `${uniqueSuffix}.${info.filename.split(".", 2)[1]}`;
+      //   const saveTo = path.join(folderPath, pathFile);
+      //   file.pipe(fs.createWriteStream(saveTo));
+      // });
+      busboy.on("file", function (fieldname, file, fileData) {
+        console.log(fileData);
+        // console.log(fieldname);
+        //Usamos el listener del archivo encontrado. Este listener se activará su el archivo supera el limite que se establece en limits
+        file.on("limit", function (data) {
+          console.log("Limit reached");
+          res.errors.push({
+            msg: "El limite de tamaño para archivos es de 10mb",
+            formID: fieldname,
           });
-          var type;
-          //Revisamos si el mimeType del archivo encontrado se encuentra dentro de los que se desean aceptar
-          //Si no lo es, agregamos al array de errores un mensaje correspondiente
+        });
+        var type;
+        //Revisamos si el mimeType del archivo encontrado se encuentra dentro de los que se desean aceptar
+        //Si no lo es, agregamos al array de errores un mensaje correspondiente
 
-          //Ciclo para obtener todos las extensiones de acuerdo a los mimeType que se hayan pasado como parametro, y cada extensión se concatena a "extensionAceptados"
-          if (acceptedTypes.indexOf(fileData.mimeType) === -1) {
-            var extensionAceptados = "";
-            for (const key in extensions) {
-              if (Object.hasOwnProperty.call(extensions, key)) {
-                const element = extensions[key];
-                if (acceptedTypes.indexOf(key) != -1) {
-                  extensionAceptados = extensionAceptados.concat(element, ", ");
-                }
+        //Ciclo para obtener todos las extensiones de acuerdo a los mimeType que se hayan pasado como parametro, y cada extensión se concatena a "extensionAceptados"
+        if (acceptedTypes.indexOf(fileData.mimeType) === -1) {
+          var extensionAceptados = "";
+          for (const key in extensions) {
+            if (Object.hasOwnProperty.call(extensions, key)) {
+              const element = extensions[key];
+              if (acceptedTypes.indexOf(key) != -1) {
+                extensionAceptados = extensionAceptados.concat(element, ", ");
               }
             }
-            //Eliminamos espacio y coma del final del string
-            extensionAceptados = extensionAceptados.trimEnd();
-            extensionAceptados = extensionAceptados.slice(
-              0,
-              extensionAceptados.length - 1
-            );
-            //Añadimos el error al array de errores
-            res.errors.push({
-              msg: `El tipo de archivo aceptado es: ${extensionAceptados}`,
-              formID: fieldname,
-            });
-          } else {
-            //Si el mimeType se encuentra dentro de los que se desean aceptar,
-            //buscamos entre las extensiones de archivos y lo asignamos a type
-            for (const key in extensions) {
-              if (Object.hasOwnProperty.call(extensions, key)) {
-                const element = extensions[key];
-                if (key == fileData.mimeType) {
-                  type = element;
-                  break;
-                }
-              }
-            }
-            //Generamos el nombre del archivo
-            const uniqueSuffix =
-              Date.now() + "-" + Math.round(Math.random() * 1e9);
-            // const nombreArchivo = fileData.fileData.replace(/\s/g, "");
-            //Le agregamos la extensión
-            const pathFile = `${uniqueSuffix}.${type}`;
-            //De acuerdo a la carpeta "folderPath", concatenamos la ruta de la carpeta y el nombre del archivo
-            var saveTo = path.join(folderPath, pathFile);
-            //Añadimos al array de fileRedeableStream, el stream del archivo y la dirección.
           }
-          // file.pipe(fs.createWriteStream(saveTo));
-          file.pipe(stream);
-          res.fileReadableStream.push({ path: saveTo, stream: stream });
-          req.body[fieldname] = saveTo;
+          //Eliminamos espacio y coma del final del string
+          extensionAceptados = extensionAceptados.trimEnd();
+          extensionAceptados = extensionAceptados.slice(
+            0,
+            extensionAceptados.length - 1
+          );
+          //Añadimos el error al array de errores
+          res.errors.push({
+            msg: `El tipo de archivo aceptado es: ${extensionAceptados}`,
+            formID: fieldname,
+          });
+          file.resume();
+          console.log("a");
+        } else {
+          //Si el mimeType se encuentra dentro de los que se desean aceptar,
+          //buscamos entre las extensiones de archivos y lo asignamos a type
+          for (const key in extensions) {
+            if (Object.hasOwnProperty.call(extensions, key)) {
+              const element = extensions[key];
+              if (key == fileData.mimeType) {
+                type = element;
+                break;
+              }
+            }
+          }
+
+          //Generamos el nombre del archivo
+          const uniqueSuffix =
+            Date.now() + "-" + Math.round(Math.random() * 1e9);
+          // const nombreArchivo = fileData.fileData.replace(/\s/g, "");
+          //Le agregamos la extensión
+          const pathFile = `${uniqueSuffix}.${type}`;
+          //De acuerdo a la carpeta "folderPath", concatenamos la ruta de la carpeta y el nombre del archivo
+          var saveTo = path.join(folderPath, pathFile);
+          //Añadimos al array de fileRedeableStream, el stream del archivo y la dirección.
+          //creamos un stream de lectura donde se guardarán los buffer del archivo
+          var readable = new Readable();
+          readable._read = (size) => {};
+          file.on("data", (data) => {
+            console.log(data);
+            readable.push(data);
+          });
+          file.on("end", () => {
+            readable.push(null);
+            res.fileReadableStream.push({ path: saveTo, stream: readable });
+            req.body[fieldname] = saveTo;
+          });
         }
-      );
+        // file.pipe(fs.createWriteStream(saveTo));
+      });
       //Usamos el listener de la instancia de busboy. Este listener se activará cuando se terminen de tratar todos los campos y archivos de la request
       busboy.on("finish", function () {
         console.log("Upload complete");
@@ -444,6 +461,12 @@ function createPromisePatchArchivo(pasoID) {
   });
 }
 
+function createPromiseDeletePaso(paso) {
+  return new Promise((resolve, reject) => {
+    resolve(Paso.query().delete().findOne(paso));
+  });
+}
+
 function getPromisesUpsert(req, res, idProtocolo) {
   var PromisesUpsert = [];
   req.body["Pasos"].forEach((paso) => {
@@ -465,6 +488,17 @@ function getPromisesUpsert(req, res, idProtocolo) {
       req.body.ArchivosEliminados.forEach((ArchivoEliminado) => {
         req.deleteFilesPath.push(ArchivoEliminado.path);
         PromisesUpsert.push(createPromisePatchArchivo(ArchivoEliminado.ID));
+      });
+    }
+  }
+  if (req.body.pasosEliminados) {
+    if (req.body.pasosEliminados.length > 0) {
+      if (!req.deleteFilesPath) {
+        req.deleteFilesPath = [];
+      }
+      req.body.pasosEliminados.forEach((PasoEliminar) => {
+        req.deleteFilesPath.push(PasoEliminar.Archivo);
+        PromisesUpsert.push(createPromiseDeletePaso(PasoEliminar));
       });
     }
   }

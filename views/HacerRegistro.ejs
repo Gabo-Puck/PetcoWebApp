@@ -381,7 +381,7 @@
           icon: 'success',
           confirmButtonText: "Siguiente"
         }
-      ).then(sweetResult=>{if(sweetResult.isConfirmed){window.location="http://localhost:3000/registro/info"}})
+      ).then(sweetResult=>{if(sweetResult.isConfirmed){window.location="/registro/info"}})
     }
 
     function sendData(formData, inputFiles) {
@@ -408,7 +408,7 @@
       xhrSubmit.onerror = function (){
         // errorScreen.fire();
       }
-      xhrSubmit.open("POST", "http://localhost:3000/registro/crear");
+      xhrSubmit.open("POST", "/registro/crear");
       xhrSubmit.send(formData);
     }
 
@@ -456,7 +456,7 @@
             }
           }
         };
-      xhr.open("POST", "http://localhost:3000/registro/verify", true);//Especificamos que tipo de request se va a hacer, el uri y si es sincrono o asincrona.
+      xhr.open("POST", "/registro/verify", true);//Especificamos que tipo de request se va a hacer, el uri y si es sincrono o asincrona.
       xhr.send(formData);//Mandamos la información del form data
     });
 
@@ -663,7 +663,7 @@
       );
       chargeInputToFormData(formData, inputText);
 
-      xhr.open("POST", "http://localhost:3000/registro/verify", true);//Especificamos que tipo de request se va a hacer, el uri y si es sincrono o no
+      xhr.open("POST", "/registro/verify", true);//Especificamos que tipo de request se va a hacer, el uri y si es sincrono o no
       xhr.send(formData);
 
     });

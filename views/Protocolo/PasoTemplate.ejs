@@ -1,31 +1,45 @@
-<div class="Paso">
-  <div class="container mt-5" style="text-align: center">
-    <div class="card border-primary mb-3" style="max-width: 20rem">
-      <div class="card-body">
+<style></style>
+
+<div class="container form-group row">
+  <div class="Paso mt-3">
+    <div class="card border-dark mb-3">
+      <div class="card-body" style="text-align: center">
         <form>
           <textarea
             type="text"
             placeholder="Titulo"
-            class="form-control Titulo"
+            class="form-control mt-3 Titulo"
           ></textarea>
           <textarea
             placeholder="Descripcion"
             class="form-control Descripcion"
           ></textarea>
+
           <input
-            type="number"
+            type="tel"
             placeholder="Dias Estimados"
-            class="form-control DiasEstimados"
+            min="0"
+            class="form-control mt-3 DiasEstimados"
           />
-          <input type="file" class="Archivo" />
-          <div class="form-check form-switch">
+
+          <input type="file" class="Archivo mt-3" />
+
+          <div class="form-check form-switch" style="text-align: left">
             <input class="form-check-input AceptaArchivo" type="checkbox" />
             <label class="form-check-label" for="flexSwitchCheckDefault"
               >Activar la subida de archivos</label
             >
           </div>
         </form>
-        <h1>TEXTO</h1>
+
+        <div style="text-align: right">
+          <button
+            type="button"
+            class="btn btn-danger btn-sm eliminarButtonPaso"
+          >
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </div>
       </div>
     </div>
   </div>

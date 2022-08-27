@@ -45,9 +45,9 @@ const guardarButton = document
       document.querySelectorAll(".preguntaAbierta"),
       document.querySelectorAll(".preguntaCerrada"),
       document.querySelectorAll(".preguntaMultiple"),
-      "http://localhost:3000/petco/formulario/info",
+      "/petco/formulario/info",
       document,
-      "http://localhost:3000/petco/formulario/crear"
+      "/petco/formulario/crear"
     );
   });
 var contPregunta = 0;
