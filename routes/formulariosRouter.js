@@ -20,7 +20,7 @@ router.get("/editar/:idFormulario", formularioController.formulario_edit_get);
 router.get("/preguntaTemplate", formularioController.formTest2);
 router.get("/eliminar/:idFormulario", formularioController.EliminarForm);
 router.get(
-  "/responder/f=:idFormulario&m=:idMascota",
+  "/responder/m=:idMascota",
   formularioController.responder_formulario_get
 );
 

@@ -4,7 +4,7 @@ var Preguntas = require("../models/Preguntas");
 var Opciones = require("../models/Opciones_Respuestas_Preguntas");
 var Solicitud = require("../models/Solicitudes");
 var Preguntas_Formulario = require("../models/Preguntas_Formulario");
-var Mascota = require("../models/Mascota")
+var Mascota = require("../models/Mascota");
 const Solicitudes = require("../models/Solicitudes");
 const Opciones_Respuestas_Preguntas = require("../models/Opciones_Respuestas_Preguntas");
 const fetch = require("node-fetch");
@@ -35,15 +35,28 @@ exports.preguntasOpciones = (req, res) => {
 exports.responder_formulario_get = [
   getTemplateResponderPreguntas,
   (req, res) => {
-    var idFormulario = req.params.idFormulario;
-    Formulario.query()
-      .withGraphJoined("Preguntas.[Opciones_Respuestas_Pregunta]")
-      .where("Formulario.ID", "=", idFormulario)
+    // var idFormulario = req.params.idFormulario;
+    //Formulario.query()
+    //.withGraphJoined("Preguntas.[Opciones_Respuestas_Pregunta]")
+    //.where("Formulario.ID", "=", idFormulario)
+    Mascota.query()
+      .withGraphFetched(
+        "[MascotasPasos.[Proto.[FormularioProtocolo.[Preguntas.[Opciones_Respuestas_Pregunta]]]]]"
+      )
+      .findById(req.params.idMascota)
+      .then((re) => {
+        return new Promise((resolve, reject) => {
+          resolve(
+            re.MascotasPasos[re.MascotasPasos.length - 1].Proto
+              .FormularioProtocolo
+          );
+        });
+      })
       .then((response) => {
         console.log(response);
-        if (response.length == 1) {
+        if (response != null) {
           res.render("Formulario/ResponderFormulario", {
-            Response: response[0],
+            Response: response,
             templatePreguntasRespuestas: res.templateHtml,
             idMascota: req.params.idMascota,
           });
