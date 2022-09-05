@@ -67,6 +67,7 @@ $(window).on("load", () => {
         "archivoEliminar"
       );
       ArchivoEliminarButton.innerText = "Eliminar archivo subido";
+      ArchivoEliminarButton.classList.add("mt-3");
       ArchivoEliminarButton.type = "button";
 
       ArchivoEliminarButton.addEventListener("click", (e) => {
@@ -84,6 +85,7 @@ $(window).on("load", () => {
 
       archivo.innerText = "Descargar archivo subido";
       archivo.download = "ArchivoPaso";
+      archivo.classList.add("mt-3");
       let inputFile = newPaso.newPaso.querySelector("input[type='file']");
       // inputFile.value = "hola.pdf";
       insertAfter(inputFile, ArchivoEliminarButton);
@@ -214,5 +216,11 @@ buttonSaveProtocol.addEventListener("click", (e) => {
 buttonAddStep.addEventListener("click", (e) => {
   let newPaso = addPaso(document, pasoCount);
   newPaso.newPaso.classList.add("pasoNuevo");
+  let buttonDelete = newPaso.newPaso.querySelector(".eliminarButtonPaso");
+
+  buttonDelete.addEventListener("click", () => {
+    selectParent(buttonDelete, "Paso");
+  });
+  pasoCount = newPaso.pasoCount;
   pasoCount = newPaso.pasoCount;
 });

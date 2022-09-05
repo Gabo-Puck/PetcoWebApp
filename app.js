@@ -16,6 +16,7 @@ var vacunasRouter = require("./routes/vacunas");
 var formulariosRouter = require("./routes/formulariosRouter");
 var loginRouter = require("./routes/login");
 var authRequired = require("./routes/authRequired");
+var dashboard = require("./routes/DashboardRoutes");
 
 var app = express();
 
@@ -43,7 +44,8 @@ app.use("/petco", isLogged, authRequired);
 app.use("/registro", registroRouter);
 //app.use("/formulario", formulariosRouter);
 app.use("/login", loginRouter);
-app.use("/protocolo", ProtocoloRouter)
+app.use("/protocolo", ProtocoloRouter);
+app.use("/dashboard", dashboard);
 
 
 function isLogged(req, res, next) {
