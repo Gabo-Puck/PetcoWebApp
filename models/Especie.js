@@ -10,6 +10,8 @@ class Especie extends BaseModel {
   static get relationMappings() {
     const Vacuna = require("./Vacunas");
     const Usuario = require("./Usuario");
+    const Mascota = require("./Mascota");
+
     return {
       Vacunas: {
         relation: Model.ManyToManyRelation,
@@ -33,6 +35,14 @@ class Especie extends BaseModel {
             to: "Intereses.ID_Usuario",
           },
           to: "Usuario.ID",
+        },
+      },
+      Mascotas: {
+        relation: Model.HasManyRelation,
+        modelClass: Mascota,
+        join: {
+          from: "Castrado.ID",
+          to: "Mascota.ID_Castrado",
         },
       },
     };
