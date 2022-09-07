@@ -61,6 +61,16 @@ function isLogged(req, res, next) {
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
+  // console.log("X");
+});
+
+app.use(function (req, res, next) {
+  try {
+    next();
+  } catch (error) {
+    console.log(error);
+    // console.log("D");
+  }
 });
 
 function validationErrorMiddleware(error, request, response, next) {
@@ -82,12 +92,16 @@ function validationErrorMiddleware(error, request, response, next) {
 
 app.use(validationErrorMiddleware);
 
+app.use(function (err, req, res, next) {
+  console.log(err);
+  next(err);
+});
 // error handler
 app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
-
+  console.log("rees");
   // render the error page
   res.status(err.status || 500);
   res.render("error");
