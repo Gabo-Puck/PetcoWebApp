@@ -17,3 +17,18 @@ exports.prueba = (req, res) => {
       )
     );
 };
+
+const getMascotaTemplate = (req, res, next) => {
+  res.render("Publicacion/mascotaTemplate", {}, (error, html) => {
+    res.htmlTemplate = html.replace(/\r?\n|\r/g, " ");
+    next();
+  });
+};
+
+exports.crearPublicacion = [
+  getMascotaTemplate,
+  (req, res, next) =>
+    res.render("Publicacion/crearPublicacion", {
+      mascotaTemplate: res.htmlTemplate,
+    }),
+];
