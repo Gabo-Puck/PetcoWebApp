@@ -31,7 +31,16 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>Crear publicacion</title>
     <script>
-      const MascotaTemplate = "<%-mascotaTemplate%>";
+      const domParser = new DOMParser();
+      const MascotaTemplateDOM = domParser.parseFromString(
+        `<%-mascotaTemplate%>`,
+        "text/html"
+      );
+      const MascotaTemplate = MascotaTemplateDOM.querySelector(".swiperCard");
+      const ImagenCardTemplate =
+        MascotaTemplateDOM.querySelector(".swiperCardImage");
+
+      console.log(MascotaTemplate);
     </script>
     <style>
       body {
@@ -77,37 +86,18 @@
   <body style="background-color: #aaa">
     <div class="swiper mySwiper swiper-h">
       <div class="swiper-wrapper">
-        <div class="swiper-slide d-flex align-items-start swiperCard">
-          <div class="swiper swiper-v">
-            <div class="swiper-wrapper">
-              <div class="swiper-slide">Foto 1</div>
-              <div class="swiper-slide">Foto 2</div>
-              <div class="swiper-slide">Foto 3</div>
-            </div>
-            <div class="swiper-button-next"></div>
-            <div class="swiper-button-prev"></div>
-            <div class="swiper-pagination"></div>
-          </div>
+        <div class="swiper-slide">
+          <button class="addCardButton btn btn-outline-info">
+            <i class="fa-solid fa-plus"></i>
+          </button>
         </div>
-        <div class="swiper-slide"><button class="addCardButton">+</button></div>
       </div>
       <div class="swiper-button-next swiper-button-next-parent"></div>
       <div class="swiper-button-prev swiper-button-prev-parent"></div>
       <div class="swiper-pagination swiper-pagination-parent"></div>
     </div>
 
-    <!-- Swiper JS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
-
-    <!-- Initialize Swiper -->
-    <!-- <script>
-      var swiper = new Swiper(".mySwiper", {
-        navigation: {
-          nextEl: ".swiper-button-next",
-          prevEl: ".swiper-button-prev",
-        },
-      });
-    </script> -->
   </body>
   <script src="/javascripts/pruebaCarousel.js" type="module"></script>
 </html>

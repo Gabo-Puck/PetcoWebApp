@@ -1,3 +1,26 @@
-<div>
-  <p>Texto Mascota</p>
+<div class="swiper-slide d-flex align-items-start swiperCard">
+  <div class="swiper swiper-v">
+    <div class="swiper-wrapper">
+      <div class="swiper-slide button">
+        <button class="buttonAddFoto btn btn-outline-info">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+    </div>
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-pagination"></div>
+  </div>
+</div>
+
+<div class="swiper-slide swiperCardImage">
+  <div class="swiper-zoom-container position-relative">
+    <button
+      class="btn btn-outline-danger position-absolute top-0 end-0 me-3 btn-delete"
+    >
+      <i class="fa-regular fa-trash-can"></i>
+    </button>
+    <input type="file" style="display: none" class="mascotaImageInput" />
+    <img class="mascotaImagePreview" src="" alt="" />
+  </div>
 </div>

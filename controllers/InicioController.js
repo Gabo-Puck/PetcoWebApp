@@ -26,14 +26,15 @@ exports.Inicio = (req, res, next) => {
 };
 
 exports.SeleccionarIntereses = (req, res, next) => {
-  Especie.query().then((Result) => {
-    res
-      .render("SeleccionarIntereses.ejs", {
+  Especie.query()
+    .then((Result) => {
+      res.render("SeleccionarIntereses.ejs", {
         Animales: Result,
-      })
-      .then((error) => next(error));
-    console.log(Result);
-  });
+      });
+
+      console.log(Result);
+    })
+    .catch((error) => next(error));
 };
 
 exports.CrearIntereses = (req, res, next) => {
