@@ -61,8 +61,27 @@ export class SliderController {
         if (image && image.type.indexOf("image") != -1) {
           newCardNested.classList.remove("d-none");
           newCardNested.querySelector("img").src = URL.createObjectURL(image);
+          var bodyRequest = new FormData();
+          bodyRequest.append("imagen", image);
           newCardNested.querySelector("img").addEventListener("load", () => {
             URL.revokeObjectURL(newCardNested.querySelector("img").src);
+            fetch("/publicaciones/check", {
+              method: "POST",
+              body: bodyRequest,
+            })
+              .then((res) => res.json())
+              .then((res) => {
+                if (res.warning) {
+                  Swal.fire({
+                    icon: "warning",
+                    title: "¡Aviso!",
+                    html: res.warning,
+                    confirmButtonText: "Entendido",
+                  });
+                  newCardNested.remove();
+                  swiperController.update();
+                }
+              });
           });
         } else {
           newCardNested.remove();
@@ -87,30 +106,30 @@ export class SliderController {
   }
 
   createCarouselController(swiperCarousel, swiperControllers) {
-    let swiper2 = new Swiper(swiperCarousel.querySelector(".swiper"), {
-      mousewheel: true,
-      spaceBetween: 10,
-      zoom: { maxRatio: 5, toggle: true },
-      effect: "cards",
-      grabCursor: true,
-      // centeredSlides: true,
-      slidesPerView: "auto",
+    let swiper2 = new Swiper(
+      swiperCarousel.querySelector(".swiper .swiper-v"),
+      {
+        mousewheel: true,
+        noSwipingSelector: "input",
+        zoom: { maxRatio: 5, toggle: true },
 
-      pagination: {
-        el: `.swiper-pagination-child${this.cont}`,
-        clickable: true,
-        type: "bullets",
-        dynamicBullets: true,
-      },
-      navigation: {
-        nextEl: `.swiper-button-next-child${this.cont}`,
-        prevEl: `.swiper-button-prev-child${this.cont}`,
-      },
-      nested: true,
-    });
+        grabCursor: true,
+        slidesPerView: "1",
+
+        pagination: {
+          el: `.swiper-pagination-child${this.cont}`,
+          clickable: true,
+          type: "bullets",
+          dynamicBullets: true,
+        },
+        navigation: {
+          nextEl: `.swiper-button-next-child${this.cont}`,
+          prevEl: `.swiper-button-prev-child${this.cont}`,
+        },
+        nested: true,
+      }
+    );
     swiperControllers.push(swiper2);
     // swiper2.uptdate();
   }
 }
-
-function uploadFilePromise() {}

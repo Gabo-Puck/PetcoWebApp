@@ -40,13 +40,20 @@
       const ImagenCardTemplate =
         MascotaTemplateDOM.querySelector(".swiperCardImage");
 
+      const EspeciesVacunas = <%-JSON.stringify(EspeciesVacunas)%>;
       console.log(MascotaTemplate);
     </script>
     <style>
+      * {
+        margin: 0;
+        padding: 0;
+        border: none;
+      }
+      .swiper-pagination-bullet {
+        background-color: aqua;
+      }
       body {
         background: #eee;
-        font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
-        font-size: 14px;
         color: #000;
         margin: 0;
         padding: 0;
@@ -54,7 +61,7 @@
 
       .swiper {
         width: 80%;
-        height: 150vh;
+        /* height: 150vh; */
       }
 
       .swiper-v {
@@ -64,7 +71,6 @@
 
       .swiper-slide {
         text-align: center;
-        font-size: 18px;
         background: #fff;
 
         /* Center slide text vertically */
@@ -84,19 +90,30 @@
     </style>
   </head>
   <body style="background-color: #aaa">
-    <div class="swiper mySwiper swiper-h">
-      <div class="swiper-wrapper">
-        <div class="swiper-slide">
+    <div
+      class="swiper mySwiper swiper-h card my-3 align-items-center border border-0"
+    >
+      <div class="swiper-wrapper card-body border border-0 py-0">
+        <div class="swiper-slide border border-0" style="height: 150vh">
           <button class="addCardButton btn btn-outline-info">
             <i class="fa-solid fa-plus"></i>
           </button>
         </div>
       </div>
-      <div class="swiper-button-next swiper-button-next-parent"></div>
-      <div class="swiper-button-prev swiper-button-prev-parent"></div>
-      <div class="swiper-pagination swiper-pagination-parent"></div>
+      <div
+        class="swiper-button-next swiper-button-next-parent border border-0 d-none d-lg-block d-none d-lg-block"
+      ></div>
+      <div
+        class="swiper-button-prev swiper-button-prev-parent border border-0 d-none d-lg-block d-none d-lg-block"
+      ></div>
+      <div
+        class="swiper-pagination swiper-pagination-parent border border-0 d-none d-lg-block d-none d-lg-block"
+      ></div>
     </div>
 
+    <button class="btn btn-primary d-block mx-auto mb-3 savePublicacion">
+      Crear publicacion
+    </button>
     <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
   </body>
   <script src="/javascripts/pruebaCarousel.js" type="module"></script>
