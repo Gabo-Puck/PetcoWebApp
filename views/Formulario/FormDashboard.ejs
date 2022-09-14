@@ -170,6 +170,23 @@ p {
   line-height: 1.6;
   margin-bottom: 20px;
 }
+.ellipsis {
+  overflow: hidden;
+  white-space: nowrap; 
+  text-overflow: ellipsis; 
+}
+.ellipsis:hover {
+  overflow: auto;
+  white-space: normal;
+  text-overflow: unset;
+}
+
+@media only screen and (max-width: 600px) {
+  .ellipsis {
+    -webkit-overflow-scrolling: touch;
+    width: 100px;
+  }
+}
     </style>
 </head>
 
@@ -213,22 +230,10 @@ p {
                     <td>
                       <%= i+1%>
                     </td>
-                    <td>
-
-                      <% if(Elemento2[i].Titulo.indexOf(' ') >0 && Elemento2[i].Titulo.length >20 ){ %>
-                        <%= Elemento2[i].Titulo.substring(0, 17) + "..."%>
-                      <% } else{ %>  
-
-                        <% if(Elemento2[i].Titulo.indexOf(' ')>0){ %>
-                          <%= Elemento2[i].Titulo%>
-                        <% } else{ %>  
-                          
-                          <%= Elemento2[i].Titulo.substring(0, 7) +"..." %>
-                       <% } %>
-                       
-                     <% } %>
-
-
+                    <td >
+                     
+                          <p class='ellipsis' > <%= Elemento2[i].Titulo%></p>
+                      
                     </td>
                     <td>
                       <a href="/protocolo/editar/<%= Elemento2[i].ID %>" class="btn btn-warning btn-block">

@@ -17,7 +17,7 @@ var formulariosRouter = require("./routes/formulariosRouter");
 var loginRouter = require("./routes/login");
 var authRequired = require("./routes/authRequired");
 var dashboard = require("./routes/DashboardRoutes");
-
+var publicacionget = require("./routes/PublicacionGetRouter");
 var app = express();
 
 const session = require("express-session");
@@ -46,7 +46,7 @@ app.use("/registro", registroRouter);
 app.use("/login", loginRouter);
 app.use("/protocolo", ProtocoloRouter);
 app.use("/dashboard", dashboard);
-
+app.use("/publicacion", publicacionget);
 
 function isLogged(req, res, next) {
   var IdSession = req.session.IdSession;

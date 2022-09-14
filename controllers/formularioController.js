@@ -45,7 +45,8 @@ exports.responder_formulario_get = [
       )
       .findById(req.params.idMascota)
       .then((re) => {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => { 
+          console.log(re);
           resolve(
             re.MascotasPasos[re.MascotasPasos.length - 1].Proto
               .FormularioProtocolo

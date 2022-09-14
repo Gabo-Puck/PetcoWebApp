@@ -1,6 +1,7 @@
 const knex = require("../knex");
 const BaseModel = require("./BaseModel");
 const { Model } = require("objection");
+const Usuario = require("./Usuario");
 Model.knex(knex);
 
 class Registro extends BaseModel {
@@ -20,6 +21,15 @@ class Registro extends BaseModel {
         join: {
           from: "Registro.Municipio",
           to: "Municipio.ID",
+        },
+      },
+
+      RegistroUsuario: {
+        relation: Model.HasOneRelation,
+        modelClass: Usuario,
+        join: {
+          from: "Registro.ID",
+          to: "Usuario.FK_Registro",
         },
       },
     };
