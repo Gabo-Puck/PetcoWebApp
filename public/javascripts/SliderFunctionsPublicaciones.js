@@ -68,7 +68,7 @@ export class SliderController {
           bodyRequest.append("imagen", image);
           newCardNested.querySelector("img").addEventListener("load", () => {
             URL.revokeObjectURL(newCardNested.querySelector("img").src);
-            fetch("/publicaciones/check", {
+            fetch("/publicacion/check", {
               method: "POST",
               body: bodyRequest,
             })

@@ -2,7 +2,12 @@ var express = require("express");
 var router = express.Router();
 
 var registro_Login = require("../controllers/PublicacionGetController");
+var PublicacionesController = require("../controllers/publicacionController");
 
+router.get("/prueba", PublicacionesController.prueba);
+router.get("/crear", PublicacionesController.crearPublicacion);
+router.post("/check", PublicacionesController.checkImage);
+router.post("/crear", PublicacionesController.crearPublicacionGuardar);
 router.get("/adopciones/:idPublicacion", registro_Login.query);
 router.get("/meta/:idMascota", registro_Login.donacionMetas);
 router.post("/donarmeta", registro_Login.pay);
@@ -11,4 +16,4 @@ router.get("/cancel", registro_Login.paycancel);
 
 //outer.post("/CheckLogin", registro_Login.CheckDB);
 
-module.exports = router; 
+module.exports = router;

@@ -106,7 +106,7 @@ class Mascota extends BaseModel {
           to: "Paso.ID",
         },
       },
-      
+
       MascotasSolicitudes: {
         modelClass: Solicitud,
         relation: Model.HasManyRelation,
@@ -116,13 +116,12 @@ class Mascota extends BaseModel {
         },
       },
 
-
       MascotasMetas: {
         modelClass: Metas,
         relation: Model.HasOneRelation,
         join: {
           from: "mascota.ID",
-          to: "metas.ID",
+          to: "metas.ID_Mascota",
         },
       },
       MascotasVacunasThrough: {

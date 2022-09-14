@@ -1,44 +1,56 @@
 [
   {
-    "ID": "32",
-    "Titulo_Paso": "skyshcok@gmail.skyshcok@gmail.comcom",
-    "Titulo_PasoID": "input8",
-    "Descripcion": "skyshcok@gmail.comskyshcok@gmail.com",
-    "DescripcionID": "input9",
-    "DiasEstimados": "1",
-    "DiasEstimadosID": "input10",
-    "AceptaArchivo": 0,
-    "AceptaArchivoName": "input11"
-  },
-  {
-    "ID": "33",
-    "Titulo_Paso": "skyshcok@gmail.comskyshcok@gmail.com",
-    "Titulo_PasoID": "input12",
-    "Descripcion": "skyshcok@gmail.comskyshcok@gmail.com",
-    "DescripcionID": "input13",
-    "DiasEstimados": "1",
-    "DiasEstimadosID": "input14",
-    "AceptaArchivo": 0,
-    "AceptaArchivoName": "input15"
-  },
-  {
-    "Titulo_Paso": "skyshcok@gmail.comskyshcok@gmail.com21",
-    "Titulo_PasoID": "input16",
-    "Descripcion": "skyshcok@gmail.comskyshcok@gmail.com12",
-    "DescripcionID": "input17",
-    "DiasEstimados": "1",
-    "DiasEstimadosID": "input18",
-    "AceptaArchivo": 0,
-    "AceptaArchivoName": "input19"
-  },
-  {
-    "Titulo_Paso": "skyshcok@gmail.com24",
-    "Titulo_PasoID": "input20",
-    "Descripcion": "skyshcok@gmail.com55",
-    "DescripcionID": "input21",
-    "DiasEstimados": "1",
-    "DiasEstimadosID": "input22",
-    "AceptaArchivo": 0,
-    "AceptaArchivoName": "input23"
+    "ID": 1,
+    "Titulo": "Prueba para creacion de mascotas",
+    "Descripcion": "Esta es una prueba de creacion de mascotas",
+    "Activo": 1,
+    "Reportes_Peso": 2,
+    "ID_Usuario": 2,
+    "Mascota": [
+      {
+        "ID": 10,
+        "ID_Publicacion": 1,
+        "Nombre": "PuckGod",
+        "ID_Especie": 24,
+        "Edad": 15,
+        "Descripcion": "Puck esta bonito <3",
+        "ID_Estado": 2,
+        "ID_Salud": 1,
+        "ID_Tamano": 4,
+        "ID_Castrado": 1,
+        "MascotasCastrado": { "ID": 1, "Castrado": "Castrado" },
+        "MascotasSalud": { "ID": 1, "Salud": "Enfermo" },
+        "MascotasTamano": { "ID": 4, "Tamano": "Grande" },
+        "MascotasEspecie": { "ID": 24, "Nombre_Especie": "Toro" },
+        "MascotasVacunas": [
+          { "ID": 21, "Nombre_Vacuna": "Brucelosis" },
+          { "ID": 22, "Nombre_Vacuna": "Carbunclo o Ántrax" }
+        ],
+        "MascotasEstado": { "ID": 2, "Estado_Nombre": "En consideración" },
+        "MascotasImagenes": [
+          { "ID": 1, "Ruta": "public/mascotasImg/1234.png" },
+          { "ID": 2, "Ruta": "public/mascotasImg/12345.png" }
+        ]
+      },
+      {
+        "ID": 12,
+        "ID_Publicacion": 1,
+        "Nombre": "TumTum",
+        "ID_Especie": 23,
+        "Edad": 10,
+        "Descripcion": "Tumtum es un buen perro?",
+        "ID_Estado": 1,
+        "ID_Salud": 2,
+        "ID_Tamano": 2,
+        "ID_Castrado": 2,
+        "MascotasCastrado": { "ID": 2, "Castrado": "No castrado" },
+        "MascotasSalud": { "ID": 2, "Salud": "Discapacitado" },
+        "MascotasTamano": { "ID": 2, "Tamano": "Pequeño" },
+        "MascotasEspecie": { "ID": 23, "Nombre_Especie": "Vaca" },
+        "MascotasVacunas": [],
+        "MascotasEstado": { "ID": 1, "Estado_Nombre": "Libre" },
+        "MascotasImagenes": [{ "ID": 3, "Ruta": "public/unaruta.png" }]
+      }
+    ]
   }
 ]

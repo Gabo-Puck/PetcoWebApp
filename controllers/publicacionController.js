@@ -115,6 +115,9 @@ exports.crearPublicacionGuardar = [
   fetchInput(acceptedTypes, "./public/imagenesMascotas"),
   (req, res, next) => {
     console.log(req.body.Mascota[0].MascotasVacunas);
+    req.body.Activo = 1;
+    req.body.Reportes_Peso = 0;
+    req.body.ID_Usuario = req.IdSession;
     Publicacion.query()
       .insertGraph(req.body)
       .then((response) => console.log("hola"));

@@ -62,18 +62,43 @@ document.querySelector(".savePublicacion").addEventListener("click", () => {
       mascotaObject.ID_Tamano = mascota
         .querySelector(".tamanoOptions")
         .querySelector("input[type='radio']:checked").value;
-      mascotaObject.ID_Castado = mascota
+      mascotaObject.ID_Castrado = mascota
         .querySelector(".castradoOptions")
         .querySelector("input[type='radio']:checked").value;
+      mascotaObject.ID_Estado = 1;
       let vacunas = [];
       mascota
         .querySelector(".vacunasBox")
         .querySelectorAll("input[type='checkbox']:checked")
-        .forEach((vacunaInput) => vacunas.push({ ID: vacunaInput.value }));
+        .forEach((vacunaInput) =>
+          vacunas.push({ ID_Vacuna: vacunaInput.value })
+        );
+      let metas = [];
+      if (
+        mascota.querySelector(".habilitarDonacionescheck").checked == 1 &&
+        mascota.querySelector(".metasBox").querySelectorAll(".metaTemplate")
+      ) {
+        mascota
+          .querySelector(".metasBox")
+          .querySelectorAll(".metaTemplate")
+          .forEach((meta) => {
+            let cantidad = meta.querySelector(".metaCantidad").value;
+            let descripcionMeta = meta.querySelector(".metaDescripcion").value;
+            metas.push({
+              Cantidad: cantidad,
+              Descripcion: descripcionMeta,
+              Completado: false,
+            });
+          });
+      }
+
       mascotaObject.MascotasVacunasThrough = vacunas;
+      mascotaObject.MascotasMetas = metas;
+
       arrayMascotas.push(mascotaObject);
+
       console.log(mascotaObject);
     });
   bodyRequest.append("Mascota", JSON.stringify(arrayMascotas));
-  fetch("/publicaciones/crear", { method: "POST", body: bodyRequest });
+  fetch("/publicacion/crear", { method: "POST", body: bodyRequest });
 });
