@@ -57,6 +57,25 @@ const RegistroSchema = checkSchema({
       options: { min: 8 },
       errorMessage: "La contraseña debe tener al menos 8 caracteres de largo",
     },
+    custom: {
+      options: (value, { req, location, path }) => {
+        if (value == req.body.ContrasenaVer) {
+          return true;
+        }
+        throw new Error("La contraseña no coinciden");
+      },
+    },
+  },
+  ContrasenaVer: {
+    in: "body",
+    custom: {
+      options: (value, { req, location, path }) => {
+        if (value == req.body.Contrasena && value.length > 8) {
+          return true;
+        }
+        throw new Error(" ");
+      },
+    },
   },
   Telefono: {
     in: "body",
@@ -140,16 +159,16 @@ const hacerRegistroMiddleware = [
         console.log("Agregue estados");
         res.stuff = Estados;
         next();
-      });
+      })
+      .catch((err) => next(err));
   },
   renderRegistroMiddleware,
 ];
 
 exports.registro_list = (req, res) => {
-  Registro.query()
-    .then((Result) => {
-      res.json(Result);
-    });
+  Registro.query().then((Result) => {
+    res.json(Result);
+  });
 };
 
 exports.registro_details = (req, res) => {

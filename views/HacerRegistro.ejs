@@ -70,36 +70,46 @@
             <div id="Formulario">
               <div id="PrimeraParte">
                 <div class="d-flex justify-content-center mt-3">
-                  <h3>Tipo de cuenta:</h3>
+                  <h3 style="text-align: center;">Tipo de cuenta:</h3>
                 </div>
                 <div class="mb-3 mx-auto form-row tipos">
                   <div class="col">
                     <div class="d-flex justify-content-center">
                       <label for="Tipo1">Organizacion</label>
                     </div>
-                    <input
-                      id="Tipo1"
-                      class="a-radio__input"
-                      type="radio"
-                      placeholder=""
-                      name="Tipo"
-                      checked
-                      value="1"
-                    />
+                    <div>
+                      <input
+                        id="Tipo1"
+                        class="form-check-input d-block mx-auto"
+                        style="position: relative;"
+                        type="radio"
+                        placeholder=""
+                        name="Tipo"
+                        checked
+                        value="1"
+                        
+                      />
+
+                    </div>
                   </div>
                   <div class="col" id="me">
                     <div class="d-flex justify-content-center">
                       <label for="Tipo2">Común</label>
                     </div>
-                    <input
-                      class="a-radio__input"
-                      type="radio"
-                      placeholder=""
-                      name="Tipo"
-                      id="Tipo2"
-                      value="2"
-                    />
-                    
+
+                    <div>
+                      <input
+                        class="form-check-input d-block mx-auto"
+                        type="radio"
+                        style="position: relative;"
+
+                        placeholder=""
+                        name="Tipo"
+                        id="Tipo2"
+                        value="2"
+                      />
+                      
+                    </div>
                   </div>
                 </div>
                 <div class="form-row">
@@ -155,7 +165,7 @@
                   </div>
                 </div>
                 <div class="form-row">
-                  <div class="col">
+                  <div class="col-md">
                     <label for="Telefono">Telefono:</label>
                     <input
                       id="Telefono"
@@ -166,7 +176,7 @@
                       value=""
                     />
                   </div>
-                  <div class="col">
+                  <div class="col-md">
                     <label for="Contrasena">Contraseña</label>
                     <input
                       id="Contrasena"
@@ -174,6 +184,17 @@
                       type="password"
                       placeholder="123456789"
                       name="Contrasena"
+                      value=""
+                    />
+                  </div>
+                  <div class="col-md">
+                    <label for="Contrasena">Confirmar Contraseña</label>
+                    <input
+                      id="Contrasena"
+                      class="form-control"
+                      type="password"
+                      placeholder="123456789"
+                      name="ContrasenaVer"
                       value=""
                     />
                   </div>

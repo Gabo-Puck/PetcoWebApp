@@ -4,6 +4,12 @@ const { Model } = require("objection");
 Model.knex(knex);
 
 class Usuario extends BaseModel {
+  $formatJson(json) {
+    json = super.$formatJson(json);
+    if (json.FK_Registro) delete json.FK_Registro;
+
+    return json;
+  }
   static get tableName() {
     return "Usuario";
   }
@@ -43,11 +49,11 @@ class Usuario extends BaseModel {
         },
       },
       Protocolos: {
-        relaton: Model.HasManyRelation,
+        relation: Model.HasManyRelation,
         modelClass: Protocolo,
         join: {
           from: "Usuario.ID",
-          to: "Protocolo.ID_Usuario",
+          to: "Protocolos.ID_Usuario",
         },
       },
     };

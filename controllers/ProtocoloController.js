@@ -102,6 +102,10 @@ var acceptedTypes = [
  * Función middleware que se puede añadir al flujo de una request. Permite hacer lo siguiente:
  * - Añadir al req.body los valores de la request del usuario.
  * - Añadir al res.fileReadableStream los stream para escribir archivos al disco del servidor.
+ *   fileReadableStream es un arreglo, donde cada objeto tiene la siguiente estructura:
+ *   - path: Es la dirección donde el archivo debería de guardarse
+ *   - stream: Es el readable stream para manipular el archivo
+ *
  *
  * Los archivos se evaluaran con respecto a los mimeType que se provean en acceptedTypes y también se revisará su tamaño en bytes
  * - Si alguno de los archivos cuenta con un mimeType que no se encuentre en acceptedTypes, se agregará un error correspondiente al res.errors.
