@@ -49,6 +49,7 @@ app.use("/publicaciones", publicaciones);
 
 function isLogged(req, res, next) {
   var IdSession = req.session.IdSession;
+  // IdSession = 2;
   if (IdSession) {
     next();
   } else {

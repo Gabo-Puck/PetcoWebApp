@@ -14,8 +14,8 @@ class Publicacion extends BaseModel {
         modelClass: Mascotas,
         relation: Model.HasManyRelation,
         join: {
-          from: "Publicacion.ID",
-          to: "Mascota.ID_Publicacion",
+          from: "publicacion.ID",
+          to: "mascota.ID_Publicacion",
         },
       },
     };

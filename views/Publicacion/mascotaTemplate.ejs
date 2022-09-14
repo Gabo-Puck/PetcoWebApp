@@ -1,5 +1,5 @@
 <div
-  class="swiper-slide d-flex align-items-start justify-items-center swiperCard flex-column"
+  class="swiper-slide d-flex align-items-start justify-items-center swiperCard flex-column mascota"
 >
   <div class="swiper swiper-v" style="width: 101%; background-color: black">
     <div class="swiper-wrapper" style="background-color: black">
@@ -25,7 +25,7 @@
             <label for="" class="from-label" hidden>Nombre Mascota</label>
             <input
               type="text"
-              class="form-control w-95 mx-auto"
+              class="form-control w-95 mx-auto nombreMascota"
               style="
                 border-top: none;
                 text-align: center;
@@ -45,7 +45,7 @@
             <select
               name=""
               id=""
-              class="form-select w-75 d-block mx-auto mb-3"
+              class="form-select w-75 d-block mx-auto mb-3 especieSelect"
             ></select>
           </div>
         </div>
@@ -56,7 +56,7 @@
 
             <input
               type="range"
-              class="form-range"
+              class="form-range edadInput"
               value="0"
               max="30"
               min="-1"
@@ -68,17 +68,18 @@
         <div class="col border-end">
           <div class="col mx-4">
             <label for="" class="from-label d-block">Vacunas</label>
+            <div class="vacunasBox"></div>
           </div>
         </div>
         <div class="col">
           <div class="row justify-content-center">
-            <div class="row mx-4">
+            <div class="row mx-4 saludOptions">
               <label for="" class="from-label">Salud</label>
             </div>
-            <div class="row mx-4">
+            <div class="row mx-4 tamanoOptions">
               <label for="" class="from-label">Tamaño</label>
             </div>
-            <div class="row mx-4">
+            <div class="row mx-4 castradoOptions">
               <label for="" class="from-label">Castado</label>
             </div>
           </div>
@@ -88,32 +89,39 @@
       <div class="row border border-1 rounded justify-content-center mb-3">
         <div class="mx-5 pt-2 pb-3">
           <label for="" class="from-label">Descripción de la mascota</label>
-          <textarea type="text" class="form-control"></textarea>
+          <textarea
+            type="text"
+            class="form-control mascotaDescripcion"
+          ></textarea>
         </div>
         <label for="">Protocolo para esta mascota</label>
         <select
           name=""
           id=""
-          class="form-select w-50 mx-auto mb-3"
+          class="form-select w-50 mx-auto mb-3 protocoloSelector"
           style="text-align: center"
         ></select>
       </div>
 
       <div class="row border border-1 rounded justify-content-center mb-3">
-        <div class="row justify-content-center">
+        <div class="row justify-content-center metasBox">
           <div class="form-check w-30 pe-5 d-inline-flex">
             <input
-              class="form-check-input me-3"
+              class="form-check-input me-3 habilitarDonacionescheck"
               type="checkbox"
-              name="habilitarDonaciones"
               id=""
             />
             <label for="" class="form-check-label">Habilitar donacion</label>
           </div>
 
-          <div class="form-check w-30">
-            <button class="btn btn-warning">Crear meta</button>
-          </div>
+          <button
+            class="btn btn-warning crearMetaButton mx-auto d-block"
+            type="button"
+            style="width: 30%"
+            disabled
+          >
+            Crear meta
+          </button>
         </div>
       </div>
     </form>
@@ -136,26 +144,33 @@
   </div>
 </div>
 
-<div class="form-check form-check radioSelector">
-  <input class="form-check-input" type="radio" />
+<div class="form-check form-check radioSelector d-inline-flex">
+  <input class="form-check-input me-4" type="radio" />
   <label class="form-check-label">1</label>
 </div>
 
-<div class="form-check form-check-inline vacuna">
+<div class="form-check form-check-inline vacunaTemplate">
   <input
     class="form-check-input"
     type="checkbox"
     id="inlineCheckbox1"
     value="option1"
   />
-  <label class="form-check-label">1</label>
+  <label class="form-check-label"></label>
 </div>
 
-<option value="" style="text-align: center" class="optionEspecie">Perro</option>
+<option value="" style="text-align: center" class="optionEspecie"></option>
 
-<div class="meta row">
+<div
+  class="metaTemplate row border border-1 rounded mb-3 pb-3 px-3"
+  style="width: 100%; padding: 0"
+>
   <label for="" class="form-label">Cantidad</label>
-  <input type="number" class="form-control mx-auto" style="width: 45%" />
+  <input
+    type="number"
+    class="form-control mx-auto metaCantidad"
+    style="width: 45%"
+  />
   <label for="" class="form-label">Descripción de meta</label>
-  <textarea class="form-control"></textarea>
+  <textarea class="form-control metaDescripcion"></textarea>
 </div>

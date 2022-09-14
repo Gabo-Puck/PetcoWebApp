@@ -1,7 +1,10 @@
+import { selectParent } from "/javascripts/FormulariosFunctions.js";
+
 export class SliderController {
   constructor() {
     this.cont = 0;
     this.swiperControllers = [];
+    this.contInput = 0;
   }
 
   addCardAfterButton(card, swiper) {
@@ -132,4 +135,133 @@ export class SliderController {
     swiperControllers.push(swiper2);
     // swiper2.uptdate();
   }
+}
+
+export function addListenersToElementsInCarousel(
+  controller,
+  MascotaTemplateDOM,
+  responseData,
+  swiper
+) {
+  const MascotaTemplate = MascotaTemplateDOM.querySelector(".swiperCard");
+  const ImagenCardTemplate =
+    MascotaTemplateDOM.querySelector(".swiperCardImage");
+  const metaTemplate = MascotaTemplateDOM.querySelector(".metaTemplate");
+  const optionEspecieTemplate =
+    MascotaTemplateDOM.querySelector(".optionEspecie");
+  const vacunaTemplate = MascotaTemplateDOM.querySelector(".vacunaTemplate");
+  const radioSelectorTemplate =
+    MascotaTemplateDOM.querySelector(".radioSelector");
+  let newCard = controller.addCardAfterButton(
+    MascotaTemplate.cloneNode(true),
+    swiper
+  );
+  controller.addCardBeforeButtonNested(
+    newCard,
+    controller.swiperControllers,
+    ImagenCardTemplate
+  );
+
+  responseData.EspeciesVacunas.forEach((EspecieVacuna) => {
+    let optionElement = document.createElement("option");
+    optionElement.value = EspecieVacuna.ID;
+    optionElement.innerText = EspecieVacuna.Nombre_Especie;
+    newCard.querySelector(".especieSelect").appendChild(optionElement);
+  });
+  newCard.querySelector(".especieSelect").id = controller.contInput++;
+
+  responseData.SaludStatus.forEach((Status) => {
+    let radioInput = radioSelectorTemplate.cloneNode(true);
+    radioInput.querySelector("input").value = Status.ID;
+    radioInput.querySelector("label").innerText = Status.Salud;
+    newCard.querySelector(".saludOptions").appendChild(radioInput);
+  });
+  newCard.querySelector(".saludOptions").id = controller.contInput++;
+
+  responseData.CastradoStatus.forEach((Status) => {
+    let radioInput = radioSelectorTemplate.cloneNode(true);
+    radioInput.querySelector("input").value = Status.ID;
+    radioInput.querySelector("label").innerText = Status.Castrado;
+    newCard.querySelector(".castradoOptions").appendChild(radioInput);
+  });
+  newCard.querySelector(".castradoOptions").id = controller.contInput++;
+
+  responseData.Tamanos.forEach((Tamano) => {
+    let radioInput = radioSelectorTemplate.cloneNode(true);
+    radioInput.querySelector("input").value = Tamano.ID;
+    radioInput.querySelector("label").innerText = Tamano.Tamano;
+    newCard.querySelector(".tamanoOptions").appendChild(radioInput);
+  });
+  newCard.querySelector(".tamanoOptions").id = controller.contInput++;
+
+  newCard.querySelector(".especieSelect").addEventListener("change", (e) => {
+    let cardID;
+    newCard.classList.forEach((e) => {
+      if (e.indexOf("card") != -1) {
+        cardID = e;
+      }
+    });
+
+    $(`.${cardID} .vacunasBox`).empty();
+    responseData.EspeciesVacunas.forEach((Especie) => {
+      if (Especie.ID == e.target.value) {
+        Especie.Vacunas.forEach((Vacuna) => {
+          if (Vacuna.Nombre_Vacuna == "Especie sin vacunas") {
+            let text = document.createElement("p");
+            text.innerText = "Especie sin vacunas";
+            newCard.querySelector(".vacunasBox").appendChild(text);
+          } else {
+            let checkboxInput = vacunaTemplate.cloneNode(true);
+            checkboxInput.querySelector("input").value = Vacuna.ID;
+            checkboxInput.querySelector("label").innerText =
+              Vacuna.Nombre_Vacuna;
+            newCard.querySelector(".vacunasBox").appendChild(checkboxInput);
+          }
+        });
+      }
+    });
+    newCard.querySelector(".vacunasBox").id = controller.contInput++;
+
+    // responseData.vacunas.forEach((vacuna) => {
+    //   if(vacuna)
+    // })
+  });
+
+  responseData.ProtocolosUsuario.forEach((Usuario) => {
+    Usuario.Protocolos.forEach((Protocolo) => {
+      let optionElement = document.createElement("option");
+      optionElement.value = Protocolo.ID;
+      optionElement.innerText = Protocolo.Titulo;
+      newCard.querySelector(".protocoloSelector").appendChild(optionElement);
+    });
+  });
+  newCard.querySelector(".protocoloSelector").id = controller.contInput++;
+  newCard.querySelector(".mascotaDescripcion").id = controller.contInput++;
+  newCard.querySelector(".nombreMascota").id = controller.contInput++;
+  newCard.querySelector(".edadInput").id = controller.contInput++;
+
+  newCard.querySelector(".crearMetaButton").addEventListener("click", (e) => {
+    e.preventDefault();
+    let meta = metaTemplate.cloneNode(true);
+    meta.querySelector(".metaDescripcion").id = controller.contInput++;
+    meta.querySelector(".metaCantidad").id = controller.contInput++;
+
+    newCard.querySelector(".metasBox").insertBefore(meta, e.target);
+  });
+  newCard
+    .querySelector(".habilitarDonacionescheck")
+    .addEventListener("click", (e) => {
+      let button = newCard.querySelector(".crearMetaButton");
+      button.disabled = e.target.checked ? false : true;
+    });
+  newCard.querySelector(".form-range").addEventListener("input", (e) => {
+    if (e.target.value == -1) {
+      newCard.querySelector(".edadTexto").innerText = "La desconozco";
+    }
+    if (e.target.value == 0) {
+      newCard.querySelector(".edadTexto").innerText = "Menos de un año";
+    }
+    if (e.target.value > 0)
+      newCard.querySelector(".edadTexto").innerText = e.target.value;
+  });
 }

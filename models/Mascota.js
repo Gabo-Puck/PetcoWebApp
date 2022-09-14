@@ -19,6 +19,7 @@ class Mascota extends BaseModel {
     const Imagenes = require("./Imagenes");
     const Solicitud = require("./Solicitudes");
     const Pasos = require("./Paso");
+    const VacunaThrough = require("./Vacunas_Mascota");
     return {
       MascotasCastrado: {
         modelClass: Castrado,
@@ -110,6 +111,14 @@ class Mascota extends BaseModel {
         join: {
           from: "mascota.ID",
           to: "solicitudes.ID_Mascota",
+        },
+      },
+      MascotasVacunasThrough: {
+        modelClass: VacunaThrough,
+        relation: Model.HasManyRelation,
+        join: {
+          from: "mascota.ID",
+          to: "vacunas_mascota.ID_Mascota",
         },
       },
     };

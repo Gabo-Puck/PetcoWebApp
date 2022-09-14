@@ -6,6 +6,7 @@ const Salud = require("../models/Salud");
 const Castrado = require("../models/Castrado");
 const Usuario = require("../models/Usuario");
 const Tamano = require("../models/Tamano");
+const Publicacion = require("../models/Publicacion");
 
 exports.prueba = (req, res) => {
   // Mascota.query()
@@ -65,13 +66,15 @@ const getAllTamano = (req, res, next) => {
 };
 
 const getProtocolosFromUsuario = (req, res, next) => {
-  req.session.IdSession;
+  req.session.IdSession = 2;
   if (req.session.IdSession) {
-    console.log("ProtocolosUsuario");
+    // console.log("ProtocolosUsuario");
     Usuario.query()
-      .withGraphFetched("Protocolos")
-      .findById(req.session.IdSession)
+      .withGraphJoined("Protocolos")
+      .where("Protocolos.ID_Usuario", "=", req.session.IdSession)
+      .orWhere("Protocolos.ID_Usuario", "=", 1)
       .then((ProtocolosUsuario) => {
+        console.log(ProtocolosUsuario.length);
         if (ProtocolosUsuario.length > 0) {
           res.ProtocolosUsuario = ProtocolosUsuario;
           next();
@@ -82,6 +85,13 @@ const getProtocolosFromUsuario = (req, res, next) => {
 };
 
 exports.crearPublicacion = [
+  // (req, res, next) => {
+  //   Publicacion.query()
+  //     .withGraphFetched(
+  //       "Mascota.[MascotasCastrado,MascotasSalud,MascotasTamano,MascotasEspecie,MascotasEstado,MascotasVacunas,MascotasImagenes]"
+  //     )
+  //     .then((response) => res.json(response));
+  // },
   getAllEspecieWithVacuna,
   getAllSalud,
   getAllCastrado,
@@ -91,12 +101,24 @@ exports.crearPublicacion = [
   (req, res, next) =>
     res.render("Publicacion/crearPublicacion", {
       mascotaTemplate: res.htmlTemplate,
-      EspeciesVacunas: res.EspeciesVacunas,
-      SaludStatus: res.SaludStatus,
-      CastradoStatus: res.CastradoStatus,
-      Tamanos: res.Tamanos,
-      ProtocolosUsuario: res.ProtocolosUsuario,
+      responseData: {
+        EspeciesVacunas: res.EspeciesVacunas,
+        SaludStatus: res.SaludStatus,
+        CastradoStatus: res.CastradoStatus,
+        Tamanos: res.Tamanos,
+        ProtocolosUsuario: res.ProtocolosUsuario,
+      },
     }),
+];
+
+exports.crearPublicacionGuardar = [
+  fetchInput(acceptedTypes, "./public/imagenesMascotas"),
+  (req, res, next) => {
+    console.log(req.body.Mascota[0].MascotasVacunas);
+    Publicacion.query()
+      .insertGraph(req.body)
+      .then((response) => console.log("hola"));
+  },
 ];
 
 exports.checkImage = [

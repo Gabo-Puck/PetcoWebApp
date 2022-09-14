@@ -36,12 +36,12 @@
         `<%-mascotaTemplate%>`,
         "text/html"
       );
-      const MascotaTemplate = MascotaTemplateDOM.querySelector(".swiperCard");
-      const ImagenCardTemplate =
-        MascotaTemplateDOM.querySelector(".swiperCardImage");
 
-      const EspeciesVacunas = <%-JSON.stringify(EspeciesVacunas)%>;
-      console.log(MascotaTemplate);
+
+      const responseData = <%-JSON.stringify(responseData)%>;
+
+
+      // console.log(MascotaTemplate);
     </script>
     <style>
       * {
@@ -93,7 +93,19 @@
     <div
       class="swiper mySwiper swiper-h card my-3 align-items-center border border-0"
     >
-      <div class="swiper-wrapper card-body border border-0 py-0">
+      <div
+        class="publicacionInfo d-block mx-auto border-1 rounded px-2 py-2"
+        style="background-color: white; width: 80%"
+      >
+        <label for="" class="from-label">Titulo</label>
+        <input type="text" class="form-control publicacionTitulo" />
+        <label for="" class="from-label">Descripción de la publicación</label>
+        <textarea
+          type="text"
+          class="form-control publicacionDescripcion"
+        ></textarea>
+      </div>
+      <div class="swiper-wrapper card-body border border-0 py-0" id="mainCard">
         <div class="swiper-slide border border-0" style="height: 150vh">
           <button class="addCardButton btn btn-outline-info">
             <i class="fa-solid fa-plus"></i>
