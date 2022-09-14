@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" , href="/stylesheets/style.css" />
+    <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"
+  />
+
+    <title>Donacion por paypal</title>
+    <style>
+      
+      .swiper {
+        width: 350px;
+        height: 350px;
+      }
+
+      .swiper-slide {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 18px;
+        font-size: 22px;
+        font-weight: bold;
+        color: #fff;
+      }
+  
+        .swiper-slide img {
+          display: block;
+          width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- <h1>Coding Shiksha App Store owo</h1>
+    <h2>Buy For $25</h2> -->
+    
+    
+
+    <div class="container mt-5 mb-5" style="text-align: center;">
+        
+        <div class="row" style="padding:1%; border: 1px solid #cecece;">
+            <!-- <h1 class="text-success">¡Gracias por tenerme en cuenta!</h1> -->
+            <div class="col" >
+                <div class="swiper mySwiper">
+                    <div class="swiper-wrapper">
+                     
+                      <% for(var j=0; j < MascotaRender[0].MascotasImagenes.length; j++) { %>
+                                        
+                        <div class="swiper-slide">
+                            <img src="<%= MascotaRender[0].MascotasImagenes[j].Ruta%>" style="height: 350px; width: 350px; object-fit: cover ;">
+                        </div>
+
+                    <% } %>
+                    
+                    </div>
+                    <div class="swiper-pagination"></div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                  </div>
+              
+                  <!-- Swiper JS -->
+                  <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+
+            </div>
+            <div class="col" >
+
+                <form action="/publicacion/donarmeta" method="post">
+                    <div class="form-group">
+                        <label for="aporteSelect1" class="form-label mt-4">Selecciona la cantidad a donar en pesos.</label>
+                        <select class="form-select" name="aporte" id="aporteSelect1">
+                            <option>100.00</option>
+                            <option>200.00</option>
+                            <option>300.00</option>
+                            <option>400.00</option>
+                            <option>500.00</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="exampleTextarea" class="form-label mt-4">Agrega un mensaje</label>
+                        <textarea class="form-control" id="exampleTextarea" rows="3" name="mensaje"></textarea>
+                      </div>
+
+                    <br>
+                    <input type="submit" value="Aportar" class="btn btn-success mt-2 mb-2">
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var swiper = new Swiper(".mySwiper", {
+          effect: "cards",
+          grabCursor: true,
+          rewind: true,
+         
+          pagination: {
+            el: ".swiper-pagination",
+          },
+          navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+        });
+      </script>
+</body>
+
+</html>

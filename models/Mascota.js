@@ -9,6 +9,7 @@ class Mascota extends BaseModel {
   }
 
   static get relationMappings() {
+    const Metas = require("./Metas");
     const Castrado = require("./Castrado");
     const Salud = require("./Salud");
     const Tamano = require("./Tamano");
@@ -105,12 +106,23 @@ class Mascota extends BaseModel {
           to: "Paso.ID",
         },
       },
+      
       MascotasSolicitudes: {
         modelClass: Solicitud,
         relation: Model.HasManyRelation,
         join: {
           from: "mascota.ID",
           to: "solicitudes.ID_Mascota",
+        },
+      },
+
+
+      MascotasMetas: {
+        modelClass: Metas,
+        relation: Model.HasOneRelation,
+        join: {
+          from: "mascota.ID",
+          to: "metas.ID",
         },
       },
       MascotasVacunasThrough: {
