@@ -1,5 +1,8 @@
 var Mascota = require("../models/Mascota");
-var { fetchInput } = require("../utils/multipartRequestHandle/index");
+var {
+  fetchInput,
+  uploadFiles,
+} = require("../utils/multipartRequestHandle/index");
 var probe = require("probe-image-size");
 const Especie = require("../models/Especie");
 const Salud = require("../models/Salud");
@@ -112,20 +115,34 @@ exports.crearPublicacion = [
 ];
 
 exports.crearPublicacionGuardar = [
-  fetchInput(acceptedTypes, "./public/imagenesMascotas"),
+  fetchInput(acceptedTypes, "./public/images/ImagenesMascotas"),
   (req, res, next) => {
     console.log(req.body.Mascota[0].MascotasVacunas);
     req.body.Activo = 1;
     req.body.Reportes_Peso = 0;
     req.body.ID_Usuario = req.IdSession;
+    for (let index = 0; index < req.body.Mascota.length; index++) {
+      const mascota = req.body.Mascota[index];
+      for (const key in req.body) {
+        if (Object.hasOwnProperty.call(req.body, key)) {
+          const prop = req.body[key];
+          if (key.charAt(0) == index) {
+            ruta = prop.replace(/public/g, "");
+            mascota.MascotasImagenes.push({ Ruta: ruta });
+            delete req.body[key];
+          }
+        }
+      }
+      console.log(mascota);
+    }
     Publicacion.query()
       .insertGraph(req.body)
-      .then((response) => console.log("hola"));
+      .then((response) => uploadFiles(res));
   },
 ];
 
 exports.checkImage = [
-  fetchInput(acceptedTypes, "./public/imagenesMascotas"),
+  fetchInput(acceptedTypes, "./public/images/ImagenesMascotas"),
   (req, res, next) => {
     if (res.fileReadableStream) {
       var min = 450,

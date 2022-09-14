@@ -43,6 +43,7 @@ document.querySelector(".savePublicacion").addEventListener("click", () => {
   var descripcionPublicacion = document.querySelector(
     ".publicacionDescripcion"
   ).value;
+  var cont = 0; //contador para las fotos, luego hay que cambiarlo por la id de las imagenes
   bodyRequest.append("Titulo", tituloPublicacion);
   bodyRequest.append("Descripcion", descripcionPublicacion);
   document
@@ -91,11 +92,21 @@ document.querySelector(".savePublicacion").addEventListener("click", () => {
             });
           });
       }
+      let images = {};
+      let cont2 = 0;
+      mascotaObject.MascotasImagenes = [];
+
+      mascota.querySelectorAll("input[type='file']").forEach((imagen) => {
+        bodyRequest.append(`${cont}${cont2}`, imagen.files[0]);
+        cont2++;
+      });
 
       mascotaObject.MascotasVacunasThrough = vacunas;
       mascotaObject.MascotasMetas = metas;
+      mascotaObject.MascotasImagenes = [];
 
       arrayMascotas.push(mascotaObject);
+      cont++;
 
       console.log(mascotaObject);
     });

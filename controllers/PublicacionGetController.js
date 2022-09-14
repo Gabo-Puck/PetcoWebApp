@@ -38,7 +38,7 @@ exports.query = (req, res) => {
     .where("Mascota.ID_Publicacion", "=", req.params.idPublicacion)
     //.findByIds({'MascotasPublicacion.ID':req.params.idPublicacion})
     .then((MascotaP) => {
-      console.log(MascotaP[0].MascotasMetas.MetasDonaciones.length);
+      // console.log(MascotaP[0].MascotasMetas.MetasDonaciones.length);
       res.render("publicacion.ejs", {
         MascotaRender: MascotaP,
       });

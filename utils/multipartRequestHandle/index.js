@@ -56,7 +56,7 @@ exports.fetchInput = (acceptedTypes, folderPath) => {
       //   file.pipe(fs.createWriteStream(saveTo));
       // });
       busboy.on("file", function (fieldname, file, fileData) {
-        console.log(fileData);
+        console.log(fieldname);
         // console.log(fieldname);
         //Usamos el listener del archivo encontrado. Este listener se activará su el archivo supera el limite que se establece en limits
         file.on("limit", function (data) {
@@ -163,7 +163,7 @@ function isJson(string) {
  * Esta función permite escribir archivos al servidor. Los stream encargados de escribir archivos deben estar dentro de un array en la propiedad "res.fileReadableStream"
  * @param {*} res El objeto que representa la respuesta al cliente
  */
-const uploadFiles = (res) => {
+exports.uploadFiles = (res) => {
   //Revisamos si fileReadableStream no esta vacio.
   if (res.fileReadableStream.length > 0) {
     res.fileReadableStream.forEach((fileArray) => {

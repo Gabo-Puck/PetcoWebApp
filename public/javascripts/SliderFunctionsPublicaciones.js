@@ -174,6 +174,9 @@ export function addListenersToElementsInCarousel(
     let radioInput = radioSelectorTemplate.cloneNode(true);
     radioInput.querySelector("input").value = Status.ID;
     radioInput.querySelector("label").innerText = Status.Salud;
+    radioInput.querySelector("input").name = `Salud${controller.contInput}`;
+    radioInput.querySelector("label").for = `Salud${controller.contInput}`;
+
     newCard.querySelector(".saludOptions").appendChild(radioInput);
   });
   newCard.querySelector(".saludOptions").id = controller.contInput++;
@@ -182,6 +185,8 @@ export function addListenersToElementsInCarousel(
     let radioInput = radioSelectorTemplate.cloneNode(true);
     radioInput.querySelector("input").value = Status.ID;
     radioInput.querySelector("label").innerText = Status.Castrado;
+    radioInput.querySelector("input").name = `Castrado${controller.contInput}`;
+    radioInput.querySelector("label").for = `Castrado${controller.contInput}`;
     newCard.querySelector(".castradoOptions").appendChild(radioInput);
   });
   newCard.querySelector(".castradoOptions").id = controller.contInput++;
@@ -190,6 +195,8 @@ export function addListenersToElementsInCarousel(
     let radioInput = radioSelectorTemplate.cloneNode(true);
     radioInput.querySelector("input").value = Tamano.ID;
     radioInput.querySelector("label").innerText = Tamano.Tamano;
+    radioInput.querySelector("input").name = `Tamano${controller.contInput}`;
+    radioInput.querySelector("label").for = `Tamano${controller.contInput}`;
     newCard.querySelector(".tamanoOptions").appendChild(radioInput);
   });
   newCard.querySelector(".tamanoOptions").id = controller.contInput++;
