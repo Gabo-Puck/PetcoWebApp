@@ -27,18 +27,13 @@ module.exports = {
   },
 
   production: {
-    client: "postgresql",
+    client: "mysql2",
     connection: {
-      database: "my_db",
-      user: "username",
-      password: "password",
-    },
-    pool: {
-      min: 2,
-      max: 10,
-    },
-    migrations: {
-      tableName: "knex_migrations",
+      host: "localhost",
+      port: 3306,
+      user: "root",
+      password: "halo1234",
+      database: "petcodbv2",
     },
   },
 };
