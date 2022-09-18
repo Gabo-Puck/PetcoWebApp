@@ -26,12 +26,10 @@
     "node-fetch": "^2.6.7",
     "nodemon": "^2.0.19",
     "objection": "^3.0.1",
-
     "paypal-rest-sdk": "^1.8.1",
-
     "probe-image-size": "^7.2.3",
-
     "pug": "^3.0.1",
+    "socket.io": "^4.5.2",
     "swiper": "^8.3.2"
   }
 }

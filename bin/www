@@ -4,16 +4,17 @@
  * Module dependencies.
  */
 
-var app = require('../app');
-var debug = require('debug')('petcowebapp-v1:server');
-var http = require('http');
+var app = require("../app");
+var { Server } = require("socket.io");
+var debug = require("debug")("petcowebapp-v1:server");
+var http = require("http");
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+var port = normalizePort(process.env.PORT || "3000");
+app.set("port", port);
 
 /**
  * Create HTTP server.
@@ -26,8 +27,54 @@ var server = http.createServer(app);
  */
 
 server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+server.on("error", onError);
+server.on("listening", onListening);
+const io = new Server(server);
+let users = new Map();
+io.on("connection", (socket) => {
+  console.log("new user connected");
+  socket.on("new user", (user) => {
+    addUser(socket, user, users);
+    // delete usersSend[socket.id];
+  });
+  socket.on("disconnect", () => {
+    deleteUser(socket, users);
+    console.log(users);
+  });
+  socket.on("private message", ({ to, message, from }) => {
+    console.log(to);
+    if (users.has(to)) {
+      socket
+        .to(users.get(to))
+        .emit("private message", { message: message, from: from });
+    }
+  });
+});
+
+function findId(user, users) {}
+
+function parseMapUsers(users) {
+  let usersSend = {};
+  for (let [key, value] of users) usersSend[key] = value;
+  return usersSend;
+}
+
+function deleteUser(socket, users) {
+  if (users.has(socket.id)) {
+    users.delete(socket.id);
+    io.emit("update list", parseMapUsers(users));
+  }
+}
+
+function addUser(socket, user, users) {
+  if (users.has(user)) {
+    socket.emit("user taken");
+  } else {
+    users.set(user, socket.id);
+    io.emit("update list", parseMapUsers(users));
+  }
+  console.log(users);
+}
 
 /**
  * Normalize a port into a number, string, or false.
@@ -54,22 +101,20 @@ function normalizePort(val) {
  */
 
 function onError(error) {
-  if (error.syscall !== 'listen') {
+  if (error.syscall !== "listen") {
     throw error;
   }
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+  var bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
+    case "EACCES":
+      console.error(bind + " requires elevated privileges");
       process.exit(1);
       break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
+    case "EADDRINUSE":
+      console.error(bind + " is already in use");
       process.exit(1);
       break;
     default:
@@ -83,8 +128,6 @@ function onError(error) {
 
 function onListening() {
   var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+  var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
+  debug("Listening on " + bind);
 }

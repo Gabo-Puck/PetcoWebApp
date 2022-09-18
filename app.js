@@ -11,7 +11,7 @@ const {
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var registroRouter = require("./routes/registro");
-var ProtocoloRouter =require("./routes/protocolos")
+var ProtocoloRouter = require("./routes/protocolos");
 var vacunasRouter = require("./routes/vacunas");
 var formulariosRouter = require("./routes/formulariosRouter");
 var loginRouter = require("./routes/login");
@@ -47,6 +47,7 @@ app.use("/login", loginRouter);
 app.use("/protocolo", ProtocoloRouter);
 app.use("/dashboard", dashboard);
 app.use("/publicacion", publicacionget);
+app.use("/videollamada", require("./routes/videollamada"));
 
 function isLogged(req, res, next) {
   var IdSession = req.session.IdSession;
