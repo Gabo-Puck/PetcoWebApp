@@ -149,7 +149,7 @@ buttonSaveProtocol.addEventListener("click", (e) => {
   };
   loadingScreen.fire();
   fetch(
-    "/protocolo/guardar",
+    "/petco/protocolo/guardar",
     {
       method: "POST",
       body: formData,
@@ -173,7 +173,7 @@ function handleResponse(res) {
           confirmButtonText: "Siguiente",
         }).then((sweetResult) => {
           if (sweetResult.isConfirmed) {
-            window.location = "ok";
+            window.location = "petco/dashboard";
           }
         });
       }
@@ -191,12 +191,17 @@ function handleResponse(res) {
 }
 function renderMessages(errors, globalError) {
   console.log(errors);
-  let inputs = document
+  let inputsForms = document
     .querySelector("form")
     .querySelectorAll(
       "input:not(input:disabled):not(input[type='checkbox']),textarea:not(textarea:disabled)"
     );
-
+  let inputsPasos = document
+    .querySelector(".pasos")
+    .querySelectorAll(
+      "input:not(input:disabled):not(input[type='checkbox']),textarea:not(textarea:disabled)"
+    );
+  let inputs = [...inputsPasos, ...inputsForms];
   document.querySelectorAll(".invalid-feedback").forEach((node) => {
     node.remove();
   });

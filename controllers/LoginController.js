@@ -4,14 +4,11 @@ var Municipio = require("../models/Municipio");
 var objection = require("objection");
 
 exports.session = (req, res, next) => {
-  Registro.query()
-    .where("Registro.Contrasena", "=", "12341")
-    .then((Results) => {
-      resultado = Results;
-      console.log(Results);
-      res.render("login.ejs");
-    })
-    .catch((err) => next(err));
+  if (req.session.IdSession) {
+    res.redirect("petco/inicio");
+  } else {
+    res.render("login.ejs");
+  }
 };
 
 exports.CheckDB = (req, res, next) => {
@@ -44,7 +41,7 @@ exports.CheckDB = (req, res, next) => {
                 alertIcon: "success",
                 showCofirmButton: false,
                 timer: 2500,
-                ruta: "./inicio",
+                ruta: "petco/inicio",
               });
             } else {
               //Usuario no encontrado

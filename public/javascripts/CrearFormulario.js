@@ -45,7 +45,7 @@ const guardarButton = document
       document.querySelectorAll(".preguntaAbierta"),
       document.querySelectorAll(".preguntaCerrada"),
       document.querySelectorAll(".preguntaMultiple"),
-      "/petco/formulario/info",
+      "/petco/dashboard",
       document,
       "/petco/formulario/crear"
     );

@@ -201,7 +201,7 @@ buttonSaveProtocol.addEventListener("click", (e) => {
   };
   loadingScreen.fire();
   fetch(
-    "/protocolo/guardarEditar",
+    "/petco/protocolo/guardarEditar",
     {
       method: "POST",
       body: formData,

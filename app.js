@@ -8,16 +8,13 @@ const {
   ValidationError,
 } = require("express-json-validator-middleware");
 
-var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var registroRouter = require("./routes/registro");
-var ProtocoloRouter = require("./routes/protocolos");
+
 var vacunasRouter = require("./routes/vacunas");
-var formulariosRouter = require("./routes/formulariosRouter");
+
 var loginRouter = require("./routes/login");
 var authRequired = require("./routes/authRequired");
-var dashboard = require("./routes/DashboardRoutes");
-var publicacionget = require("./routes/PublicacionGetRouter");
 var app = express();
 
 const session = require("express-session");
@@ -29,6 +26,7 @@ app.use(
     saveUninitialized: true,
   })
 );
+
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
@@ -39,15 +37,15 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/inicio", indexRouter);
+// app.use("/inicio", indexRouter);
 app.use("/petco", isLogged, authRequired);
 app.use("/registro", registroRouter);
 //app.use("/formulario", formulariosRouter);
 app.use("/login", loginRouter);
-app.use("/protocolo", ProtocoloRouter);
-app.use("/dashboard", dashboard);
-app.use("/publicacion", publicacionget);
-app.use("/videollamada", require("./routes/videollamada"));
+// app.use("/protocolo", ProtocoloRouter);
+// app.use("/dashboard", dashboard);
+// app.use("/publicacion", publicacionget);
+// app.use("/videollamada", require("./routes/videollamada"));
 
 function isLogged(req, res, next) {
   var IdSession = req.session.IdSession;
@@ -105,6 +103,11 @@ app.use(function (err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
   console.log("rees");
+  if (err.status == 404) {
+    console.log("http://" + req.hostname + ":3000/login");
+
+    res.redirect("http://" + req.hostname + ":3000/login");
+  }
   // render the error page
   res.status(err.status || 500);
   res.render("error");

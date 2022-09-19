@@ -45,7 +45,7 @@ exports.responder_formulario_get = [
       )
       .findById(req.params.idMascota)
       .then((re) => {
-        return new Promise((resolve, reject) => { 
+        return new Promise((resolve, reject) => {
           console.log(re);
           resolve(
             re.MascotasPasos[re.MascotasPasos.length - 1].Proto
@@ -371,7 +371,7 @@ exports.verSolicitud = (req, res) => {
 exports.EliminarForm = (req, res) => {
   Formulario.query()
     .deleteById(req.params.idFormulario)
-    .then(res.redirect("/petco/formulario/info"));
+    .then(res.redirect("/petco/dashboard"));
 };
 
 exports.verifyFormulario = (req, res) => {
@@ -662,12 +662,13 @@ exports.formulario_edit_get = [
       .then((response) => {
         // console.log(FormWPreguntas);
         if (response == "") {
-          res.redirect(200, "/info");
+          res.redirect("/petco/dashboard");
+        } else {
+          res.render("Formulario/EditarFormulario", {
+            Response: response,
+          });
         }
         console.log(response);
-        res.render("Formulario/EditarFormulario", {
-          Response: response,
-        });
       });
     // res.render("Formulario/EditarFormulario");
     // res.render("Formulario/PreguntasTemplate", {}, (err, html) => {

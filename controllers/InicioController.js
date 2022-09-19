@@ -11,18 +11,29 @@ exports.Inicio = (req, res, next) => {
     Intereses.query()
       .where("Intereses.ID_Usuario", "=", req.session.IdSession)
       .then((Result) => {
+        console.log(Result);
+
         if (Result.length < 3) {
           //Revisa que el usuario tenga 3 intereses
           console.log(Result);
-          res.redirect("/inicio/intereses");
+          console.log(req.baseUrl.concat("login"));
+          console.log(req.hostname.concat("/login"));
+
+          res.redirect(req.baseUrl + "/intereses");
+          // res.redirect("./login");
         } else {
-          res.render("feed.ejs"); //El usuario esta logeado y tiene los intereses correspondientes
+          // res.render("feed.ejs"); //El usuario esta logeado y tiene los intereses correspondientes
+          res.redirect(req.baseUrl + "/feed");
         }
       })
       .catch((err) => next(err));
   } else {
-    res.redirect("/login");
+    res.redirect("../login");
   }
+};
+
+exports.feed = (req, res, next) => {
+  res.render("feed.ejs");
 };
 
 exports.SeleccionarIntereses = (req, res, next) => {
@@ -54,5 +65,6 @@ exports.CrearIntereses = (req, res, next) => {
       .catch((err) => next(err));
   }
 
-  res.redirect("/inicio");
+  // res.redirect("/inicio");
+  res.redirect(req.baseUrl + "/feed");
 };

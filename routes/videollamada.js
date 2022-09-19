@@ -2,7 +2,7 @@ var express = require("express");
 var router = express.Router();
 
 var myConnection = (req, res, next) => {
-  res.render("videochat");
+  res.render("videochatRoom");
 };
 
 router.get("/", myConnection);

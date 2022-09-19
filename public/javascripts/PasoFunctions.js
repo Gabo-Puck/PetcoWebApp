@@ -67,7 +67,7 @@ export function handleResponse(res) {
           confirmButtonText: "Siguiente",
         }).then((sweetResult) => {
           if (sweetResult.isConfirmed) {
-            window.location = "Dashboard";
+            window.location = "/petco/dashboard";
           }
         });
       }
