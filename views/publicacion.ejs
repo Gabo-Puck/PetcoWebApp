@@ -59,7 +59,7 @@
                                     <% for(var j=0; j < MascotaRender[i].MascotasImagenes.length; j++) { %>
                                         
                                         <div class="swiper-slide">
-                                            <img src="<%= MascotaRender[i].MascotasImagenes[j].Ruta%>" style="height: 300px; width: 300px; object-fit: cover ;">
+                                            <img src="/<%= MascotaRender[i].MascotasImagenes[j].Ruta%>" style="height: 300px; width: 300px; object-fit: cover ;">
                                         </div>
 
                                     <% } %>
@@ -91,7 +91,7 @@
                             <% if(MascotaRender[i].MascotasMetas != null && progreso<100){ %>
                                 <h5 style="text-align: center;">
 
-                                    <a href="/publicacion/meta/<%=MascotaRender[i].ID%>" class="btn btn-primary btn-block mt-3">
+                                    <a href="/petco/publicacion/meta/<%=MascotaRender[i].ID%>" class="btn btn-primary btn-block mt-3">
     
                                         Donar<i class="fa-solid fa-hand-holding-dollar"></i>
 

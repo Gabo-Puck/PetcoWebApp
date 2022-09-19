@@ -111,5 +111,5 @@ document.querySelector(".savePublicacion").addEventListener("click", () => {
       console.log(mascotaObject);
     });
   bodyRequest.append("Mascota", JSON.stringify(arrayMascotas));
-  fetch("/publicacion/crear", { method: "POST", body: bodyRequest });
+  fetch("/petco/publicacion/crear", { method: "POST", body: bodyRequest });
 });
