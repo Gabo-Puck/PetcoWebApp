@@ -17,6 +17,10 @@ class InMemorySessionStore extends SessionStore {
   printSessions() {
     console.log(this.activeSessions);
   }
+
+  deleteSession(id) {
+    this.activeSessions.delete(id);
+  }
 }
 
 /*Podría ser útil crear una clase igual pero para comentarios y otra para mensajes*/

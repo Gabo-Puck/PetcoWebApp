@@ -32,26 +32,31 @@ var server = http.createServer(app);
 server.listen(port);
 server.on("error", onError);
 server.on("listening", onListening);
+//Montamos la instancia de socket io con el servidor http que teníamos creado
 const io = new Server(server);
 
 const wrap = (middleware) => (socket, next) =>
   middleware(socket.request, {}, next);
 
-io.use(wrap(app.sessionReference));
+io.use(wrap(app.sessionReference)); //Esta función middleware específica para socket.io nos permite "parsear" la función middleware de express-session
 
 io.use((socket, next) => {
-  const sessionID = socket.handshake.auth.sessionID;
+  //Esta es una función middleware, que se ejecutará cada vez que haya un intento de conexión. Esto quiere decir que en este punto aún no se ha establecido una conexión formal
+  const sessionID = socket.handshake.auth.sessionID; //Recibimos la sesion guardada del usuario
   if (sessionID) {
-    const session = sessionStore.findSession(sessionID);
+    //Si el usuario si tenía su sesion guardada en las cookies
+    const session = sessionStore.findSession(sessionID); //Revisamos si tenemos una sesion actualmente guardada en el sessionStore
     if (session) {
+      //Si lo tenemos simplemente le asignamos los datos al socket del usuario
       socket.sessionID = sessionID;
       socket.userID = session.userID;
       return next();
     }
   }
+  //En el caso de que el usuario no haya tenido guardado en las cookies una sessionID le generamos una
   if (socket.request.session.IdSession) {
-    socket.sessionID = randomId();
-    socket.userID = socket.request.session.IdSession;
+    socket.sessionID = randomId(); //Generamos una id y única random para la sesion del usuario.
+    socket.userID = socket.request.session.IdSession; //Guardamos la id del usuario al que pertenece el usuario
     next();
   } else {
     return next(new Error("Usuario no logeado"));
@@ -59,11 +64,39 @@ io.use((socket, next) => {
 });
 
 io.on("connection", (socket) => {
-  sessionStore.saveSession(socket.sessionID, { userID: socket.userID });
+  //Este listener del server socket se acciona cada vez que se conecta un nuevo socket al server
+  sessionStore.saveSession(socket.sessionID, { userID: socket.userID }); //Cada vez que se conecta un socket, guardamos sus datos de sesion en nuestro sessionStore
   sessionStore.printSessions();
+  //Emitimos al usuario sus datos de acceso, para que se guarden en las cookies del navegador.
   socket.emit("session", {
     sessionID: socket.sessionID,
     userID: socket.userID,
+  });
+  socket.join(socket.userID); //Metemos al socket a la room del usuario
+  //Esto lo hacemos con el fin de considerar la posibilidad de que el usuario abra diferentes pestañas en el mismo navegador
+  //Entonces cada vez que entre un usuario con la misma sessionID, metemos a la misma room todos sus sockets
+  /*Esto nos permite por ejemplo, si se manda un mensaje al usuario con ID 2, y este usuario tiene 3 pestañas activas 
+   *con su cuenta abierta en la app, todas las pestañas recibiran el mensaje. Inclusive nos permite tener en cuenta el
+   hipotetico caso de que el usuario abra su cuenta en el celular y en una computadora*/
+
+  socket.on("disconnect", () => {
+    //Este listener se accionará cuando el socket se desconecte del servidor
+    //Revisamos la cantidad de usuarios que estan dentro de la room "socket.userID"
+    io.in(socket.userID)
+      .allSockets() //Obtenemos todos los sockets de esa room
+      .then((matchingSockets) => {
+        const isDisconnected = matchingSockets.size === 0; //Revisamos si la cantidad de sockets en la room es 0
+        if (isDisconnected) {
+          //Si es 0, quiere decir que el usuario finalmente se ha desconectado
+          sessionStore.deleteSession(socket.sessionID); //Eliminamos su session de las sesiones activas actuales
+          sessionStore.printSessions();
+          console.log(`El usuario ${socket.userID} se ha desconectado`);
+        } else {
+          console.log(
+            `Se ha desconectado un nodo del usuario con ID: ${socket.userID}. Quedan: ${matchingSockets.size}`
+          );
+        }
+      });
   });
 });
 
