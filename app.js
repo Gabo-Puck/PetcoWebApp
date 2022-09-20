@@ -19,13 +19,13 @@ var app = express();
 
 const session = require("express-session");
 const Protocolo = require("./models/Protocolo");
-app.use(
-  session({
-    secret: "secrete",
-    resave: true,
-    saveUninitialized: true,
-  })
-);
+const sessionMiddleware = session({
+  secret: "secrete",
+  resave: true,
+  saveUninitialized: true,
+});
+app.use(sessionMiddleware);
+app.sessionReference = sessionMiddleware;
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -105,8 +105,7 @@ app.use(function (err, req, res, next) {
   console.log("rees");
   if (err.status == 404) {
     console.log("http://" + req.hostname + ":3000/login");
-
-    res.redirect("http://" + req.hostname + ":3000/login");
+    return res.redirect("http://" + req.hostname + ":3000/login");
   }
   // render the error page
   res.status(err.status || 500);

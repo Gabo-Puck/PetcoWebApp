@@ -1,9 +1,6 @@
 var Intereses = require("../models/Intereses");
 var Especie = require("../models/Especie");
 
-var objection = require("objection");
-const { name } = require("ejs");
-
 exports.Inicio = (req, res, next) => {
   if (req.session.Logged) {
     //Revisa si el usuario esta logeado en la pagina

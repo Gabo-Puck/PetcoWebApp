@@ -8,6 +8,9 @@ var app = require("../app");
 var { Server } = require("socket.io");
 var debug = require("debug")("petcowebapp-v1:server");
 var http = require("http");
+var { InMemorySessionStore } = require("../utils/socketUtils/SessionStore");
+var { randomId } = require("../utils/cryptoUtils/randomId");
+var sessionStore = new InMemorySessionStore();
 
 /**
  * Get port from environment and store in Express.
@@ -30,51 +33,39 @@ server.listen(port);
 server.on("error", onError);
 server.on("listening", onListening);
 const io = new Server(server);
-let users = new Map();
-io.on("connection", (socket) => {
-  console.log("new user connected");
-  socket.on("new user", (user) => {
-    addUser(socket, user, users);
-    // delete usersSend[socket.id];
-  });
-  socket.on("disconnect", () => {
-    deleteUser(socket, users);
-    console.log(users);
-  });
-  socket.on("private message", ({ to, message, from }) => {
-    console.log(to);
-    if (users.has(to)) {
-      socket
-        .to(users.get(to))
-        .emit("private message", { message: message, from: from });
+
+const wrap = (middleware) => (socket, next) =>
+  middleware(socket.request, {}, next);
+
+io.use(wrap(app.sessionReference));
+
+io.use((socket, next) => {
+  const sessionID = socket.handshake.auth.sessionID;
+  if (sessionID) {
+    const session = sessionStore.findSession(sessionID);
+    if (session) {
+      socket.sessionID = sessionID;
+      socket.userID = session.userID;
+      return next();
     }
-  });
+  }
+  if (socket.request.session.IdSession) {
+    socket.sessionID = randomId();
+    socket.userID = socket.request.session.IdSession;
+    next();
+  } else {
+    return next(new Error("Usuario no logeado"));
+  }
 });
 
-function findId(user, users) {}
-
-function parseMapUsers(users) {
-  let usersSend = {};
-  for (let [key, value] of users) usersSend[key] = value;
-  return usersSend;
-}
-
-function deleteUser(socket, users) {
-  if (users.has(socket.id)) {
-    users.delete(socket.id);
-    io.emit("update list", parseMapUsers(users));
-  }
-}
-
-function addUser(socket, user, users) {
-  if (users.has(user)) {
-    socket.emit("user taken");
-  } else {
-    users.set(user, socket.id);
-    io.emit("update list", parseMapUsers(users));
-  }
-  console.log(users);
-}
+io.on("connection", (socket) => {
+  sessionStore.saveSession(socket.sessionID, { userID: socket.userID });
+  sessionStore.printSessions();
+  socket.emit("session", {
+    sessionID: socket.sessionID,
+    userID: socket.userID,
+  });
+});
 
 /**
  * Normalize a port into a number, string, or false.
