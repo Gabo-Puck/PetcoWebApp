@@ -9,12 +9,148 @@
       integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k"
       crossorigin="anonymous"
     ></script>
+    <script
+      src="https://kit.fontawesome.com/f0156fc078.js"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="/stylesheets/bootstrap-5.2.0-dist/themes/Lumen/bootstrap.css"
+    />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="/stylesheets/bootstrap-5.2.0-dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+
 
     <title>Videochat</title>
-    <style></style>
+    <style>
+      * {
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      body {
+        width: 100vw !important;
+        height: 100vh !important;
+        background-color: rgb(237, 237, 237);
+      }
+      #chatBox {
+        background-color: aquamarine;
+        flex-grow: 1;
+      }
+      #videosBox {
+        background-color: rgb(45, 80, 111);
+        flex-grow: 2;
+        /* max-width: 75%; */
+      }
+      #videochatBox {
+        width: 100%;
+        height: 100%;
+      }
+      .container {
+        background-color: transparent;
+      }
+      button {
+        width: 50px;
+        height: 50px;
+      }
+      video {
+        height: 300px;
+        border-radius: 1rem;
+        margin: 0.5rem;
+        width: 40%;
+        object-fit: cover;
+
+        background-color: aliceblue;
+      }
+      #you {
+        width: 15%;
+        height: 30%;
+      }
+      #user {
+        width: 80%;
+        height: 80%;
+      }
+      #controls {
+        /* top: 90%; */
+      }
+
+      #messageInput {
+        width: 100%;
+      }
+
+      @media (max-width: 425px) {
+        #you {
+          width: 30%;
+        }
+      }
+      @media (orientation: landscape) {
+      }
+    </style>
   </head>
   <body>
+    <div id="videochatBox" class="">
+      <div class="row h-100 flex-grow-1">
+        <div
+          id="videosBox"
+          class="bd-highlight col-lg justify-content-center align-items-center flex-column flex-md-row position-relative"
+        >
+          <video
+            class="position-absolute top-50 start-50 translate-middle"
+            id="user"
+            src=""
+          ></video>
+          <video
+            id="you"
+            class="position-absolute top-0 end-0 me-3"
+            style="background-color: black"
+            src=""
+          ></video>
+          <div
+            id="controls"
+            class="d-flex position-absolute bottom-0 start-50 translate-middle-x"
+          >
+            <div>
+              <button class="btn btn-light rounded-circle d-none">
+                <i class="fa-solid fa-microphone-slash"></i>
+                <!-- Icon para mute microfono-->
+              </button>
+              <button class="btn btn-light rounded-circle">
+                <i class="fa-solid fa-microphone"></i>
+                <!-- Icon para unmute microfono-->
+              </button>
+            </div>
+            <div>
+              <button class="btn btn-light rounded-circle d-none">
+                <i class="fa-solid fa-video-slash"></i
+                ><!-- Icon para ocultar camara-->
+              </button>
+              <button class="btn btn-light rounded-circle">
+                <i class="fa-solid fa-video"></i
+                ><!-- Icon para mostrar camara-->
+              </button>
+            </div>
+            <div>
+              <button class="btn btn-light rounded-circle">
+                <i class="fa-solid fa-phone-slash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div id="chatBox" class=" bd-highlight col-sm d-flex flex-column position-relative">
+          <div id="messages">
+a
+          </div>
+
+          <div class="d-flex position-absolute bottom-0 start-50 translate-middle-x input-group" id="messageInput">
+
+            <input class="flex-grow-1 form-control" type="text" placeholder="Di algo!"/>
+            <button class="flex-grow-0 btn btn-light"><i class="fa-regular fa-comment"></i></button>
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="/javascripts/videollamada.js"></script>
   </body>
 </html>

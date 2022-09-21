@@ -11,7 +11,7 @@ var http = require("http");
 var { InMemorySessionStore } = require("../utils/socketUtils/SessionStore");
 var { randomId } = require("../utils/cryptoUtils/randomId");
 var sessionStore = new InMemorySessionStore();
-
+const { ExpressPeerServer } = require("peer");
 /**
  * Get port from environment and store in Express.
  */
@@ -25,10 +25,12 @@ app.set("port", port);
 
 var server = http.createServer(app);
 
+const peerServer = ExpressPeerServer(server, { debug: true });
+
 /**
  * Listen on provided port, on all network interfaces.
  */
-
+app.use("/peerjs", peerServer);
 server.listen(port);
 server.on("error", onError);
 server.on("listening", onListening);
@@ -71,6 +73,10 @@ io.on("connection", (socket) => {
   socket.emit("session", {
     sessionID: socket.sessionID,
     userID: socket.userID,
+  });
+  socket.on("join-call", (roomId) => {
+    socket.join(roomId);
+    socket.to(roomId).broadcast.emit("user-connected", userId);
   });
   socket.join(socket.userID); //Metemos al socket a la room del usuario
   //Esto lo hacemos con el fin de considerar la posibilidad de que el usuario abra diferentes pestañas en el mismo navegador
