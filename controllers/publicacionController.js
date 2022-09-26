@@ -2,6 +2,8 @@ var Mascota = require("../models/Mascota");
 var {
   fetchInput,
   uploadFiles,
+  validateBody,
+  cleanInputID,
 } = require("../utils/multipartRequestHandle/index");
 var probe = require("probe-image-size");
 const Especie = require("../models/Especie");
@@ -10,6 +12,11 @@ const Castrado = require("../models/Castrado");
 const Usuario = require("../models/Usuario");
 const Tamano = require("../models/Tamano");
 const Publicacion = require("../models/Publicacion");
+const { check, validationResult } = require("express-validator");
+const _ = require("lodash");
+
+// const {  } = require("express-validator/src/base");
+// const { ValidationError } = require("express-json-validator-middleware");
 
 exports.prueba = (req, res) => {
   // Mascota.query()
@@ -116,28 +123,67 @@ exports.crearPublicacion = [
 
 exports.crearPublicacionGuardar = [
   fetchInput(acceptedTypes, "./public/images/ImagenesMascotas"),
+  check("Titulo")
+    .isLength({ min: 10, max: 50 })
+    .withMessage("El título debe tener entre 10 y 50 caracteres"),
+  check("Descripcion")
+    .isLength({ min: 20, max: 255 })
+    .withMessage("La descripción debe de tener entre 20 y 255 caracteres"),
+  check("Mascota.*.Nombre")
+    .isLength({ min: 1 })
+    .withMessage("El nombre es un campo obligatorio"),
+  check("Mascota.*.Edad")
+    .isInt()
+    .withMessage("La edad tiene que ser un numero"),
+  check("Mascota.*.Descripcion")
+    .isLength({ min: 20, max: 255 })
+    .withMessage("La descripción debe de tener entre 20 y 255 caracteres"),
+  check("Mascota.*.MascotasMetas.*.Descripcion")
+    .isLength({ min: 20, max: 255 })
+    .withMessage("La descripción debe de tener entre 20 y 255 caracteres"),
+  check("Mascota.*.MascotasMetas.*.Cantidad")
+    .isInt({ min: 100 })
+    .withMessage("La cantidad de la meta debe de ser por lo menos de 100 mxn"),
+  validateBody,
+  // (req, res, next) => {
+  //   var validationResult = validationResult(req).array({
+  //     onlyFirstError: true,
+  //   });
+  //   if (validationResult.length > 0) {
+  //     var errorObject = new ValidationError(validationResult);
+  //     validationResult.forEach((error) => {
+  //       var ID_Error = _.get(req.body, error.param + "ID");
+  //       resulta.errors.push({ ID: ID_Error, msg: error.msg });
+  //     });
+  //     return next(resulta);
+  //   }
+  //   next();
+  // },
   (req, res, next) => {
-    console.log(req.body.Mascota[0].MascotasVacunas);
-    req.body.Activo = 1;
-    req.body.Reportes_Peso = 0;
-    req.body.ID_Usuario = req.IdSession;
-    for (let index = 0; index < req.body.Mascota.length; index++) {
-      const mascota = req.body.Mascota[index];
-      for (const key in req.body) {
-        if (Object.hasOwnProperty.call(req.body, key)) {
-          const prop = req.body[key];
-          if (key.charAt(0) == index) {
-            ruta = prop.replace(/public/g, "");
-            mascota.MascotasImagenes.push({ Ruta: ruta });
-            delete req.body[key];
-          }
-        }
-      }
-      console.log(mascota);
-    }
-    Publicacion.query()
-      .insertGraph(req.body)
-      .then((response) => uploadFiles(res));
+    cleanInputID(req.body);
+
+    // console.log(req.body.Mascota[0].MascotasVacunas);
+    // req.body.Activo = 1;
+    // req.body.Reportes_Peso = 0;
+    // req.body.ID_Usuario = req.IdSession;
+    // for (let index = 0; index < req.body.Mascota.length; index++) {
+    //   const mascota = req.body.Mascota[index];
+    //   for (const key in req.body) {
+    //     if (Object.hasOwnProperty.call(req.body, key)) {
+    //       const prop = req.body[key];
+    //       const numMascota = key.split("-")[0];
+    //       if (numMascota == index) {
+    //         ruta = prop.replace(/public/g, "");
+    //         mascota.MascotasImagenes.push({ Ruta: ruta });
+    //         delete req.body[key];
+    //       }
+    //     }
+    //   }
+    //   console.log(mascota);
+    // }
+    // Publicacion.query()
+    //   .insertGraph(req.body)
+    //   .then((response) => uploadFiles(res));
   },
 ];
 

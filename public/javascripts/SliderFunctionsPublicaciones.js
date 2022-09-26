@@ -1,4 +1,7 @@
-import { selectParent } from "/javascripts/FormulariosFunctions.js";
+import {
+  selectParent,
+  retrieveParent,
+} from "/javascripts/FormulariosFunctions.js";
 
 export class SliderController {
   constructor() {
@@ -162,45 +165,6 @@ export function addListenersToElementsInCarousel(
     ImagenCardTemplate
   );
 
-  responseData.EspeciesVacunas.forEach((EspecieVacuna) => {
-    let optionElement = document.createElement("option");
-    optionElement.value = EspecieVacuna.ID;
-    optionElement.innerText = EspecieVacuna.Nombre_Especie;
-    newCard.querySelector(".especieSelect").appendChild(optionElement);
-  });
-  newCard.querySelector(".especieSelect").id = controller.contInput++;
-
-  responseData.SaludStatus.forEach((Status) => {
-    let radioInput = radioSelectorTemplate.cloneNode(true);
-    radioInput.querySelector("input").value = Status.ID;
-    radioInput.querySelector("label").innerText = Status.Salud;
-    radioInput.querySelector("input").name = `Salud${controller.contInput}`;
-    radioInput.querySelector("label").for = `Salud${controller.contInput}`;
-
-    newCard.querySelector(".saludOptions").appendChild(radioInput);
-  });
-  newCard.querySelector(".saludOptions").id = controller.contInput++;
-
-  responseData.CastradoStatus.forEach((Status) => {
-    let radioInput = radioSelectorTemplate.cloneNode(true);
-    radioInput.querySelector("input").value = Status.ID;
-    radioInput.querySelector("label").innerText = Status.Castrado;
-    radioInput.querySelector("input").name = `Castrado${controller.contInput}`;
-    radioInput.querySelector("label").for = `Castrado${controller.contInput}`;
-    newCard.querySelector(".castradoOptions").appendChild(radioInput);
-  });
-  newCard.querySelector(".castradoOptions").id = controller.contInput++;
-
-  responseData.Tamanos.forEach((Tamano) => {
-    let radioInput = radioSelectorTemplate.cloneNode(true);
-    radioInput.querySelector("input").value = Tamano.ID;
-    radioInput.querySelector("label").innerText = Tamano.Tamano;
-    radioInput.querySelector("input").name = `Tamano${controller.contInput}`;
-    radioInput.querySelector("label").for = `Tamano${controller.contInput}`;
-    newCard.querySelector(".tamanoOptions").appendChild(radioInput);
-  });
-  newCard.querySelector(".tamanoOptions").id = controller.contInput++;
-
   newCard.querySelector(".especieSelect").addEventListener("change", (e) => {
     let cardID;
     newCard.classList.forEach((e) => {
@@ -211,6 +175,7 @@ export function addListenersToElementsInCarousel(
 
     $(`.${cardID} .vacunasBox`).empty();
     responseData.EspeciesVacunas.forEach((Especie) => {
+      let count = 0;
       if (Especie.ID == e.target.value) {
         Especie.Vacunas.forEach((Vacuna) => {
           if (Vacuna.Nombre_Vacuna == "Especie sin vacunas") {
@@ -218,21 +183,109 @@ export function addListenersToElementsInCarousel(
             text.innerText = "Especie sin vacunas";
             newCard.querySelector(".vacunasBox").appendChild(text);
           } else {
+            let vacunaBoxId = newCard.querySelector(".vacunasBox").id;
             let checkboxInput = vacunaTemplate.cloneNode(true);
             checkboxInput.querySelector("input").value = Vacuna.ID;
+            checkboxInput.querySelector(
+              "input"
+            ).id = `vacunaInput${vacunaBoxId} ${count}`;
             checkboxInput.querySelector("label").innerText =
               Vacuna.Nombre_Vacuna;
+            checkboxInput.querySelector(
+              "label"
+            ).htmlFor = `vacunaInput${vacunaBoxId} ${count}`;
             newCard.querySelector(".vacunasBox").appendChild(checkboxInput);
+            count++;
+            // var xD = document.createElement("div");
+            // xD.childNodes
           }
         });
       }
     });
-    newCard.querySelector(".vacunasBox").id = controller.contInput++;
+    // var a = new HTMLSelectElement();
 
     // responseData.vacunas.forEach((vacuna) => {
     //   if(vacuna)
     // })
   });
+
+  responseData.EspeciesVacunas.forEach((EspecieVacuna) => {
+    let optionElement = document.createElement("option");
+    optionElement.value = EspecieVacuna.ID;
+    optionElement.innerText = EspecieVacuna.Nombre_Especie;
+    newCard.querySelector(".especieSelect").appendChild(optionElement);
+  });
+  newCard.querySelector(".especieSelect").id = `input${controller.contInput++}`;
+  var event = new Event("change");
+  newCard.querySelector(".especieSelect").dispatchEvent(event);
+  let contRadios = 0;
+
+  responseData.SaludStatus.forEach((Status) => {
+    let radioInput = radioSelectorTemplate.cloneNode(true);
+    radioInput.querySelector("input").value = Status.ID;
+    radioInput.querySelector("label").innerText = Status.Salud;
+    radioInput.querySelector("input").name = `Salud${controller.contInput}`;
+    radioInput.querySelector(
+      "input"
+    ).id = `Salud${controller.contInput}${contRadios}`;
+    radioInput.querySelector(
+      "label"
+    ).htmlFor = `Salud${controller.contInput}${contRadios}`;
+    newCard.querySelector(".saludOptions").appendChild(radioInput);
+    contRadios++;
+  });
+  newCard
+    .querySelector(".saludOptions")
+    .firstChild.querySelector("input").checked = 1;
+  // newCard.querySelector(".saludOptions").childNodes[1].checked = 1;
+  // var a = new HTMLDivElement();
+  // a.childNodes.;
+  newCard.querySelector(".saludOptions").contRadios = 0;
+  newCard.querySelector(".saludOptions").id = `input${controller.contInput++}`;
+
+  responseData.CastradoStatus.forEach((Status) => {
+    let radioInput = radioSelectorTemplate.cloneNode(true);
+    radioInput.querySelector("input").value = Status.ID;
+    radioInput.querySelector("label").innerText = Status.Castrado;
+    radioInput.querySelector("input").name = `Castrado${controller.contInput}`;
+    radioInput.querySelector(
+      "input"
+    ).id = `Castrado${controller.contInput}${contRadios}`;
+    radioInput.querySelector(
+      "label"
+    ).htmlFor = `Castrado${controller.contInput}${contRadios}`;
+    newCard.querySelector(".castradoOptions").appendChild(radioInput);
+    contRadios++;
+  });
+  contRadios = 0;
+
+  newCard.querySelector(
+    ".castradoOptions"
+  ).id = `input${controller.contInput++}`;
+  newCard
+    .querySelector(".castradoOptions")
+    .firstChild.querySelector("input").checked = 1;
+
+  responseData.Tamanos.forEach((Tamano) => {
+    let radioInput = radioSelectorTemplate.cloneNode(true);
+    radioInput.querySelector("input").value = Tamano.ID;
+    radioInput.querySelector("label").innerText = Tamano.Tamano;
+    radioInput.querySelector("input").name = `Tamano${controller.contInput}`;
+    radioInput.querySelector(
+      "input"
+    ).id = `Tamano${controller.contInput}${contRadios}`;
+    radioInput.querySelector(
+      "label"
+    ).htmlFor = `Tamano${controller.contInput}${contRadios}`;
+    newCard.querySelector(".tamanoOptions").appendChild(radioInput);
+    contRadios++;
+  });
+  newCard.querySelector(".tamanoOptions").id = `input${controller.contInput++}`;
+  newCard
+    .querySelector(".tamanoOptions")
+    .firstChild.querySelector("input").checked = 1;
+
+  newCard.querySelector(".vacunasBox").id = `input${controller.contInput++}`;
 
   responseData.ProtocolosUsuario.forEach((Usuario) => {
     Usuario.Protocolos.forEach((Protocolo) => {
@@ -242,25 +295,7 @@ export function addListenersToElementsInCarousel(
       newCard.querySelector(".protocoloSelector").appendChild(optionElement);
     });
   });
-  newCard.querySelector(".protocoloSelector").id = controller.contInput++;
-  newCard.querySelector(".mascotaDescripcion").id = controller.contInput++;
-  newCard.querySelector(".nombreMascota").id = controller.contInput++;
-  newCard.querySelector(".edadInput").id = controller.contInput++;
 
-  newCard.querySelector(".crearMetaButton").addEventListener("click", (e) => {
-    e.preventDefault();
-    let meta = metaTemplate.cloneNode(true);
-    meta.querySelector(".metaDescripcion").id = controller.contInput++;
-    meta.querySelector(".metaCantidad").id = controller.contInput++;
-
-    newCard.querySelector(".metasBox").insertBefore(meta, e.target);
-  });
-  newCard
-    .querySelector(".habilitarDonacionescheck")
-    .addEventListener("click", (e) => {
-      let button = newCard.querySelector(".crearMetaButton");
-      button.disabled = e.target.checked ? false : true;
-    });
   newCard.querySelector(".form-range").addEventListener("input", (e) => {
     if (e.target.value == -1) {
       newCard.querySelector(".edadTexto").innerText = "La desconozco";
@@ -271,4 +306,54 @@ export function addListenersToElementsInCarousel(
     if (e.target.value > 0)
       newCard.querySelector(".edadTexto").innerText = e.target.value;
   });
+  newCard.querySelector(
+    ".protocoloSelector"
+  ).id = `input${controller.contInput++}`;
+  newCard.querySelector(
+    ".mascotaDescripcion"
+  ).id = `input${controller.contInput++}`;
+  newCard.querySelector(".nombreMascota").id = `input${controller.contInput++}`;
+  newCard.querySelector(".edadInput").id = `input${controller.contInput++}`;
+  var eventInput = new Event("input");
+  newCard.querySelector(".edadInput").dispatchEvent(eventInput);
+
+  // newCard.querySelector(".crearMetaButton").addEventListener("click", (e) => {
+  //   e.preventDefault();
+  //   let meta = metaTemplate.cloneNode(true);
+  //   meta.querySelector(".metaDescripcion").id = controller.contInput++;
+  //   meta.querySelector(".metaCantidad").id = controller.contInput++;
+
+  //   newCard.querySelector(".metasBox").insertBefore(meta, e.target);
+  // });
+  // newCard
+  //   .querySelector(".habilitarDonacionescheck")
+  //   .addEventListener("click", (e) => {
+  //     let button = newCard.querySelector(".crearMetaButton");
+  //     button.disabled = e.target.checked ? false : true;
+  //   });
+
+  newCard
+    .querySelector(".optionMascotaConMeta")
+    .querySelector("label").htmlFor = "opcionConMeta" + controller.contInput;
+  newCard.querySelector(".optionMascotaConMeta").querySelector("input").id =
+    "opcionConMeta" + controller.contInput;
+  newCard
+    .querySelector(".optionMascotaSinMeta")
+    .querySelector("label").htmlFor = "opcionSinMeta" + controller.contInput;
+  newCard.querySelector(".optionMascotaSinMeta").querySelector("input").id =
+    "opcionSinMeta" + controller.contInput;
+  newCard
+    .querySelector(".optionMascotaConMeta")
+    .addEventListener("change", () => {
+      newCard.querySelector(".metasBox").style.display = "block";
+    });
+  newCard
+    .querySelector(".optionMascotaSinMeta")
+    .addEventListener("change", () => {
+      newCard.querySelector(".metasBox").style.display = "none";
+    });
+  newCard.querySelector(
+    ".metaDescripcion"
+  ).id = `input${controller.contInput++}`;
+  newCard.querySelector(".metaCantidad").id = `input${controller.contInput++}`;
 }

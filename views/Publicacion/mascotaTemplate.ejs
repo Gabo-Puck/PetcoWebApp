@@ -1,6 +1,10 @@
 <div
   class="swiper-slide d-flex align-items-start justify-items-center swiperCard flex-column mascota"
 >
+  <p class="informative">
+    <i class="fa-solid fa-circle-info mx-2 infoImagenes"></i>Muestranos a tu
+    mascota, sube de 3 a 5 fotos suyas!
+  </p>
   <div class="swiper swiper-v" style="width: 101%; background-color: black">
     <div class="swiper-wrapper" style="background-color: black">
       <div
@@ -20,6 +24,28 @@
   <div class="flex-grow-1 mt-3 w-100 px-5 overflow-hidden">
     <form method="post" class="">
       <div class="row border border-1 rounded justify-content-center mb-4">
+        <div class="row mb-2">
+          <div class="col mx-4 d-flex justify-content-around flex-wrap">
+            <div class="d-flex flex-column bd-highlight optionMascotaConMeta">
+              <label class="form-check-label"> Mascota con meta </label>
+              <input
+                class="form-check-input mx-auto"
+                type="radio"
+                name="mascotaMeta"
+                checked
+              />
+            </div>
+            <div class="d-flex flex-column bd-highlight optionMascotaSinMeta">
+              <label class="form-check-label"> Mascota sin meta </label>
+              <input
+                class="form-check-input mx-auto"
+                type="radio"
+                name="mascotaMeta"
+              />
+            </div>
+          </div>
+        </div>
+
         <div class="row mb-2">
           <div class="col mx-4">
             <label for="" class="from-label" hidden>Nombre Mascota</label>
@@ -72,16 +98,13 @@
           </div>
         </div>
         <div class="col">
-          <div class="row justify-content-center">
-            <div class="row mx-4 saludOptions">
-              <label for="" class="from-label">Salud</label>
-            </div>
-            <div class="row mx-4 tamanoOptions">
-              <label for="" class="from-label">Tamaño</label>
-            </div>
-            <div class="row mx-4 castradoOptions">
-              <label for="" class="from-label">Castado</label>
-            </div>
+          <div class="row justify-content-center border-1 rounded">
+            <label for="" class="from-label">Salud</label>
+            <div class="row mx-4 saludOptions"></div>
+            <label for="" class="from-label">Tamaño</label>
+            <div class="row mx-4 tamanoOptions"></div>
+            <label for="" class="from-label">Castrado</label>
+            <div class="row mx-4 castradoOptions"></div>
           </div>
         </div>
       </div>
@@ -102,26 +125,35 @@
           style="text-align: center"
         ></select>
       </div>
-
-      <div class="row border border-1 rounded justify-content-center mb-3">
+      <div class="row border border-1 rounded justify-content-center mb-3 pb-5">
         <div class="row justify-content-center metasBox">
-          <div class="form-check w-30 pe-5 d-inline-flex">
+          <h3 class="mx-auto">Meta</h3>
+          <!-- <div class="form-check w-30 pe-5 d-inline-flex">
             <input
               class="form-check-input me-3 habilitarDonacionescheck"
               type="checkbox"
               id=""
             />
             <label for="" class="form-check-label">Habilitar donacion</label>
-          </div>
+          </div> -->
 
-          <button
+          <!-- <button
             class="btn btn-warning crearMetaButton mx-auto d-block"
             type="button"
             style="width: 30%"
             disabled
           >
             Crear meta
-          </button>
+          </button> -->
+
+          <label for="" class="form-label">Cantidad</label>
+          <input
+            type="number"
+            class="form-control mx-auto metaCantidad"
+            style="width: 45%"
+          />
+          <label for="" class="form-label">Descripción de meta</label>
+          <textarea class="form-control metaDescripcion"></textarea>
         </div>
       </div>
     </form>

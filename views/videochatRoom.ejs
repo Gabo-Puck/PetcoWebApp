@@ -19,14 +19,17 @@
     />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="/stylesheets/bootstrap-5.2.0-dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <script src="https://unpkg.com/peerjs@1.3.2/dist/peerjs.min.js"></script>
+    <script>
+      const nombreUsuario = "<%=nombre%>";
+    </script>
 
 
     <title>Videochat</title>
     <style>
       * {
-        margin: 0 !important;
-        padding: 0 !important;
+        margin: 0;
+        padding: 0;
       }
       body {
         width: 100vw !important;
@@ -76,6 +79,21 @@
 
       #messageInput {
         width: 100%;
+      }
+      .mensajeNuevo{
+
+      }
+      #messages{
+        padding: 0 4px;
+      }
+
+      .mensajeContenido{
+        padding-left: 1%;
+      }
+      .mensajeNombre{
+        padding: 0;
+        margin: 0;
+        font-weight: 900;
       }
 
       @media (max-width: 425px) {
@@ -138,14 +156,15 @@
         </div>
         <div id="chatBox" class=" bd-highlight col-sm d-flex flex-column position-relative">
           <div id="messages">
-a
+            a
           </div>
-
-          <div class="d-flex position-absolute bottom-0 start-50 translate-middle-x input-group" id="messageInput">
-
-            <input class="flex-grow-1 form-control" type="text" placeholder="Di algo!"/>
-            <button class="flex-grow-0 btn btn-light"><i class="fa-regular fa-comment"></i></button>
-          </div>
+          <form action="" class="d-flex position-absolute bottom-0 start-50 translate-middle-x w-100" id="messageForm">
+            <div class="input-group flex-nowrap">
+              <input class="form-control" type="text" placeholder="Di algo!" autocomplete="off" id="messageInput"/>
+              <button class="btn btn-outline-secondary" id=""><i class="fa-regular fa-comment"></i></button>
+            </div>
+    
+          </form>
           </div>
         </div>
       </div>
