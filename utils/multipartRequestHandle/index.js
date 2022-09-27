@@ -121,7 +121,7 @@ exports.fetchInput = (acceptedTypes, folderPath) => {
           var readable = new Readable();
           readable._read = (size) => {};
           file.on("data", (data) => {
-            console.log(data);
+            // console.log(data);
             readable.push(data);
           });
           file.on("end", () => {

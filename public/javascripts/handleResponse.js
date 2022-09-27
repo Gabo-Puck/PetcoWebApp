@@ -1,18 +1,18 @@
 import { loadingScreen } from "/javascripts/FormulariosFunctions.js";
 
-export function handleResponse(res) {
+export function handleResponse(res, url) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       loadingScreen.close();
       if (res == "ok") {
         Swal.fire({
           title: "Listo!",
-          text: "Se ha guardado tu protocolo correctamente!",
+          text: "¡Publicación creada correctamente!",
           icon: "success",
           confirmButtonText: "Siguiente",
         }).then((sweetResult) => {
           if (sweetResult.isConfirmed) {
-            window.location = "petco/dashboard";
+            window.location = url;
           }
         });
       }

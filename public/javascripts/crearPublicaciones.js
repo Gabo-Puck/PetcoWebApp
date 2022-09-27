@@ -114,8 +114,17 @@ document.querySelector(".savePublicacion").addEventListener("click", () => {
       let cont2 = 0;
       mascotaObject.MascotasImagenes = [];
       let mascotaImagenes = mascota.querySelectorAll("input[type='file']");
+      mascotaImagenes.forEach((element) => {
+        if (element.files.length == 0) {
+          element.remove();
+        }
+      });
       mascota.querySelector(".infoImagenes").classList.remove("fa-circle-info");
-      if (mascotaImagenes.length >= 3 && mascotaImagenes.length <= 5 && conteoMascotas) {
+      if (
+        mascotaImagenes.length >= 3 &&
+        mascotaImagenes.length <= 5 &&
+        conteoMascotas
+      ) {
         conteoMascotas = true;
         mascota
           .querySelector(".infoImagenes")
@@ -131,7 +140,6 @@ document.querySelector(".savePublicacion").addEventListener("click", () => {
           .querySelector(".infoImagenes")
           .classList.add("fa-circle-exclamation");
         mascota.querySelector(".informative").style.color = "#FF4136";
-
       }
       mascota.querySelectorAll("input[type='file']").forEach((imagen) => {
         bodyRequest.append(`${cont}-${cont2}`, imagen.files[0]);
@@ -155,7 +163,13 @@ document.querySelector(".savePublicacion").addEventListener("click", () => {
     loadingScreen.fire();
     fetch("/petco/publicacion/crear", { method: "POST", body: bodyRequest })
       .then((res) => res.json())
-      .then((res) => handleResponse(res))
+      .then((res) =>
+        handleResponse(
+          res,
+          "/petco/inicio/feed",
+          "¡Publicación creada correctamente!"
+        )
+      )
       .then((res) => displayErrors(res));
     return;
   }

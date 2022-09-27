@@ -165,13 +165,19 @@ export function addListenersToElementsInCarousel(
     ImagenCardTemplate
   );
 
+  let cardID;
+  newCard.classList.forEach((e) => {
+    if (e.indexOf("card") != -1) {
+      cardID = e;
+    }
+  });
+  newCard.querySelector(".deleteMascota").addEventListener("click", (e) => {
+    swiper.removeSlide(swiper.activeIndex);
+    swiper.update();
+  });
   newCard.querySelector(".especieSelect").addEventListener("change", (e) => {
-    let cardID;
-    newCard.classList.forEach((e) => {
-      if (e.indexOf("card") != -1) {
-        cardID = e;
-      }
-    });
+    // var a = "";
+    // a.split()
 
     $(`.${cardID} .vacunasBox`).empty();
     responseData.EspeciesVacunas.forEach((Especie) => {

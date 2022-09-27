@@ -1,10 +1,19 @@
 <div
   class="swiper-slide d-flex align-items-start justify-items-center swiperCard flex-column mascota"
 >
-  <p class="informative">
-    <i class="fa-solid fa-circle-info mx-2 infoImagenes"></i>Muestranos a tu
-    mascota, sube de 3 a 5 fotos suyas!
-  </p>
+  <div class="d-flex w-100 justify-content-between mb-2">
+    <div class="d-flex">
+      <p class="informative align-items-center my-auto">
+        <i class="fa-solid fa-circle-info mx-2 infoImagenes"></i>Muestranos a tu
+        mascota, sube de 3 a 5 fotos suyas!
+      </p>
+    </div>
+    <div class="position-relative align-content-center">
+      <button class="btn btn-danger me-2 deleteMascota">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
   <div class="swiper swiper-v" style="width: 101%; background-color: black">
     <div class="swiper-wrapper" style="background-color: black">
       <div
@@ -166,7 +175,7 @@
 >
   <div class="swiper-zoom-container position-relative">
     <button
-      class="btn btn-danger position-absolute top-0 end-0 me-3 btn-delete"
+      class="btn btn-danger position-absolute top-0 start-0 ms-3 btn-delete"
       style="z-index: 1"
     >
       <i class="fa-regular fa-trash-can"></i>

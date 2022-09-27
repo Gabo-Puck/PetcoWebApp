@@ -14,6 +14,9 @@ const Tamano = require("../models/Tamano");
 const Publicacion = require("../models/Publicacion");
 const { check, validationResult } = require("express-validator");
 const _ = require("lodash");
+const Protocolo = require("../models/Protocolo");
+const Paso = require("../models/Paso");
+const Pasos_Mascota = require("../models/Pasos_Mascota");
 
 // const {  } = require("express-validator/src/base");
 // const { ValidationError } = require("express-json-validator-middleware");
@@ -130,8 +133,8 @@ exports.crearPublicacionGuardar = [
     .isLength({ min: 20, max: 255 })
     .withMessage("La descripción debe de tener entre 20 y 255 caracteres"),
   check("Mascota.*.Nombre")
-    .isLength({ min: 1 })
-    .withMessage("El nombre es un campo obligatorio"),
+    .isLength({ min: 5, max: 20 })
+    .withMessage("El nombre debe de tener entre 5 y 20 caracteres"),
   check("Mascota.*.Edad")
     .isInt()
     .withMessage("La edad tiene que ser un numero"),
@@ -162,30 +165,116 @@ exports.crearPublicacionGuardar = [
   (req, res, next) => {
     cleanInputID(req.body);
 
-    // console.log(req.body.Mascota[0].MascotasVacunas);
-    // req.body.Activo = 1;
-    // req.body.Reportes_Peso = 0;
-    // req.body.ID_Usuario = req.IdSession;
-    // for (let index = 0; index < req.body.Mascota.length; index++) {
-    //   const mascota = req.body.Mascota[index];
-    //   for (const key in req.body) {
-    //     if (Object.hasOwnProperty.call(req.body, key)) {
-    //       const prop = req.body[key];
-    //       const numMascota = key.split("-")[0];
-    //       if (numMascota == index) {
-    //         ruta = prop.replace(/public/g, "");
-    //         mascota.MascotasImagenes.push({ Ruta: ruta });
-    //         delete req.body[key];
-    //       }
-    //     }
-    //   }
-    //   console.log(mascota);
-    // }
-    // Publicacion.query()
-    //   .insertGraph(req.body)
-    //   .then((response) => uploadFiles(res));
+    console.log(req.body.Mascota[0].MascotasVacunas);
+    req.body.Activo = 1;
+    req.body.Reportes_Peso = 0;
+    req.body.ID_Usuario = req.session.IdSession;
+    let protocolos = [];
+    for (let index = 0; index < req.body.Mascota.length; index++) {
+      const mascota = req.body.Mascota[index];
+      if (mascota.MascotasMetas.length == 0) {
+        delete mascota.MascotasMetas;
+      }
+      if (mascota.MascotasVacunasThrough.length == 0) {
+        delete mascota.MascotasVacunasThrough;
+      }
+      protocolos.push(mascota.ID_Protocolo);
+      delete mascota.ID_Protocolo;
+      for (const key in req.body) {
+        if (Object.hasOwnProperty.call(req.body, key)) {
+          const prop = req.body[key];
+          const numMascota = key.split("-")[0];
+          if (numMascota == index) {
+            ruta = prop.replace(/public/g, "");
+            ruta = ruta.replace("\\", "/");
+            mascota.MascotasImagenes.push({ Ruta: ruta });
+            delete req.body[key];
+          }
+        }
+      }
+      console.log(mascota);
+    }
+
+    Publicacion.query()
+      .insertGraphAndFetch(req.body)
+      .then((response) => {
+        // return new Promise((resolve, reject) => {
+        //   Protocolo.query().withGraphJoined("Pasos").findById(ID_Protocolo).then((Pasos) => {
+
+        //   })
+        // });
+        return new Promise((resolve, reject) => {
+          resolve(
+            createArrayPromisesPasosMascota(response.Mascota, protocolos)
+          );
+        });
+
+        // console.log(response);
+      })
+      .then((promises) => Promise.all(promises))
+      .then(() => uploadFiles(res))
+      .then(() => res.json("ok"))
+      .catch((err) =>
+        res.json({
+          globalError: "<p>Algo ha salido mal</p><p>Intentalo más tarde</p>",
+        })
+      );
   },
 ];
+
+function createArrayPromisesPasosMascota(Mascotas, Protocolos) {
+  let arrayProm = [];
+  for (let index = 0; index < Mascotas.length; index++) {
+    const element = Mascotas[index];
+    let prom = createPromisesPasosMascota(
+      Mascotas[index].ID,
+      Protocolos[index]
+    );
+    arrayProm.push(prom);
+  }
+  return arrayProm;
+}
+
+function createPromisesPasosMascota(ID_Mascota, ID_Protocolo) {
+  return new Promise((resolve, reject) => {
+    Paso.query()
+      // .withGraphJoined("Pasos")
+      .where("ID_Protocolo", "=", 1)
+      .orWhere("ID_Protocolo", "=", ID_Protocolo)
+      .then((Pasos) => {
+        if (ID_Protocolo == 1) {
+          resolve(Pasos);
+        } else {
+          let PasosID = [];
+          // console.log(Pasos[0]);
+          PasosID.push(Pasos[0]);
+          // console.log(Pasos[1]);
+          PasosID.push(Pasos[1]);
+          for (let index = 4; index < Pasos.length; index++) {
+            const element = Pasos[index];
+            console.log(element);
+            PasosID.push(Pasos[index]);
+          }
+
+          resolve(PasosID);
+        }
+        // resolve(1);
+      });
+  }).then((Pasos) => {
+    let PasosMascotaInsert = [];
+    for (let index = 0; index < Pasos.length; index++) {
+      const element = Pasos[index];
+      PasosMascotaInsert.push({
+        ID_Mascota: ID_Mascota,
+        ID_Paso: element.ID,
+        Completado: 0,
+      });
+    }
+    Pasos_Mascota.query()
+      .insertGraph(PasosMascotaInsert)
+      .then((res) => console.log("done"));
+  });
+}
 
 exports.checkImage = [
   fetchInput(acceptedTypes, "./public/images/ImagenesMascotas"),
