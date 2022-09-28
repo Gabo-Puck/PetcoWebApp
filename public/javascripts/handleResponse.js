@@ -1,13 +1,13 @@
 import { loadingScreen } from "/javascripts/FormulariosFunctions.js";
 
-export function handleResponse(res, url) {
+export function handleResponse(res, url, message) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       loadingScreen.close();
       if (res == "ok") {
         Swal.fire({
           title: "Listo!",
-          text: "¡Publicación creada correctamente!",
+          text: message,
           icon: "success",
           confirmButtonText: "Siguiente",
         }).then((sweetResult) => {

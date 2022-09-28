@@ -24,7 +24,6 @@
       const nombreUsuario = "<%=nombre%>";
     </script>
 
-
     <title>Videochat</title>
     <style>
       * {
@@ -60,9 +59,8 @@
         height: 300px;
         border-radius: 1rem;
         margin: 0.5rem;
-        width: 40%;
+        width: 100%;
         object-fit: cover;
-
         background-color: aliceblue;
       }
       #you {
@@ -80,17 +78,16 @@
       #messageInput {
         width: 100%;
       }
-      .mensajeNuevo{
-
+      .mensajeNuevo {
       }
-      #messages{
+      #messages {
         padding: 0 4px;
       }
 
-      .mensajeContenido{
+      .mensajeContenido {
         padding-left: 1%;
       }
-      .mensajeNombre{
+      .mensajeNombre {
         padding: 0;
         margin: 0;
         font-weight: 900;
@@ -107,16 +104,18 @@
   </head>
   <body>
     <div id="videochatBox" class="">
-      <div class="row h-100 flex-grow-1">
+      <div class="row h-100 w-100 m-0">
         <div
           id="videosBox"
           class="bd-highlight col-lg justify-content-center align-items-center flex-column flex-md-row position-relative"
         >
-          <video
-            class="position-absolute top-50 start-50 translate-middle"
-            id="user"
-            src=""
-          ></video>
+          <div>
+            <video
+              class="position-absolute top-50 start-50 translate-middle"
+              id="user"
+              src=""
+            ></video>
+          </div>
           <video
             id="you"
             class="position-absolute top-0 end-0 me-3"
@@ -128,24 +127,28 @@
             class="d-flex position-absolute bottom-0 start-50 translate-middle-x"
           >
             <div>
-              <button class="btn btn-light rounded-circle d-none">
-                <i class="fa-solid fa-microphone-slash"></i>
+              <button
+                class="btn btn-light rounded-circle"
+                id="buttonMicrophone"
+              >
+                <i class="fa-solid"></i>
                 <!-- Icon para mute microfono-->
-              </button>
-              <button class="btn btn-light rounded-circle">
-                <i class="fa-solid fa-microphone"></i>
+                <!-- <i class="fa-solid fa-microphone"></i> -->
                 <!-- Icon para unmute microfono-->
               </button>
+              <button class="btn btn-light rounded-circle d-none"></button>
             </div>
             <div>
-              <button class="btn btn-light rounded-circle d-none">
-                <i class="fa-solid fa-video-slash"></i
+              <button
+                class="btn btn-light rounded-circle buttonCamera"
+                id="buttonCamera"
+              >
+                <i class="fa-solid"></i
                 ><!-- Icon para ocultar camara-->
+                <!-- <i class="fa-solid fa-video"></i
+                >Icon para mostrar camara -->
               </button>
-              <button class="btn btn-light rounded-circle">
-                <i class="fa-solid fa-video"></i
-                ><!-- Icon para mostrar camara-->
-              </button>
+              <button class="btn btn-light rounded-circle d-none"></button>
             </div>
             <div>
               <button class="btn btn-light rounded-circle">
@@ -154,18 +157,29 @@
             </div>
           </div>
         </div>
-        <div id="chatBox" class=" bd-highlight col-sm d-flex flex-column position-relative">
-          <div id="messages">
-            a
-          </div>
-          <form action="" class="d-flex position-absolute bottom-0 start-50 translate-middle-x w-100" id="messageForm">
+        <div
+          id="chatBox"
+          class="bd-highlight col-sm d-flex flex-column position-relative"
+        >
+          <div id="messages"></div>
+          <form
+            action=""
+            class="d-flex position-absolute bottom-0 start-50 translate-middle-x w-100"
+            id="messageForm"
+          >
             <div class="input-group flex-nowrap">
-              <input class="form-control" type="text" placeholder="Di algo!" autocomplete="off" id="messageInput"/>
-              <button class="btn btn-outline-secondary" id=""><i class="fa-regular fa-comment"></i></button>
+              <input
+                class="form-control"
+                type="text"
+                placeholder="Di algo!"
+                autocomplete="off"
+                id="messageInput"
+              />
+              <button class="btn btn-secondary" id="">
+                <i class="fa-regular fa-comment"></i>
+              </button>
             </div>
-    
           </form>
-          </div>
         </div>
       </div>
     </div>

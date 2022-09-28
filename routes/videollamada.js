@@ -8,6 +8,6 @@ var myConnection = (req, res, next) => {
 };
 
 router.get("/", videollamadaController.getUserData);
-router.get("/", videollamadaController.getUserData);
+// router.get("/", videollamadaController.getUserData);
 
 module.exports = router;
