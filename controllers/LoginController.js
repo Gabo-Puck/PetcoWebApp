@@ -14,6 +14,7 @@ exports.session = (req, res, next) => {
 exports.CheckDB = (req, res, next) => {
   console.log(req.body);
 
+  
   Registro.query()
     .where("Registro.Contrasena", "=", req.body.Password)
     .andWhere("Registro.Correo", "=", req.body.Correo)
@@ -22,7 +23,8 @@ exports.CheckDB = (req, res, next) => {
         Usuario.query()
           .where("Usuario.ID", "=", Results[0].ID)
           .then((UsserLogged) => {
-            console.log(Results);
+            //console.log(Results[0].Nombre);
+            req.session.UserSessionNombre=Results[0].Nombre;
 
             //LoginCorrecto
 

@@ -18,6 +18,14 @@ class Publicacion extends BaseModel {
           to: "mascota.ID_Publicacion",
         },
       },
+      PublicacionComentario: {
+        modelClass: Mascotas,
+        relation: Model.HasManyRelation,
+        join: {
+          from: "publicacion.ID",
+          to: "mascota.ID_Publicacion",
+        },
+      },
     };
   }
 }

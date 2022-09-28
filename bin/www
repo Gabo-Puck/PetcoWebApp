@@ -10,6 +10,7 @@ var debug = require("debug")("petcowebapp-v1:server");
 var http = require("http");
 var { InMemorySessionStore } = require("../utils/socketUtils/SessionStore");
 var { randomId } = require("../utils/cryptoUtils/randomId");
+const Comentario = require("../models/Comentario");
 var sessionStore = new InMemorySessionStore();
 
 /**
@@ -98,60 +99,94 @@ io.on("connection", (socket) => {
         }
       });
   });
-});
 
-/**
- * Normalize a port into a number, string, or false.
- */
 
-function normalizePort(val) {
-  var port = parseInt(val, 10);
+  //Comentarios // Se establece el contexto de los comentarios dentro de la publicacion
+  socket.on('publicacion', (id) => {
+    console.log(id);
+    socket.join('publicacion' + id)
 
-  if (isNaN(port)) {
-    // named pipe
-    return val;
+  })
+
+  socket.on('comentario', ({ msg, id, nombre, imagen, fecha }) => {
+    console.log('Comentario: ' + msg)
+    console.log("El usuario del comentario es " + socket.userID);
+    console.log(fecha);
+    //Se procesan los datos correspondientes
+    const idusuario = socket.userID;
+    //Se guardan los comentarios en la base de datos
+    Comentario.query()
+      .insertAndFetch({
+        ID_Publicacion: id,
+        Texto: msg,
+        Fecha_Envio: fecha,
+        ID_Usuario: socket.userID,
+
+      }).then((resultado) => {
+
+        console.log(resultado.ID)
+        //   //Se emite el comentario por parte del cliente dentro del contexto de la publicacion
+        io.to('publicacion' + id).emit('comentario', { msg: msg, nombre: nombre, imagen: imagen, fecha: fecha, idcomentario: resultado.ID })
+
+
+        })
+      })
+
+    
+  });
+
+  /**
+   * Normalize a port into a number, string, or false.
+   */
+
+  function normalizePort(val) {
+    var port = parseInt(val, 10);
+
+    if (isNaN(port)) {
+      // named pipe
+      return val;
+    }
+
+    if (port >= 0) {
+      // port number
+      return port;
+    }
+
+    return false;
   }
 
-  if (port >= 0) {
-    // port number
-    return port;
-  }
+  /**
+   * Event listener for HTTP server "error" event.
+   */
 
-  return false;
-}
-
-/**
- * Event listener for HTTP server "error" event.
- */
-
-function onError(error) {
-  if (error.syscall !== "listen") {
-    throw error;
-  }
-
-  var bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
-
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
-    case "EACCES":
-      console.error(bind + " requires elevated privileges");
-      process.exit(1);
-      break;
-    case "EADDRINUSE":
-      console.error(bind + " is already in use");
-      process.exit(1);
-      break;
-    default:
+  function onError(error) {
+    if (error.syscall !== "listen") {
       throw error;
+    }
+
+    var bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
+
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+      case "EACCES":
+        console.error(bind + " requires elevated privileges");
+        process.exit(1);
+        break;
+      case "EADDRINUSE":
+        console.error(bind + " is already in use");
+        process.exit(1);
+        break;
+      default:
+        throw error;
+    }
   }
-}
 
-/**
- * Event listener for HTTP server "listening" event.
- */
+  /**
+   * Event listener for HTTP server "listening" event.
+   */
 
-function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
-  debug("Listening on " + bind);
-}
+  function onListening() {
+    var addr = server.address();
+    var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
+    debug("Listening on " + bind);
+  }

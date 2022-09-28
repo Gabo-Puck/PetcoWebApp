@@ -5,6 +5,7 @@ var objection = require("objection");
 const Mascota = require("../models/Mascota");
 const Publicacion = require("../models/Publicacion");
 const Metas = require("../models/Metas");
+const Comentario = require("../models/Comentario");
 
 //Configuracion de paypal
 const paypal = require("paypal-rest-sdk");
@@ -19,13 +20,16 @@ paypal.configure({
 });
 
 exports.query = (req, res) => {
-  Metas.query()
-    .withGraphJoined("MetasDonaciones")
-    .then((result) => {
-      //console.log(result[0].MetasDonaciones);
-    });
 
-  Mascota.query()
+  Comentario.query()
+  .withGraphJoined('ComentariosPublicacion')
+  .withGraphJoined('ComentariosUsuario.UsuariosRegistro')
+  .where('comentario.ID_Publicacion', '=', req.params.idPublicacion)
+  .then((result)=>{
+    console.log(result); 
+    
+    
+    Mascota.query()
     .withGraphJoined("MascotasPublicacion")
     .withGraphJoined("MascotasCastrado")
     .withGraphJoined("MascotasTamano")
@@ -38,11 +42,28 @@ exports.query = (req, res) => {
     .where("Mascota.ID_Publicacion", "=", req.params.idPublicacion)
     //.findByIds({'MascotasPublicacion.ID':req.params.idPublicacion})
     .then((MascotaP) => {
-      // console.log(MascotaP[0].MascotasMetas.MetasDonaciones.length);
-      res.render("publicacion.ejs", {
-        MascotaRender: MascotaP,
-      });
+      //nombre usuario
+
+      Registro.query()
+      .withGraphJoined('RegistroUsuario')
+      .where('RegistroUsuario.ID', '=', req.session.IdSession)
+      .then((resultados)=>{
+        console.log(resultados[0].Nombre);
+        
+        console.log(MascotaP[0].MascotasImagenes);
+        res.render("publicacion.ejs", {
+          MascotaRender: MascotaP,
+          usuario:resultados,
+          comentarios:result,
+        });
+        
+        
+      })
     });
+
+  })
+
+
 };
 
 //Controlar publicaciones
@@ -161,10 +182,8 @@ exports.paysuccess = (req, res) => {
   );
 
   var today = new Date();
-  var date =
-    today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
-  var time =
-    today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+  var date =today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+  var time =today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
   var dateTime = date + " " + time;
   console.log(dateTime);
 

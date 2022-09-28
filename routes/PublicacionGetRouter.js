@@ -10,6 +10,7 @@ router.post("/check", PublicacionesController.checkImage);
 router.post("/crear", PublicacionesController.crearPublicacionGuardar);
 router.get("/adopciones/:idPublicacion", registro_Login.query);
 router.get("/meta/:idMascota", registro_Login.donacionMetas);
+//router.get("/responder/comentario/:idComentario", registro_Login.donacionMetas);
 router.post("/donarmeta", registro_Login.pay);
 router.get("/success", registro_Login.paysuccess);
 router.get("/cancel", registro_Login.paycancel);
