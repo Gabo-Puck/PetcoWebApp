@@ -11,7 +11,7 @@ class Usuario extends BaseModel {
     return json;
   }
   static get tableName() {
-    return "Usuario";
+    return "railway.Usuario";
   }
 
   static get relationMappings() {
