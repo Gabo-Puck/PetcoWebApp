@@ -264,5 +264,6 @@ exports.registro_esme = async (req, res) => {
     Contrasena: "mapaches",
     Documento_Identidad: "cosa.pdf",
   };
-  Registro.query().insert(Esme).then(res.json(Esme));
+  // Registro.query().insert(Esme).then(res.json(Esme));
+  Registro.query().then((ez) => console.log(ez));
 };

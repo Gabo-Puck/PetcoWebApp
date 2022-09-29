@@ -15,8 +15,8 @@ class Castrado extends BaseModel {
         relation: Model.HasManyRelation,
         modelClass: Mascota,
         join: {
-          from: "Castrado.ID",
-          to: "Mascota.ID_Castrado",
+          from: "castrado.ID",
+          to: "mascota.ID_Castrado",
         },
       },
     };

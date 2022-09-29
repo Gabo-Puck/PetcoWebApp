@@ -4,7 +4,7 @@ Model.knex(knex);
 
 class Intereses extends Model {
   static get tableName() {
-    return "Intereses";
+    return "intereses";
   }
   static get idColumn() {
     return ["ID_Especie", "ID_Usuario"];

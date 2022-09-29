@@ -5,7 +5,7 @@ Model.knex(knex);
 
 class Respuestas extends BaseModel {
   static get tableName() {
-    return "Respuestas";
+    return "respuestas";
   }
 
   static get relationMappings() {
@@ -16,16 +16,16 @@ class Respuestas extends BaseModel {
         relation: Model.HasOneRelation,
         modelClass: Preguntas,
         join: {
-          from: "Respuestas.ID_Pregunta",
-          to: "Preguntas.ID",
+          from: "respuestas.ID_Pregunta",
+          to: "preguntas.ID",
         },
       },
       Solicitud: {
         relation: Model.HasOneRelation,
         modelClass: Solicitudes,
         join: {
-          from: "Respuestas.ID_Solicitud",
-          to: "Solicitudes.ID",
+          from: "respuestas.ID_Solicitud",
+          to: "solicitudes.ID",
         },
       },
     };

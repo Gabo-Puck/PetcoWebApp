@@ -11,7 +11,7 @@ class Usuario extends BaseModel {
     return json;
   }
   static get tableName() {
-    return "railway.Usuario";
+    return "usuario";
   }
 
   static get relationMappings() {
@@ -24,36 +24,36 @@ class Usuario extends BaseModel {
         relation: Model.ManyToManyRelation,
         modelClass: Especie,
         join: {
-          from: "Usuario.ID",
+          from: "usuario.ID",
           through: {
-            from: "Intereses.ID_Usuario",
-            to: "Intereses.ID_Especie",
+            from: "intereses.ID_Usuario",
+            to: "intereses.ID_Especie",
           },
-          to: "Especie.ID",
+          to: "especie.ID",
         },
       },
       Formularios: {
         relation: Model.HasManyRelation,
         modelClass: Formulario,
         join: {
-          from: "Usuario.ID",
-          to: "Formulario.ID_Usuario",
+          from: "usuario.ID",
+          to: "formulario.ID_Usuario",
         },
       },
       Solicitudes: {
         relation: Model.HasManyRelation,
         modelClass: Solicitudes,
         join: {
-          from: "Usuario.ID",
-          to: "Solicitudes.ID_Usuario",
+          from: "usuario.ID",
+          to: "solicitudes.ID_Usuario",
         },
       },
       Protocolos: {
         relation: Model.HasManyRelation,
         modelClass: Protocolo,
         join: {
-          from: "Usuario.ID",
-          to: "Protocolos.ID_Usuario",
+          from: "usuario.ID",
+          to: "protocolos.ID_Usuario",
         },
       },
     };

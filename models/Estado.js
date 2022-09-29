@@ -5,7 +5,7 @@ Model.knex(knex);
 
 class Estado extends BaseModel {
   static get tableName() {
-    return "railway.Estado";
+    return "estado";
   }
   static get relationMappings() {
     const Municipio = require("./Municipio");
@@ -14,8 +14,8 @@ class Estado extends BaseModel {
         relation: Model.HasManyRelation,
         modelClass: Municipio,
         join: {
-          from: "railway.Estado.ID",
-          to: "railway.Municipio.ID_Estado",
+          from: "estado.ID",
+          to: "mnicipio.ID_Estado",
         },
       },
     };

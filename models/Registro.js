@@ -2,14 +2,15 @@ const knex = require("../knex");
 const BaseModel = require("./BaseModel");
 const { Model } = require("objection");
 const Usuario = require("./Usuario");
-Model.knex(knex);
+// Model.knex(knex);
 
 class Registro extends BaseModel {
   constructor() {
     super();
   }
+
   static get tableName() {
-    return "railway.registro";
+    return "registro";
   }
   static get relationMappings() {
     const Municipio = require("./Municipio");
@@ -19,8 +20,8 @@ class Registro extends BaseModel {
         relation: Model.BelongsToOneRelation,
         modelClass: Municipio,
         join: {
-          from: "railway.registro.Municipio",
-          to: "railway.Municipio.ID",
+          from: "registro.Municipio",
+          to: "municipio.ID",
         },
       },
 
@@ -28,8 +29,8 @@ class Registro extends BaseModel {
         relation: Model.HasOneRelation,
         modelClass: Usuario,
         join: {
-          from: "railway.registro.ID",
-          to: "railway.Usuario.FK_Registro",
+          from: "registro.ID",
+          to: "usuario.FK_Registro",
         },
       },
     };

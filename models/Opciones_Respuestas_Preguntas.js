@@ -5,7 +5,7 @@ Model.knex(knex);
 
 class Opciones_Respuestas_Preguntas extends BaseModel {
   static get tableName() {
-    return "Opciones_Respuestas_Preguntas";
+    return "opciones_respuestas_preguntas";
   }
 
   static get relationMappings() {
@@ -15,8 +15,8 @@ class Opciones_Respuestas_Preguntas extends BaseModel {
         relation: Model.BelongsToOneRelation,
         modelClass: Preguntas,
         join: {
-          from: "Opciones_Respuestas_Preguntas.ID_Pregunta",
-          to: "Preguntas.ID",
+          from: "opciones_respuestas_preguntas.ID_Pregunta",
+          to: "preguntas.ID",
         },
       },
     };

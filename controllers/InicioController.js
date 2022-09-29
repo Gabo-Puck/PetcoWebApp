@@ -6,7 +6,7 @@ exports.Inicio = (req, res, next) => {
     //Revisa si el usuario esta logeado en la pagina
 
     Intereses.query()
-      .where("Intereses.ID_Usuario", "=", req.session.IdSession)
+      .where("intereses.ID_Usuario", "=", req.session.IdSession)
       .then((Result) => {
         console.log(Result);
 
