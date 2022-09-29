@@ -5,13 +5,13 @@
  */
 module.exports = {
   development: {
-    client: "mysql2",
+    client: "mysql",
     connection: {
-      host: "localhost",
+      host: "fdb32.awardspace.net",
       port: 3306,
-      user: "root",
-      password: "halo1234",
-      database: "petcodbv2",
+      user: "4139525_petcowebapp",
+      password: "123456789A",
+      database: "4139525_petcowebapp",
     },
   },
 
@@ -29,11 +29,11 @@ module.exports = {
   production: {
     client: "mysql2",
     connection: {
-      host: "localhost",
-      port: 3306,
+      host: "containers-us-west-67.railway.app",
+      port: 5801,
       user: "root",
-      password: "halo1234",
-      database: "petcodbv2",
+      password: "lfhlMhu37lvzAcIdfOYs",
+      database: "railway",
     },
   },
 };
