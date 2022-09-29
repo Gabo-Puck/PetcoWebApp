@@ -105,7 +105,7 @@ app.use(function (err, req, res, next) {
   console.log("rees");
   if (err.status == 404) {
     console.log("http://" + req.hostname + ":3000/login");
-    return res.redirect("http://" + req.hostname + ":3000/login");
+    return res.redirect("/login");
   }
   // render the error page
   res.status(err.status || 500);
