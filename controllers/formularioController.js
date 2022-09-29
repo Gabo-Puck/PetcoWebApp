@@ -22,7 +22,7 @@ exports.formularioList = (req, res) => {
 exports.formularioPreguntas = (req, res) => {
   Formulario.query()
     .withGraphJoined("Preguntas.[Opciones_Respuestas_Pregunta,Respuestas]")
-    .where("Formulario.ID", "=", "18")
+    .where("formulario.ID", "=", "18")
     .then((FormWPreguntas) => res.json(FormWPreguntas));
 };
 
@@ -283,7 +283,7 @@ function validateRespuestaOpcion(respuestasOpcion, idFormulario) {
         new Promise((resolve, reject) => {
           resolve(
             Formulario.query().withGraphJoined("Preguntas").findOne({
-              "Formulario.ID": idFormulario,
+              "formulario.ID": idFormulario,
               "Preguntas.ID": propiedad,
             })
           );
@@ -308,7 +308,7 @@ function validateRespuestaAbierta(respuestasAbiertas, idFormulario) {
             .withGraphJoined("Preguntas.[Opciones_Respuestas_Pregunta]")
             // .findOne("Preguntas.ID", "=", respuesta.ID_Pregunta)
             .findOne({
-              "Formulario.ID": idFormulario,
+              "formulario.ID": idFormulario,
               "Preguntas.ID": respuesta.ID_Pregunta,
             })
         );
@@ -597,7 +597,7 @@ exports.formDashboard = (req, res) => {
   var IdSession = req.session.IdSession;
 
   Formulario.query()
-    .where("Formulario.ID_Usuario", "=", IdSession)
+    .where("formulario.ID_Usuario", "=", IdSession)
     .then((Formularios) => {
       res.render("Formulario/FormDashboard.ejs", {
         Elemento: Formularios,
@@ -655,8 +655,8 @@ exports.formulario_edit_get = [
     // console.log("a");
     Formulario.query()
       .withGraphJoined("Preguntas.[Opciones_Respuestas_Pregunta,Respuestas]")
-      .where("Formulario.ID", "=", req.params.idFormulario)
-      .andWhere("Formulario.ID_Usuario", "=", IdSession)
+      .where("formulario.ID", "=", req.params.idFormulario)
+      .andWhere("formulario.ID_Usuario", "=", IdSession)
       // .then((FormWPreguntas) => FormWPreguntas.json())
       .then((Formulario) => promiseFetchTemplate(Formulario, res))
       .then((response) => {
