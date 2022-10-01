@@ -192,4 +192,5 @@ socket.on("message-recieved", ({ nombre, message }) => {
   messageBox.appendChild(user);
   messageBox.appendChild(mensaje);
   messagesBox.appendChild(messageBox);
+  messagesBox.scrollTop = messagesBox.scrollHeight;
 });

@@ -26,6 +26,34 @@
 
     <title>Videochat</title>
     <style>
+      /* width */
+      p {
+        color: #737373;
+      }
+      *:focus {
+        outline: none !important;
+        box-shadow: none !important;
+        /* border-color: #d4fffe !important; */
+      }
+      #messages::-webkit-scrollbar {
+        width: 14px;
+        /* margin-right: 1px; */
+      }
+
+      /* Track */
+      /* #messages::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 5px grey;
+        border-radius: 10px;
+        border: solid 3px blue;
+      } */
+
+      /* Handle */
+      #messages::-webkit-scrollbar-thumb {
+        border: 4px solid rgba(0, 0, 0, 0);
+        background-clip: padding-box;
+        border-radius: 9999px;
+        background-color: #9a9a9a;
+      }
       * {
         margin: 0;
         padding: 0;
@@ -36,8 +64,12 @@
         background-color: rgb(237, 237, 237);
       }
       #chatBox {
-        background-color: aquamarine;
+        background-color: rgb(237, 255, 249);
         flex-grow: 1;
+        /* max-height: 70vh; */
+        padding: 0;
+        position: relative;
+        height: 100vh;
       }
       #videosBox {
         background-color: rgb(45, 80, 111);
@@ -47,6 +79,7 @@
       #videochatBox {
         width: 100%;
         height: 100%;
+        position: relative;
       }
       .container {
         background-color: transparent;
@@ -78,10 +111,20 @@
       #messageInput {
         width: 100%;
       }
+      #messageForm {
+        position: sticky;
+        bottom: 0;
+        /* max-width: inherit; */
+        width: 100%;
+      }
       .mensajeNuevo {
       }
       #messages {
+        overflow-y: scroll;
         padding: 0 4px;
+        height: 100%;
+
+        /* max-height: 100%; */
       }
 
       .mensajeContenido {
@@ -93,9 +136,42 @@
         font-weight: 900;
       }
 
-      @media (max-width: 425px) {
+      @media (max-width: 768px) {
         #you {
           width: 30%;
+        }
+        #chatBox {
+          background-color: aquamarine;
+          flex-grow: 1;
+          /* max-height: 70vh; */
+          padding: 0;
+          position: relative;
+          /* flex-basis: 45%; */
+          max-height: 50vh;
+          /* height: auto; */
+          /* height: 100vh; */
+        }
+        #videosBox {
+          background-color: rgb(45, 80, 111);
+          flex-grow: 2;
+          min-height: 50vh;
+          /* flex-basis: 55%; */
+
+          /* max-width: 75%; */
+        }
+        #videochatBox {
+          width: 100%;
+          height: 100%;
+          position: relative;
+        }
+        #messages {
+          padding: 0 4px;
+          height: 100%;
+          max-height: 90%;
+        }
+        #main {
+          display: flex;
+          flex-direction: column;
         }
       }
       @media (orientation: landscape) {
@@ -104,7 +180,7 @@
   </head>
   <body>
     <div id="videochatBox" class="">
-      <div class="row h-100 w-100 m-0">
+      <div class="row h-100 w-100 m-0" id="main">
         <div
           id="videosBox"
           class="bd-highlight col-lg justify-content-center align-items-center flex-column flex-md-row position-relative"
@@ -162,11 +238,7 @@
           class="bd-highlight col-sm d-flex flex-column position-relative"
         >
           <div id="messages"></div>
-          <form
-            action=""
-            class="d-flex position-absolute bottom-0 start-50 translate-middle-x w-100"
-            id="messageForm"
-          >
+          <form action="" class="d-flex w-100" id="messageForm">
             <div class="input-group flex-nowrap">
               <input
                 class="form-control"
