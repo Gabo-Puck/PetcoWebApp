@@ -35,7 +35,7 @@ exports.query = (req, res) => {
     .withGraphJoined("MascotasEstado")
     .withGraphJoined("MascotasImagenes")
     .withGraphJoined("MascotasMetas.MetasDonaciones")
-    .where("Mascota.ID_Publicacion", "=", req.params.idPublicacion)
+    .where("mascota.ID_Publicacion", "=", req.params.idPublicacion)
     //.findByIds({'MascotasPublicacion.ID':req.params.idPublicacion})
     .then((MascotaP) => {
       // console.log(MascotaP[0].MascotasMetas.MetasDonaciones.length);
@@ -58,7 +58,7 @@ exports.donacionMetas = (req, res) => {
     .withGraphJoined("MascotasPublicacion")
     .withGraphJoined("MascotasImagenes")
     .withGraphJoined("MascotasMetas.MetasDonaciones")
-    .where("Mascota.ID", "=", req.params.idMascota)
+    .where("mascota.ID", "=", req.params.idMascota)
     .then((MascotaP) => {
       //id organizacion
       idOrganizacion = MascotaP[0].MascotasPublicacion.ID_Usuario;

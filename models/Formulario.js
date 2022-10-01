@@ -29,8 +29,8 @@ class Formulario extends BaseModel {
         join: {
           from: "formulario.ID",
           through: {
-            from: "preguntas_Formulario.ID_Formulario",
-            to: "preguntas_Formulario.ID_Pregunta",
+            from: "preguntas_formulario.ID_Formulario",
+            to: "preguntas_formulario.ID_Pregunta",
           },
           to: "preguntas.ID",
         },
