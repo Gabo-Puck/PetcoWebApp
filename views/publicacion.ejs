@@ -48,7 +48,7 @@
 
 <body>
 
-    <div class="container mt-3" style="border:1px solid #cecece; text-align:center ;">
+    <div class="container mt-5" style="border:1px solid #cecece; text-align:center ;">
         <h1 class="mt-2 text-primary ">
             <%= MascotaRender[0].MascotasPublicacion.Titulo %>
         </h1>
@@ -118,9 +118,11 @@
                                                                 progreso<100){ %>
                                                                 <h5 style="text-align: center;">
 
-                                                                    <a href="/petco/publicacion/meta/<%=MascotaRender[i].ID%>" class="btn btn-primary btn-block mt-3">
+                                                                    <a href="/petco/publicacion/meta/<%=MascotaRender[i].ID%>"
+                                                                        class="btn btn-primary btn-block mt-3">
 
-                                                                        Donar<i class="fa-solid fa-hand-holding-dollar"></i>
+                                                                        Donar<i
+                                                                            class="fa-solid fa-hand-holding-dollar"></i>
 
 
                                                                         </i>
@@ -247,11 +249,9 @@
             <div class="swiper-button-prev MacotaPrev"></div>
 
         </div>
+
+        
         <div class="container mt-3 mb-5" style="padding: 0%;">
-
-
-
-
 
             <div class="row d-flex justify-content-center">
                 <div class="">
@@ -263,7 +263,7 @@
                                     placeholder="Escribe un comentario" />
                             </form>
 
-                            <div class="card mb-4 comentarioTemplate" style="display: block;">
+                            <div class="card mb-4 comentarioTemplate" style="display: none;" >
                                 <div class="card-body">
                                     <p style="text-align: left;" class="contenido">Aqui va un comentario</p>
 
@@ -272,51 +272,106 @@
                                             <img class="imagenusuario"
                                                 src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(4).webp"
                                                 alt="avatar" width="25" height="25" />
-                                            <p class="small mb-0 ms-2 nombreusuario">Usuario Nombre</p> 
+                                            <p class="small mb-0 ms-2 nombreusuario">Usuario Nombre</p>
                                             <span class="text-muted fechahecho">-2 hours ago</span>
                                         </div>
-                                        <div class="d-flex flex-row align-items-center">
+                                        <div class="">
                                             <form id="comentario-1" action="">
                                                 <input class="form-control mt-3 mb-3" id="input" autocomplete="off"
-                                                    placeholder="Escribe un comentario" />
-                                            </form>                                     
+                                                    placeholder="Responder" />
+                                            </form>
                                         </div>
-                                    </div>
-                                    <div class="list-group respuestas">
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Recibir los comentarios de la base de datos -->
-                            <div class="list-group comentarios">  
+                            <div class="list-group comentarios">
                                 <% for(var i=0; i < comentarios.length; i++) { %>
-
-                                    <div class="card mb-4 comentarioTemplate" style="display: block;">
+                                    <div class="card mb-4 comentarioTemplate" style= " display: <%=comentarios[i].Comentario_Padre== null ? 'block' : 'none' %>;  max-width: 1244px; max-height: 423px"   >
+                                        
                                         <div class="card-body">
-                                            <p style="text-align: left;" class="contenido"> <%= comentarios[i].Texto%></p>
-        
+                                            <p style="text-align: left;" class="contenido">
+                                                <%= comentarios[i].Texto%>
+                                            </p>
                                             <div class="">
                                                 <div class="d-flex flex-row align-items-center">
                                                     <img class="imagenusuario"
                                                         src="<%= comentarios[i].ComentariosUsuario.Foto_Perfil%>"
                                                         alt="avatar" width="25" height="25" />
-                                                    <p class="small mb-0 ms-2 nombreusuario"><%= comentarios[i].ComentariosUsuario.UsuariosRegistro.Nombre%></p> 
-                                                    <span class="text-muted fechahecho">—<%= comentarios[i].Fecha_Envio%></span>
+                                                    <p class="small mb-0 ms-2 nombreusuario">
+                                                        <%= comentarios[i].ComentariosUsuario.UsuariosRegistro.Nombre%>
+                                                    </p>
+                                                    <span class="text-muted fechahecho">—
+                                                        
+                                                        <% var FechaFormateada = comentarios[i].Fecha_Envio.toString()%>
+                                                        
+                                                        <%var myDate = new Date(FechaFormateada); %>
+
+                                                        <%=    myDate.getFullYear() + '-' +  myDate.getMonth() +  '-' + myDate.getDate() +' ' +myDate.getHours() + ':' +myDate.getMinutes()  + ':' +myDate.getSeconds()   %>
+                                                    
+                                                    </span>
                                                 </div>
-                                                <div class="d-flex flex-row align-items-center">
-                                                    <form id="comentario-<%=comentarios[i].ID%>" action="">
-                                                        <input class="form-control mt-3 mb-3" id="inputC-<%=comentarios[i].ID%>" autocomplete="off"
-                                                            placeholder="Escribe un comentario" />
-                                                    </form>                                     
+                                                <div class="">
+                                                    <form id="comentarioForm-<%=comentarios[i].ID%>" action="">
+                                                        <input class="form-control mt-3 mb-3"
+                                                            id="inputC-<%=comentarios[i].ID%>" autocomplete="off"
+                                                            placeholder="Responder" />
+                                                    </form>
                                                 </div>
                                             </div>
-                                            <div class="list-group respuestas">
-                                            </div>
+
+                                            <div class="list-group respuestas" id="comentario-<%=comentarios[i].ID%>">
+                                                <% for(var j=0; j < comentarios.length; j++) { %>
+    
+                                                    <%if (comentarios[j].Comentario_Padre == comentarios[i].ID ) { %>
+                                                        <!-- Se ponen las respuestas --> 
+                               
+    
+    
+                                                        <div class="card mb-4 respuestaTemplate" style="display: block;">
+                                                                    
+                                                            <div class="card-body">
+                                                                <p style="text-align: left;" class="contenido">
+                                                                    <%= comentarios[j].Texto%>
+                                                                </p>
+                    
+                                                                <div class="">
+                                                                    <div class="d-flex flex-row align-items-center">
+                                                                        <img class="imagenusuario"
+                                                                            src="<%= comentarios[j].ComentariosUsuario.Foto_Perfil%>"
+                                                                            alt="avatar" width="25" height="25" />
+                                                                        <p class="small mb-0 ms-2 nombreusuario">
+                                                                            <%= comentarios[j].ComentariosUsuario.UsuariosRegistro.Nombre%>
+                                                                        </p>
+                                                                        <span class="text-muted fechahecho">—
+                                                                            
+                                                                            <% var FechaFormateada = comentarios[j].Fecha_Envio.toString()%>
+                                                                            
+                                                                            <%var myDate = new Date(FechaFormateada); %>
+                    
+                                                                            <%=    myDate.getFullYear() + '-' +  myDate.getMonth() +  '-' + myDate.getDate() +' ' +myDate.getHours() + ':' +myDate.getMinutes()  + ':' +myDate.getSeconds()   %>
+                                                                        
+                                                                        </span>
+                                                                    </div>
+                                                
+                                                                </div>
+                    
+                                                            
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <% } %>
+                                                        <% } %>                
+                                                        
+                                                </div>
+                                            
+                            
                                         </div>
-                                    </div>
+                                        </div>
+                                        <% } %>
 
-
-                                    <% } %>
+                                    </div>     
                             </div>
                         </div>
                     </div>
@@ -327,79 +382,18 @@
         </div>
     </div>
 
-
-
-
     <script src="/socket.io/socket.io.js"></script>
-
     <script>
-         window.onload = function () { //Se ejecuta al terminar de cargar la pagina
-            socket.emit('publicacion', idPublicacion); //Metodo que etablece la sala y el contexto de los comentarios dentro de la publicacion
-        }
-        const formC = document.querySelector('#comentario-9');
-        const inputC = document.querySelector('#inputC-9');
-        console.log(formC); 
-        console.log('¿eh?'); 
-         
+    var idPublicacion = <%=MascotaRender[0].MascotasPublicacion.ID %>;
+    var nombreuser = '<%= usuario[0].Nombre%>';
+    var imagenperfil = ' <%= usuario[0].RegistroUsuario.Foto_Perfil%>';
+    //Script para respuestas
+    var ncomentarios = <%=comentarios.length%>;
+    const comentariosJS = <%-JSON.stringify(comentarios)%>;
+    console.log("🚀 ~ file: publicacion.ejs ~ line 357 ~ idPublicacion", idPublicacion)
     </script>
 
-
-
-    <script>
-        var socket = io(); //Se inicializa dentro del scritp socket.io
-        //Se obtienen algunos de los datos que conforman el comentario
-        var idPublicacion = <%=MascotaRender[0].MascotasPublicacion.ID %>;
-        var nombreuser = '<%= usuario[0].Nombre%>';
-        var imagenperfil = ' <%= usuario[0].RegistroUsuario.Foto_Perfil%>';
-
-
-
-
-        window.onload = function () { //Se ejecuta al terminar de cargar la pagina
-            socket.emit('publicacion', idPublicacion); //Metodo que etablece la sala y el contexto de los comentarios dentro de la publicacion
-        }
-
-        var tarjeta = document.querySelector(".comentarioTemplate"); //Se obtiene el formato del comentario de un template
-        const form = document.querySelector('form')
-        const input = document.querySelector('input') //Se obtiene el texto contenido dentro del input del comentario
-        form.addEventListener('submit', (e) => {
-            e.preventDefault()
-            if (input.value) { //Se ejecuta lo siguiente al haber introducido el texto
-                //Se envian los datos a la funcion 
-                var today = new Date();
-                var date = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
-                var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-                var dateTime = date + " " + time;
-                socket.emit('comentario', { msg: input.value, id: idPublicacion, nombre: nombreuser, imagen: imagenperfil, fecha: dateTime })
-                input.value = ''
-            }
-
-        })
-
-        socket.on('comentario', ({ msg, nombre, imagen, fecha, idcomentario}) => {
-
-            var tarjeta2 = tarjeta.cloneNode(true); //se clona un elemento con las caracteristicas de un comentario
-            var list = document.querySelector(".comentarios") //Se obtienen todos los comentarios existentes para poder acomdarlos
-            tarjeta2.querySelector('form').id='comentario-'+idcomentario;
-            console.log( tarjeta2.querySelector('form').id);
-
-            tarjeta2.querySelector('form').addEventListener('submit', (e) => {
-
-            });
-
-
-            tarjeta2.style.display = 'block'// se hace visible el comentario
-            tarjeta2.querySelector(".contenido").innerText = msg; //Se le introduce dentro del div contenido el texto del comentario
-            tarjeta2.querySelector(".nombreusuario").innerText = nombre; //Se le introduce dentro del div del nombreusuario el nombre del usuario
-            tarjeta2.querySelector(".imagenusuario").src = imagen; //se coloca dentro de la imagen, la imagen del usuario
-            tarjeta2.querySelector(".fechahecho").innerText = "—"+fecha;
-
-            document.querySelector(".comentarios").insertBefore(tarjeta2, list.children[0]); //Se inserta el comentario dentro 
-
-        })
-
-
-
+    <script type="module" src="/javascripts/ComentarioSockets.js">
     </script>
 
 

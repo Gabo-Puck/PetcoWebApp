@@ -108,6 +108,7 @@ io.on("connection", (socket) => {
 
   })
 
+  //Evento para comentarios
   socket.on('comentario', ({ msg, id, nombre, imagen, fecha }) => {
     console.log('Comentario: ' + msg)
     console.log("El usuario del comentario es " + socket.userID);
@@ -121,72 +122,92 @@ io.on("connection", (socket) => {
         Texto: msg,
         Fecha_Envio: fecha,
         ID_Usuario: socket.userID,
-
       }).then((resultado) => {
-
         console.log(resultado.ID)
-        //   //Se emite el comentario por parte del cliente dentro del contexto de la publicacion
+        //Se emite el comentario por parte del cliente dentro del contexto de la publicacion
         io.to('publicacion' + id).emit('comentario', { msg: msg, nombre: nombre, imagen: imagen, fecha: fecha, idcomentario: resultado.ID })
-
-
-        })
       })
+  })
 
-    
-  });
+  socket.on('respuesta', ({ msg, idP, idcomentario, nombre, imagen, fecha}) => {
+    console.log(msg);
+    console.log(idP);
+    console.log(idcomentario);
+    console.log(nombre);
+    console.log(imagen);
+    console.log(fecha);
 
-  /**
-   * Normalize a port into a number, string, or false.
-   */
+    Comentario.query()
+    .insertAndFetch({
+      ID_Publicacion: idP,
+      Comentario_Padre: idcomentario,
+      Texto: msg,
+      Fecha_Envio: fecha,
+      ID_Usuario: socket.userID,
+    }).then((resultado) => {
+      console.log(resultado.ID)
+      //Se emite el comentario por parte del cliente dentro del contexto de la publicacion
+      io.to('publicacion'+ idP ).emit('respuesta', {msg:msg, idP: idP, idcomentario:idcomentario, nombre:nombre, imagen:imagen, fecha:fecha})
+    })
 
-  function normalizePort(val) {
-    var port = parseInt(val, 10);
+  })
 
-    if (isNaN(port)) {
-      // named pipe
-      return val;
-    }
 
-    if (port >= 0) {
-      // port number
-      return port;
-    }
 
-    return false;
+});
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
   }
 
-  /**
-   * Event listener for HTTP server "error" event.
-   */
+  if (port >= 0) {
+    // port number
+    return port;
+  }
 
-  function onError(error) {
-    if (error.syscall !== "listen") {
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== "listen") {
+    throw error;
+  }
+
+  var bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case "EACCES":
+      console.error(bind + " requires elevated privileges");
+      process.exit(1);
+      break;
+    case "EADDRINUSE":
+      console.error(bind + " is already in use");
+      process.exit(1);
+      break;
+    default:
       throw error;
-    }
-
-    var bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
-
-    // handle specific listen errors with friendly messages
-    switch (error.code) {
-      case "EACCES":
-        console.error(bind + " requires elevated privileges");
-        process.exit(1);
-        break;
-      case "EADDRINUSE":
-        console.error(bind + " is already in use");
-        process.exit(1);
-        break;
-      default:
-        throw error;
-    }
   }
+}
 
-  /**
-   * Event listener for HTTP server "listening" event.
-   */
+/**
+ * Event listener for HTTP server "listening" event.
+ */
 
-  function onListening() {
-    var addr = server.address();
-    var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
-    debug("Listening on " + bind);
-  }
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
+  debug("Listening on " + bind);
+}

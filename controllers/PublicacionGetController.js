@@ -25,6 +25,7 @@ exports.query = (req, res) => {
   .withGraphJoined('ComentariosPublicacion')
   .withGraphJoined('ComentariosUsuario.UsuariosRegistro')
   .where('comentario.ID_Publicacion', '=', req.params.idPublicacion)
+  .orderBy('Fecha_Envio' , "desc")
   .then((result)=>{
     console.log(result); 
     
