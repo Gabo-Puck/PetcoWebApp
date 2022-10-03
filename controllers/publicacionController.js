@@ -186,7 +186,7 @@ exports.crearPublicacionGuardar = [
           const numMascota = key.split("-")[0];
           if (numMascota == index) {
             ruta = prop.replace(/public/g, "");
-            ruta = ruta.replace("\\", "/");
+            ruta = ruta.replaceAll("\\", "/");
             mascota.MascotasImagenes.push({ Ruta: ruta });
             delete req.body[key];
           }

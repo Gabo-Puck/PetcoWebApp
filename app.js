@@ -47,6 +47,7 @@ app.use("/login", loginRouter);
 // app.use("/dashboard", dashboard);
 app.use("/publicacion", publicacionget);
 app.use("/videollamada", require("./routes/videollamada"));
+app.use("/solicitudes", require("./routes/SolicitudesRouter"));
 
 function isLogged(req, res, next) {
   var IdSession = req.session.IdSession;

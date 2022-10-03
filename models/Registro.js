@@ -1,7 +1,6 @@
 const knex = require("../knex");
 const BaseModel = require("./BaseModel");
 const { Model } = require("objection");
-const Usuario = require("./Usuario");
 // Model.knex(knex);
 
 class Registro extends BaseModel {
@@ -9,11 +8,18 @@ class Registro extends BaseModel {
     super();
   }
 
+  $formatJson(json) {
+    json = super.$formatJson(json);
+
+    return json;
+  }
+
   static get tableName() {
     return "registro";
   }
   static get relationMappings() {
     const Municipio = require("./Municipio");
+    const Usuario = require("./Usuario");
 
     return {
       muni: {
