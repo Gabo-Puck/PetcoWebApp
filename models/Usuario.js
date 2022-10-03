@@ -58,18 +58,14 @@ class Usuario extends BaseModel {
           to: "protocolos.ID_Usuario",
         },
       },
-
-      UsuariosRegistro: {
-        relation: Model.BelongsToOneRelation,
+      UsuarioRegistro: {
+        relation: Model.HasOneRelation,
         modelClass: Registro,
         join: {
           from: "usuario.FK_Registro",
           to: "registro.ID",
         },
       },
-
-     
-      
     };
   }
 }

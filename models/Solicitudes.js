@@ -31,7 +31,7 @@ class Solicitudes extends BaseModel {
       },
       Mascota: {
         relation: Model.BelongsToOneRelation,
-        modelClass: Usuario,
+        modelClass: Mascota,
         join: {
           from: "solicitudes.ID_Mascota",
           to: "mascota.ID",

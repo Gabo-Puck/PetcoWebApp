@@ -1,12 +1,17 @@
 const knex = require("../knex");
 const BaseModel = require("./BaseModel");
 const { Model } = require("objection");
-const Usuario = require("./Usuario");
 // Model.knex(knex);
 
 class Registro extends BaseModel {
   constructor() {
     super();
+  }
+
+  $formatJson(json) {
+    json = super.$formatJson(json);
+
+    return json;
   }
 
   static get tableName() {
