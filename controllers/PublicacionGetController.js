@@ -10,6 +10,7 @@ const Comentario = require("../models/Comentario");
 //Configuracion de paypal
 const paypal = require("paypal-rest-sdk");
 const Donaciones = require("../models/Donaciones");
+const Like = require("../models/Like");
 
 paypal.configure({
   mode: "sandbox", //sandbox or live
@@ -21,17 +22,16 @@ paypal.configure({
 
 exports.query = (req, res) => {
 
+ 
   Comentario.query()
   .withGraphJoined('ComentariosPublicacion')
   .withGraphJoined('ComentariosUsuario.UsuariosRegistro')
   .where('comentario.ID_Publicacion', '=', req.params.idPublicacion)
   .orderBy('Fecha_Envio' , "desc")
-  .then((result)=>{
-    console.log(result); 
-    
-    
+  .then((result)=>{ 
+
     Mascota.query()
-    .withGraphJoined("MascotasPublicacion")
+    .withGraphJoined("MascotasPublicacion.PublicacionUsuario")
     .withGraphJoined("MascotasCastrado")
     .withGraphJoined("MascotasTamano")
     .withGraphJoined("MascotasEspecie")
@@ -40,18 +40,20 @@ exports.query = (req, res) => {
     .withGraphJoined("MascotasEstado")
     .withGraphJoined("MascotasImagenes")
     .withGraphJoined("MascotasMetas.MetasDonaciones")
-    .where("Mascota.ID_Publicacion", "=", req.params.idPublicacion)
+    .where("mascota.ID_Publicacion", "=", req.params.idPublicacion)
     //.findByIds({'MascotasPublicacion.ID':req.params.idPublicacion})
     .then((MascotaP) => {
       //nombre usuario
+      //console.log("🚀 ~ file: PublicacionGetController.js ~ line 65 ~ .then ~ MascotaP "+ MascotaP[0].MascotasPublicacion.PublicacionUsuario.ID)
+      
 
       Registro.query()
       .withGraphJoined('RegistroUsuario')
       .where('RegistroUsuario.ID', '=', req.session.IdSession)
       .then((resultados)=>{
-        console.log(resultados[0].Nombre);
+        // console.log(resultados[0].Nombre);
         
-        console.log(MascotaP[0].MascotasImagenes);
+        // console.log(MascotaP[0].MascotasImagenes);
         res.render("publicacion.ejs", {
           MascotaRender: MascotaP,
           usuario:resultados,
@@ -80,7 +82,7 @@ exports.donacionMetas = (req, res) => {
     .withGraphJoined("MascotasPublicacion")
     .withGraphJoined("MascotasImagenes")
     .withGraphJoined("MascotasMetas.MetasDonaciones")
-    .where("Mascota.ID", "=", req.params.idMascota)
+    .where("mascota.ID", "=", req.params.idMascota)
     .then((MascotaP) => {
       //id organizacion
       idOrganizacion = MascotaP[0].MascotasPublicacion.ID_Usuario;

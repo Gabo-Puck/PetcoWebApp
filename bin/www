@@ -12,7 +12,7 @@ var { InMemorySessionStore } = require("../utils/socketUtils/SessionStore");
 var { randomId } = require("../utils/cryptoUtils/randomId");
 const Comentario = require("../models/Comentario");
 var sessionStore = new InMemorySessionStore();
-
+const cors = require("cors");
 /**
  * Get port from environment and store in Express.
  */
@@ -29,16 +29,20 @@ var server = http.createServer(app);
 /**
  * Listen on provided port, on all network interfaces.
  */
-
 server.listen(port);
 server.on("error", onError);
 server.on("listening", onListening);
 //Montamos la instancia de socket io con el servidor http que teníamos creado
-const io = new Server(server);
+const io = new Server(server, { cors: { origin: "*" } });
 
 const wrap = (middleware) => (socket, next) =>
   middleware(socket.request, {}, next);
+// const { ExpressPeerServer } = require("peer");
 
+// const peerServer = ExpressPeerServer(server, {
+//   debug: true,
+// });
+// app.use("/peerjs", peerServer);
 io.use(wrap(app.sessionReference)); //Esta función middleware específica para socket.io nos permite "parsear" la función middleware de express-session
 
 io.use((socket, next) => {
@@ -73,6 +77,19 @@ io.on("connection", (socket) => {
     sessionID: socket.sessionID,
     userID: socket.userID,
   });
+  socket.on("join-room", (roomId, userId) => {
+    console.log("An user has joined the call");
+    socket.join(roomId);
+    socket.broadcast.emit("user-connected", userId);
+    socket.on("send-message", ({ nombreUsuario, message, roomID }) => {
+      console.log(nombreUsuario);
+      io.to(roomId).emit("message-recieved", {
+        nombre: nombreUsuario,
+        message: message,
+      });
+    });
+  });
+
   socket.join(socket.userID); //Metemos al socket a la room del usuario
   //Esto lo hacemos con el fin de considerar la posibilidad de que el usuario abra diferentes pestañas en el mismo navegador
   //Entonces cada vez que entre un usuario con la misma sessionID, metemos a la misma room todos sus sockets

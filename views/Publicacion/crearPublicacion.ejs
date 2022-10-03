@@ -98,13 +98,19 @@
         style="background-color: white; width: 80%"
       >
         <label for="" class="from-label">Titulo</label>
-        <input type="text" class="form-control publicacionTitulo" />
+        <input
+          type="text"
+          class="form-control publicacionTitulo"
+          id="tituloPublicacionID"
+        />
         <label for="" class="from-label">Descripción de la publicación</label>
         <textarea
           type="text"
           class="form-control publicacionDescripcion"
+          id="descripcionPublicacionID"
         ></textarea>
       </div>
+      <div class="border-top border-2 rounded w-100 mb-2"></div>
       <div class="swiper-wrapper card-body border border-0 py-0" id="mainCard">
         <div class="swiper-slide border border-0" style="height: 150vh">
           <button class="addCardButton btn btn-outline-info">
@@ -130,5 +136,5 @@
     </button>
     <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
   </body>
-  <script src="/javascripts/pruebaCarousel.js" type="module"></script>
+  <script src="/javascripts/crearPublicaciones.js" type="module"></script>
 </html>

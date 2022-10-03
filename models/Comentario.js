@@ -26,7 +26,7 @@ class Comentario extends BaseModel {
             relation: Model.BelongsToOneRelation,
             join: {
               from: "comentario.ID_Usuario",
-              to: "Usuario.ID",
+              to: "usuario.ID",
             },
           },
     };

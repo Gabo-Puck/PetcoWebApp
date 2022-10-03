@@ -4,7 +4,7 @@ const { Model } = require("objection");
 Model.knex(knex);
 class Paso extends BaseModel {
   static get tableName() {
-    return "Paso";
+    return "paso";
   }
   static get relationMappings() {
     const Protocolo = require("./Protocolo");
@@ -14,8 +14,8 @@ class Paso extends BaseModel {
         relation: Model.BelongsToOneRelation,
         modelClass: Protocolo,
         join: {
-          from: "Protocolos.ID",
-          to: "Paso.ID_Protocolo",
+          from: "protocolos.ID",
+          to: "paso.ID_Protocolo",
         },
       },
       Mascota: {

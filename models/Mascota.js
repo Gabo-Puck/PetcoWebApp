@@ -103,7 +103,7 @@ class Mascota extends BaseModel {
             from: "paso_mascota.ID_Mascota",
             to: "paso_mascota.ID_Paso",
           },
-          to: "Paso.ID",
+          to: "paso.ID",
         },
       },
 

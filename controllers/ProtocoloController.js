@@ -392,8 +392,8 @@ exports.ProtocoloEditarGet = [
     Protocolo.query()
       .withGraphJoined("Pasos")
       .findOne({
-        "Protocolos.ID_Usuario": req.session.IdSession,
-        "Protocolos.ID": req.params.idProtocolo,
+        "protocolos.ID_Usuario": req.session.IdSession,
+        "protocolos.ID": req.params.idProtocolo,
       })
       .then((protocolo) =>
         res.render("Protocolo/EditarProtocolo", {

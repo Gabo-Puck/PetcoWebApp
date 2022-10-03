@@ -3,15 +3,15 @@
 /**
  * @type { Object.<string, import("knex").Knex.Config> }
  */
-module.exports = {
+ module.exports = {
   development: {
     client: "mysql2",
     connection: {
-      host: "localhost",
-      port: 3306,
+      host: "containers-us-west-67.railway.app",
+      port: 5801,
       user: "root",
-      password: "nuevopass",
-      database: "petcodb",
+      password: "lfhlMhu37lvzAcIdfOYs",
+      database: "railway",
     },
   },
 

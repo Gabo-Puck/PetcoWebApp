@@ -5,7 +5,7 @@ Model.knex(knex);
 
 class Preguntas extends BaseModel {
   static get tableName() {
-    return "Preguntas";
+    return "preguntas";
   }
 
   static get relationMappings() {
@@ -17,28 +17,28 @@ class Preguntas extends BaseModel {
         relation: Model.ManyToManyRelation,
         modelClass: Formulario,
         join: {
-          from: "Preguntas.ID",
+          from: "preguntas.ID",
           through: {
-            from: "Preguntas_Formulario.ID_Pregunta",
-            to: "Preguntas_Formulario.ID_Formulario",
+            from: "preguntas_formulario.ID_Pregunta",
+            to: "preguntas_formulario.ID_Formulario",
           },
-          to: "Formulario.ID",
+          to: "formulario.ID",
         },
       },
       Opciones_Respuestas_Pregunta: {
         relation: Model.HasManyRelation,
         modelClass: Opciones_Respuesta,
         join: {
-          from: "Preguntas.ID",
-          to: "Opciones_Respuestas_Preguntas.ID_Pregunta",
+          from: "preguntas.ID",
+          to: "opciones_respuestas_preguntas.ID_Pregunta",
         },
       },
       Respuestas: {
         relation: Model.HasManyRelation,
         modelClass: Respuestas,
         join: {
-          from: "Preguntas.ID",
-          to: "Respuestas.ID_Pregunta",
+          from: "preguntas.ID",
+          to: "respuestas.ID_Pregunta",
         },
       },
     };

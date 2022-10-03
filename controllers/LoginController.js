@@ -16,12 +16,12 @@ exports.CheckDB = (req, res, next) => {
 
   
   Registro.query()
-    .where("Registro.Contrasena", "=", req.body.Password)
-    .andWhere("Registro.Correo", "=", req.body.Correo)
+    .where("registro.Contrasena", "=", req.body.Password)
+    .andWhere("registro.Correo", "=", req.body.Correo)
     .then((Results) => {
       if (Results.length > 0) {
         Usuario.query()
-          .where("Usuario.ID", "=", Results[0].ID)
+          .where("usuario.ID", "=", Results[0].ID)
           .then((UsserLogged) => {
             //console.log(Results[0].Nombre);
             req.session.UserSessionNombre=Results[0].Nombre;

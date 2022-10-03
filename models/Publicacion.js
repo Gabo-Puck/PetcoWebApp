@@ -8,6 +8,7 @@ class Publicacion extends BaseModel {
     return "publicacion";
   }
   static get relationMappings() {
+    const Usuario = require("./Usuario");
     const Mascotas = require("./Mascota");
     return {
       Mascota: {
@@ -24,6 +25,14 @@ class Publicacion extends BaseModel {
         join: {
           from: "publicacion.ID",
           to: "mascota.ID_Publicacion",
+        },
+      },
+      PublicacionUsuario: {
+        modelClass: Usuario,
+        relation: Model.BelongsToOneRelation,
+        join: {
+          from: "publicacion.ID_Usuario",
+          to: "usuario.ID",
         },
       },
     };

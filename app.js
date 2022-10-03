@@ -3,16 +3,13 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
-const {
-  Validator,
-  ValidationError,
-} = require("express-json-validator-middleware");
+const { Validator } = require("express-json-validator-middleware");
 
 var usersRouter = require("./routes/users");
 var registroRouter = require("./routes/registro");
 
 var vacunasRouter = require("./routes/vacunas");
-
+var publicacionget = require("./routes/PublicacionGetRouter");
 var loginRouter = require("./routes/login");
 var authRequired = require("./routes/authRequired");
 var app = express();
@@ -24,7 +21,11 @@ const sessionMiddleware = session({
   resave: true,
   saveUninitialized: true,
 });
+const cors = require("cors");
+const { ValidationError } = require("./utils/ValidationError");
+
 app.use(sessionMiddleware);
+app.use(cors());
 app.sessionReference = sessionMiddleware;
 
 // view engine setup
@@ -44,8 +45,8 @@ app.use("/registro", registroRouter);
 app.use("/login", loginRouter);
 // app.use("/protocolo", ProtocoloRouter);
 // app.use("/dashboard", dashboard);
-// app.use("/publicacion", publicacionget);
-// app.use("/videollamada", require("./routes/videollamada"));
+app.use("/publicacion", publicacionget);
+app.use("/videollamada", require("./routes/videollamada"));
 
 function isLogged(req, res, next) {
   var IdSession = req.session.IdSession;
@@ -56,7 +57,7 @@ function isLogged(req, res, next) {
     if (res.permiso == true) {
       next();
     }
-    return res.redirect("http://localhost:3000/login");
+    return res.redirect("/login");
   }
 }
 // catch 404 and forward to error handler
@@ -74,20 +75,19 @@ app.use(function (req, res, next) {
   }
 });
 
-function validationErrorMiddleware(error, request, response, next) {
+function validationErrorMiddleware(validationError, request, response, next) {
   if (response.headersSent) {
-    return next(error);
+    return next(validationError);
   }
 
-  const isValidationError = error instanceof ValidationError;
+  const isValidationError = validationError instanceof ValidationError;
   if (!isValidationError) {
-    return next(error);
+    return next(validationError);
   }
-
+  console.log("Esta mal");
   response.status(400).json({
-    errors: error.validationErrors,
+    errors: validationError.errors,
   });
-
   next();
 }
 
@@ -105,7 +105,7 @@ app.use(function (err, req, res, next) {
   console.log("rees");
   if (err.status == 404) {
     console.log("http://" + req.hostname + ":3000/login");
-    return res.redirect("http://" + req.hostname + ":3000/login");
+    return res.redirect("/login");
   }
   // render the error page
   res.status(err.status || 500);

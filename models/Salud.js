@@ -15,8 +15,8 @@ class Salud extends BaseModel {
         relation: Model.HasManyRelation,
         modelClass: Mascota,
         join: {
-          from: "Salud.ID",
-          to: "Mascota.ID_Salud",
+          from: "salud.ID",
+          to: "mascota.ID_Salud",
         },
       },
     };

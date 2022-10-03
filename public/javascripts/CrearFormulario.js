@@ -15,7 +15,7 @@ import {
 } from "/javascripts/FormulariosFunctions.js";
 
 $(function () {
-  fetch("http://localhost:3000/petco/formulario/preguntaTemplate")
+  fetch("/petco/formulario/preguntaTemplate")
     .then((res) => res.text())
     .then((html) => {
       var parserDOM = new DOMParser();

@@ -6,6 +6,7 @@ const { PassThrough, Readable } = require("stream");
 var fs = require("fs");
 var os = require("os");
 const { resolve } = require("path");
+const { ValidationError } = require("../ValidationError");
 
 /**
  * Función middleware que se puede añadir al flujo de una request. Permite hacer lo siguiente:
@@ -120,7 +121,7 @@ exports.fetchInput = (acceptedTypes, folderPath) => {
           var readable = new Readable();
           readable._read = (size) => {};
           file.on("data", (data) => {
-            console.log(data);
+            // console.log(data);
             readable.push(data);
           });
           file.on("end", () => {
@@ -191,3 +192,34 @@ function deleteFiles(req) {
   }
   return deleteFilesPromises;
 }
+
+exports.cleanInputID = (input) => {
+  for (const key in input) {
+    if (Object.hasOwnProperty.call(input, key)) {
+      // const element = validatedInput[key];
+      let isId = key.substring(key.length - 2).includes("ID");
+      if (isId) {
+        delete input[key];
+      }
+      if (Array.isArray(input[key])) {
+        input[key].forEach((element) => {
+          this.cleanInputID(element);
+        });
+      }
+    }
+  }
+  console.log(input);
+};
+
+exports.validateBody = (req, res, next) => {
+  var validationObject = validationResult(req).array({ onlyFirstError: true });
+  if (validationObject.length > 0) {
+    var errorObject = new ValidationError(validationObject);
+    validationObject.forEach((error) => {
+      var ID_Error = _.get(req.body, error.param + "ID");
+      errorObject.errors.push({ ID: ID_Error, msg: error.msg });
+    });
+    return next(errorObject);
+  }
+  next();
+};

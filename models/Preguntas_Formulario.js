@@ -5,7 +5,7 @@ Model.knex(knex);
 
 class Preguntas_Formulario extends Model {
   static get tableName() {
-    return "Preguntas_Formulario";
+    return "preguntas_formulario";
   }
   static get idColumn() {
     return ["ID_Pregunta", "ID_Formulario"];

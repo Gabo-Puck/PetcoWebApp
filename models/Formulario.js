@@ -8,7 +8,7 @@ class Formulario extends BaseModel {
     super();
   }
   static get tableName() {
-    return "Formulario";
+    return "formulario";
   }
   static get relationMappings() {
     const Usuario = require("./Usuario");
@@ -19,28 +19,28 @@ class Formulario extends BaseModel {
         relation: Model.BelongsToOneRelation,
         modelClass: Usuario,
         join: {
-          from: "Formulario.ID_Usuario",
-          to: " Usuario.ID",
+          from: "formulario.ID_Usuario",
+          to: " usuario.ID",
         },
       },
       Preguntas: {
         relation: Model.ManyToManyRelation,
         modelClass: Preguntas,
         join: {
-          from: "Formulario.ID",
+          from: "formulario.ID",
           through: {
-            from: "Preguntas_Formulario.ID_Formulario",
-            to: "Preguntas_Formulario.ID_Pregunta",
+            from: "preguntas_formulario.ID_Formulario",
+            to: "preguntas_formulario.ID_Pregunta",
           },
-          to: "Preguntas.ID",
+          to: "preguntas.ID",
         },
       },
       Protocolo: {
         relation: Model.HasManyRelation,
         modelClass: Protocolo,
         join: {
-          from: "Formulario.ID",
-          to: "Protocolos.ID_Formulario",
+          from: "formulario.ID",
+          to: "protocolos.ID_Formulario",
         },
       },
     };

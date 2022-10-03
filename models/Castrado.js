@@ -10,13 +10,13 @@ class Castrado extends BaseModel {
 
   static get relationMappings() {
     const Mascota = require("./Mascota");
-    return {
+    return { 
       MascotaRel: {
         relation: Model.HasManyRelation,
         modelClass: Mascota,
         join: {
-          from: "Castrado.ID",
-          to: "Mascota.ID_Castrado",
+          from: "castrado.ID",
+          to: "mascota.ID_Castrado",
         },
       },
     };
