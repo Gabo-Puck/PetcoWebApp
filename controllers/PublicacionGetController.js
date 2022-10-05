@@ -22,7 +22,6 @@ paypal.configure({
 
 exports.query = (req, res) => {
 
- 
   Comentario.query()
   .withGraphJoined('ComentariosPublicacion')
   .withGraphJoined('ComentariosUsuario.UsuarioRegistro')
@@ -68,6 +67,16 @@ exports.query = (req, res) => {
 
 
 };
+exports.likes = (req, res) => {
+  Like.query()
+  .then( (res)=>{
+
+    console.log(res);
+
+  })
+
+
+}
 
 //Controlar publicaciones
 var aporte;
