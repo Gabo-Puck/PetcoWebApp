@@ -3,4 +3,6 @@ const router = express.Router();
 
 const ProcesoAdopcionesController = require("../controllers/ProcesoAdopcionController");
 
-router.get("/proceso/:MascotaID");
+router.get("/ver/:MascotaID", ProcesoAdopcionesController.getProceso);
+
+module.exports = router;
