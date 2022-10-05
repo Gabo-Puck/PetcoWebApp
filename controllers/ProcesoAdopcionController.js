@@ -6,5 +6,6 @@ exports.getProceso = (req, res, next) => {
     //   .withGraphJoined("MascotasSolicitudes")
     //   .where("mascota.ID", "=", req.params.MascotaID)
     //   .andWhere("MascotasSolicitudes.ID","=",);
+    res.render("procesoAdopcion");
   }
 };

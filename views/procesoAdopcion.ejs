@@ -31,7 +31,176 @@
     <!-- Sweetalert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </head>
-  <body>
-    <div class="mainContainer h-100 w-100"></div>
+  <style>
+    :root {
+      --active-bg-color-paso-progressbar: #415a80;
+      --active-text-color-paso-progressbar: #d7e2e9;
+      --completed-bg-color-paso-progressbar: #a5d4dc;
+      --completed-text-color-paso-progressbar: #415a80;
+      --pending-bg-color-paso-progressbar: #f2f4f8;
+      --pending-text-color-paso-progressbar: #415a80;
+      --info-paso-bg-color: #d7e2e9;
+      --info-paso-text-color: #415a80;
+    }
+    li {
+      list-style-type: none;
+    }
+    .progress-bar-dot {
+      height: 0;
+      max-width: 10%;
+      min-width: 10%;
+      padding-bottom: 10%;
+      background-color: #d7fdff;
+    }
+    .progress-bar-line {
+      max-width: 15vh;
+      min-width: 15vh;
+      height: 2%;
+      background-color: gray;
+    }
+
+    .progress-bar {
+      height: 30%;
+      /* cambiar a 30% esto */
+      max-width: 70%;
+      min-width: 70%;
+      overflow-x: scroll;
+      margin: 0 auto;
+    }
+
+    .progress-bar::-webkit-scrollbar {
+      width: 14px;
+      /* margin-right: 1px; */
+    }
+
+    .progress-bar::-webkit-scrollbar-thumb {
+      border: 4px solid rgba(0, 0, 0, 0);
+      background-clip: padding-box;
+      border-radius: 9999px;
+      margin: 1em 0;
+      border-radius: 5em;
+      background-color: #9a9a9a;
+    }
+
+    .progress-bar::-webkit-scrollbar-track-piece:end {
+      background: transparent;
+      margin-bottom: 1em;
+    }
+
+    .progress-bar::-webkit-scrollbar-track-piece:start {
+      background: transparent;
+      margin-top: 1em;
+    }
+
+    .active-paso-progressbar {
+      background-color: var(--active-bg-color-paso-progressbar);
+      color: var(--active-text-color-paso-progressbar);
+    }
+
+    .completed-paso-progressbar {
+      background-color: var(--completed-bg-color-paso-progressbar);
+      color: var(--completed-text-color-paso-progressbar);
+    }
+    .pending-paso-progressbar {
+      background-color: var(--pending-bg-color-paso-progressbar);
+      color: var(--pending-text-color-paso-progressbar);
+    }
+
+    @media (max-width: 374px) {
+      .progress-bar-dot {
+        max-width: 30%;
+        min-width: 30%;
+        padding-bottom: 30%;
+      }
+      .progress-bar-line {
+        max-width: 8vh;
+        min-width: 8vh;
+        height: 2%;
+      }
+    }
+
+    .infoPasoProceso .card-header {
+      background-color: var(--info-paso-bg-color);
+      color: var(--info-paso-text-color);
+    }
+
+    @media (min-width: 375px) and (max-width: 600px) {
+      .progress-bar-dot {
+        max-width: 23%;
+        min-width: 23%;
+        padding-bottom: 23%;
+      }
+    }
+    @media (min-width: 601px) and (max-width: 767px) {
+      .progress-bar-dot {
+        max-width: 15%;
+        min-width: 15%;
+        padding-bottom: 15%;
+      }
+    }
+    @media (min-width: 768px) and (max-width: 1023px) {
+      .progress-bar-dot {
+        max-width: 15%;
+        min-width: 15%;
+        padding-bottom: 15%;
+      }
+    }
+  </style>
+  <body style="height: 100vh">
+    <div class="mainContainer h-100 w-100">
+      <div class="progress-bar">
+        <ul
+          class="d-flex align-items-center px-0"
+          style="max-width: 100%; height: 100%"
+        >
+          <li class="p-4"></li>
+          <li
+            class="rounded-circle d-flex align-items-center position-relative progress-bar-dot pending-paso-progressbar"
+          >
+            <span class="position-absolute top-50 start-50 translate-middle"
+              >1</span
+            >
+          </li>
+          <li class="progress-bar-line"></li>
+          <li
+            class="rounded-circle d-flex align-items-center position-relative progress-bar-dot active-paso-progressbar"
+          >
+            <span class="position-absolute top-50 start-50 translate-middle"
+              >1</span
+            >
+          </li>
+          <li class="progress-bar-line"></li>
+          <li
+            class="rounded-circle d-flex align-items-center position-relative progress-bar-dot completed-paso-progressbar"
+          >
+            <span class="position-absolute top-50 start-50 translate-middle"
+              >1</span
+            >
+          </li>
+
+          <li class="p-4"></li>
+        </ul>
+      </div>
+      <div class="controlesPasoProceso">
+        <!--Solo para paso activo-->
+        <button class="btn btn-info">
+          <i class="fa-solid fa-phone-flip"></i>
+        </button>
+        <div class="marcarCompletadoPaso"></div>
+        <!--Solo para paso activo-->
+      </div>
+      <div class="infoPasoProceso card w-50 mx-auto">
+        <div class="card-header">Paso activo</div>
+        <div class="card-body">
+          <h4 class="tituloPasoProceso card-title">Paso 1</h4>
+          <p class="descripcionPasoProceso card-text">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos
+            similique animi ea sit aspernatur magnam enim laboriosam amet ex
+            quam consectetur quae, nulla suscipit unde culpa est! Sapiente,
+            mollitia laboriosam.
+          </p>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
