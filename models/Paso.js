@@ -9,6 +9,8 @@ class Paso extends BaseModel {
   static get relationMappings() {
     const Protocolo = require("./Protocolo");
     const Mascota = require("./Mascota");
+    const Pasos_Mascota = require("./Pasos_Mascota");
+
     return {
       Proto: {
         relation: Model.BelongsToOneRelation,
@@ -28,6 +30,14 @@ class Paso extends BaseModel {
             to: "paso_mascota.ID.Mascota",
           },
           to: "mascota.ID",
+        },
+      },
+      PasoProceso: {
+        relation: Model.HasManyRelation,
+        modelClass: Pasos_Mascota,
+        join: {
+          from: "paso.ID",
+          to: "paso_mascota.ID_Paso",
         },
       },
     };

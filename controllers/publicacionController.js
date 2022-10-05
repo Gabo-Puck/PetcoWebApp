@@ -264,11 +264,19 @@ function createPromisesPasosMascota(ID_Mascota, ID_Protocolo) {
     let PasosMascotaInsert = [];
     for (let index = 0; index < Pasos.length; index++) {
       const element = Pasos[index];
-      PasosMascotaInsert.push({
-        ID_Mascota: ID_Mascota,
-        ID_Paso: element.ID,
-        Completado: 0,
-      });
+      if (index == 0) {
+        PasosMascotaInsert.push({
+          ID_Mascota: ID_Mascota,
+          ID_Paso: element.ID,
+          Completado: 1,
+        });
+      } else {
+        PasosMascotaInsert.push({
+          ID_Mascota: ID_Mascota,
+          ID_Paso: element.ID,
+          Completado: 0,
+        });
+      }
     }
     Pasos_Mascota.query()
       .insertGraph(PasosMascotaInsert)

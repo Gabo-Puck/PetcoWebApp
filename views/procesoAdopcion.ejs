@@ -30,13 +30,17 @@
     />
     <!-- Sweetalert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+      const PasosProceso = <%-JSON.stringify(PasosProceso)%>;
+    </script>
   </head>
   <style>
     :root {
-      --active-bg-color-paso-progressbar: #415a80;
-      --active-text-color-paso-progressbar: #d7e2e9;
-      --completed-bg-color-paso-progressbar: #a5d4dc;
-      --completed-text-color-paso-progressbar: #415a80;
+      --active-bg-color-paso-progressbar: #a5d4dc;
+      --active-text-color-paso-progressbar: #415a80;
+      --completed-bg-color-paso-progressbar: #415a80;
+      --completed-text-color-paso-progressbar: #d7e2e9;
       --pending-bg-color-paso-progressbar: #f2f4f8;
       --pending-text-color-paso-progressbar: #415a80;
       --info-paso-bg-color: #d7e2e9;
@@ -51,7 +55,13 @@
       min-width: 10%;
       padding-bottom: 10%;
       background-color: #d7fdff;
+      cursor: pointer;
+      transition: background-color 1s;
     }
+    .progress-bar-dot:hover {
+      background-color: #89bdbf;
+    }
+
     .progress-bar-line {
       max-width: 15vh;
       min-width: 15vh;
@@ -147,6 +157,31 @@
     }
   </style>
   <body style="height: 100vh">
+    <div class="d-none templateElmentsPasosProgressBar">
+      <li
+        class="rounded-circle d-flex align-items-center position-relative progress-bar-dot pending-paso-progressbar"
+      >
+        <span class="position-absolute top-50 start-50 translate-middle"
+          >1</span
+        >
+      </li>
+      <li class="progress-bar-line"></li>
+      <li
+        class="rounded-circle d-flex align-items-center position-relative progress-bar-dot active-paso-progressbar"
+      >
+        <span class="position-absolute top-50 start-50 translate-middle"
+          >1</span
+        >
+      </li>
+      <li class="progress-bar-line"></li>
+      <li
+        class="rounded-circle d-flex align-items-center position-relative progress-bar-dot completed-paso-progressbar"
+      >
+        <span class="position-absolute top-50 start-50 translate-middle"
+          >1</span
+        >
+      </li>
+    </div>
     <div class="mainContainer h-100 w-100">
       <div class="progress-bar">
         <ul
@@ -154,53 +189,51 @@
           style="max-width: 100%; height: 100%"
         >
           <li class="p-4"></li>
-          <li
-            class="rounded-circle d-flex align-items-center position-relative progress-bar-dot pending-paso-progressbar"
-          >
-            <span class="position-absolute top-50 start-50 translate-middle"
-              >1</span
-            >
-          </li>
-          <li class="progress-bar-line"></li>
-          <li
-            class="rounded-circle d-flex align-items-center position-relative progress-bar-dot active-paso-progressbar"
-          >
-            <span class="position-absolute top-50 start-50 translate-middle"
-              >1</span
-            >
-          </li>
-          <li class="progress-bar-line"></li>
-          <li
-            class="rounded-circle d-flex align-items-center position-relative progress-bar-dot completed-paso-progressbar"
-          >
-            <span class="position-absolute top-50 start-50 translate-middle"
-              >1</span
-            >
-          </li>
 
           <li class="p-4"></li>
         </ul>
       </div>
-      <div class="controlesPasoProceso">
-        <!--Solo para paso activo-->
-        <button class="btn btn-info">
-          <i class="fa-solid fa-phone-flip"></i>
-        </button>
-        <div class="marcarCompletadoPaso"></div>
-        <!--Solo para paso activo-->
-      </div>
-      <div class="infoPasoProceso card w-50 mx-auto">
-        <div class="card-header">Paso activo</div>
-        <div class="card-body">
-          <h4 class="tituloPasoProceso card-title">Paso 1</h4>
-          <p class="descripcionPasoProceso card-text">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos
-            similique animi ea sit aspernatur magnam enim laboriosam amet ex
-            quam consectetur quae, nulla suscipit unde culpa est! Sapiente,
-            mollitia laboriosam.
-          </p>
+      <div class="w-50 mx-auto">
+        <div class="d-flex justify-content-end controlesPasoProceso mb-3">
+          <!--Solo para paso activo-->
+          <button class="btn btn-info me-3">
+            <i class="fa-solid fa-phone-flip"></i>
+          </button>
+          <button class="btn btn-info">
+            <i class="fa-regular fa-comments"></i>
+          </button>
+          <div class="marcarCompletadoPaso"></div>
+          <!--Solo para paso activo-->
+        </div>
+        <div class="infoPasoProceso card w-100 mx-auto">
+          <div class="card-header d-flex justify-content-between">
+            <div>Paso Activo</div>
+            <div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="flexRadioDefault"
+                  id="flexRadioDefault1"
+                />
+                <label class="form-check-label" for="flexRadioDefault1">
+                  Completado
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <h4 class="tituloPasoProceso card-title">Paso 1</h4>
+            <p class="descripcionPasoProceso card-text">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos
+              similique animi ea sit aspernatur magnam enim laboriosam amet ex
+              quam consectetur quae, nulla suscipit unde culpa est! Sapiente,
+              mollitia laboriosam.
+            </p>
+          </div>
         </div>
       </div>
     </div>
+    <script type="module" src="/javascripts/ProcesoAdopcion.js"></script>
   </body>
 </html>
