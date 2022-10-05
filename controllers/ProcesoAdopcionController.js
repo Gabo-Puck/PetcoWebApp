@@ -7,10 +7,17 @@ exports.getProceso = [
     if (res.isAdoptante || res.isDuenoMascota) {
       console.log("Si es valido para entrar");
       Mascota.query()
-        .withGraphJoined("MascotasPasos")
+        .withGraphJoined("MascotasPasos.[PasoProceso]")
         .where("mascota.ID", "=", req.params.MascotaID)
+        .andWhere(
+          "MascotasPasos:PasoProceso.ID_Mascota",
+          "=",
+          req.params.MascotaID
+        )
         .then((PasosProceso) => {
-          res.render("procesoAdopcion", { PasosProceso: PasosProceso });
+          res.render("procesoAdopcion", {
+            PasosProceso: PasosProceso[0].MascotasPasos,
+          });
         });
     } else {
       console.log("Te mando al login");
