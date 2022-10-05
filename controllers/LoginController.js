@@ -14,63 +14,63 @@ exports.session = (req, res, next) => {
 exports.CheckDB = (req, res, next) => {
   console.log(req.body);
 
-  
+
   Registro.query()
+    .withGraphJoined('RegistroUsuario')
     .where("registro.Contrasena", "=", req.body.Password)
     .andWhere("registro.Correo", "=", req.body.Correo)
     .then((Results) => {
-      if (Results.length > 0) {
-        Usuario.query()
-          .where("usuario.ID", "=", Results[0].ID)
-          .then((UsserLogged) => {
-            //console.log(Results[0].Nombre);
-            req.session.UserSessionNombre=Results[0].Nombre;
 
-            //LoginCorrecto
+      console.log(Results[0]);
+      //El usuario se Logeo
+      if (Results[0] != null && Results[0].RegistroUsuario != null) {
+        console.log('ojo');
+        req.session.Logged = true;
+        req.session.IdSession = Results[0].RegistroUsuario.ID;
 
-            if (UsserLogged.length > 0) {
-              //Usuario encontrado y existente
-              req.session.Logged = true;
-              Usuario.query();
-              req.session.IdSession = UsserLogged[0].ID;
-              console.log(UsserLogged);
-              console.log(req.session);
-              //Alert
-              res.render("login.ejs", {
-                alert: true,
-                alertTitle: "Conexion Exitosa",
-                alertMessage: "Se ha iniciado Sesion",
-                alertIcon: "success",
-                showCofirmButton: false,
-                timer: 2500,
-                ruta: "petco/inicio",
-              });
-            } else {
-              //Usuario no encontrado
-              res.render("login.ejs", {
-                alert: true,
-                alertTitle: "¡Ups!",
-                alertMessage: "Aún no cuentas un usuario valido para ingresar",
-                alertIcon: "warning",
-                showCofirmButton: true,
-                timer: false,
-                ruta: "./login",
-              });
-            }
-          });
-      } else {
-        //Login Incorrecto
-        //Alert
-        res.render("login.ejs", {
+
+        console.log("🚀 ~ file: LoginController.js ~ line 29 ~ .then ~ session", req.session.IdSession);
+
+        res.render('login.ejs', {
+          alert: true,
+          alertTitle: "Conexion Exitosa",
+          alertMessage: "Se ha iniciado Sesion",
+          alertIcon: "success",
+          showCofirmButton: false,
+          timer: 2500,
+          ruta: './inicio'
+
+        });
+      }
+
+      //Datos Sin coincidencias
+      if (Results[0] == null) {
+        res.render('login.ejs', {
           alert: true,
           alertTitle: "Error",
           alertMessage: "La direccion de correo y la contraseña no coinciden",
           alertIcon: "error",
           showCofirmButton: true,
           timer: false,
-          ruta: "./login",
+          ruta: './login'
         });
       }
+
+      //Usuario no aprobado
+      if (Results[0] != null && Results[0].RegistroUsuario == null) {
+        res.render('login.ejs', {
+          alert: true,
+          alertTitle: "¡Ups!",
+          alertMessage: "Aún no cuentas un usuario valido para ingresar",
+          alertIcon: "warning",
+          showCofirmButton: true,
+          timer: false,
+          ruta: './login'
+      });
+
+      }
+
+
     })
     .catch((err) => next(err));
 };

@@ -5,7 +5,7 @@ const Solicitudes = require("../models/Solicitudes");
 const { secureRegistro } = require("../utils/formDatabaseClean");
 exports.getListaSolicitudesPublicacion = (req, res, next) => {
   //Importante Borrar esta parte
-  req.session.IdSession = 2;
+  //req.session.IdSession = 2;
   console.log("BORRAR LINEA 5 SolicitudesController.js");
   if (req.session.IdSession) {
     Publicacion.query()
