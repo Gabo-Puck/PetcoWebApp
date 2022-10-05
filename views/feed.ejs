@@ -1,18 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Feed</title>
-    <script
-      src="https://cdn.socket.io/4.5.0/socket.io.min.js"
-      integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k"
-      crossorigin="anonymous"
-    ></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  </head>
-  <body></body>
+
+<head>
+  <link rel="stylesheet" , href="/stylesheets/style.css" />
+
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feed</title>
+  <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"
+    integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k"
+    crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+
+<body>
+<a href="/#">
+
+  <div class="container templateFeed">
+    <div class="card border-primary mb-3 " style="max-width: 20rem;">
+      <div class="card-header">Header</div>
+    <div class="card-body">
+      <h4 class="card-title">Primary card title</h4>
+      <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
+        content.</p>
+      </div>
+    </div>
+  </div>
+  
+</a>
+
+
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+
+
+
+  <script>
+    var template = document.querySelector(".templateFeed"); //Se obtiene el formato del comentario de un template
+    let tarjeta2 = template.cloneNode(true); //se clona un elemento con las caracteristicas de un comentario
+
+
+
+    window.onscroll = function (ev) {
+      if ((window.innerHeight + window.scrollY) >= document.body.scrollHeight) {
+        // you're at the bottom of the page
+        alert("Bottom of page");
+        // create a new div element
+        const newDiv = document.createElement("div");
+
+        // and give it some content
+        const newContent = document.createTextNode("Hi there and greetings!");
+
+        // add the text node to the newly created div
+        newDiv.appendChild(newContent);
+
+        // add the newly created element and its content into the DOM
+        const currentDiv = document.getElementById("div1");
+        document.body.insertBefore(newDiv, currentDiv);
+        document.body.insertBefore(currentDiv,tarjeta2)
+      }
+    };
+  </script>
 
   <script src="/javascripts/socketUtils.js"></script>
+</body>
+
 </html>

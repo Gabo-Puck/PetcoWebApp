@@ -10,7 +10,7 @@ router.post("/check", PublicacionesController.checkImage);
 router.post("/crear", PublicacionesController.crearPublicacionGuardar);
 router.get("/adopciones/:idPublicacion", registro_Login.query);
 router.get("/meta/:idMascota", registro_Login.donacionMetas);
-router.get("/likes/:idP/IdU", registro_Login.likes);
+router.get("/likes/:idP/:IdU", registro_Login.likes);
 //router.get("/responder/comentario/:idComentario", registro_Login.donacionMetas);
 
 //Rutas de la API de paypal

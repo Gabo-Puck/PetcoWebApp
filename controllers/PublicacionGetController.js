@@ -72,7 +72,7 @@ exports.likes = (req, res) => {
   .then( (res)=>{
 
     console.log(res);
-
+    console.log(req.params)
   })
 
 

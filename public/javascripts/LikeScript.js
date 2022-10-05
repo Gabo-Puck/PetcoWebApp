@@ -2,16 +2,14 @@
 const element = document.getElementById("like") ;
 element.addEventListener("click", myFunction);
 
-const Like = require("../../models/Like");
-
-Like.query()
-.where('like.ID_Usuario' , '=', idSession)
-.then((r) =>{
-    console.log(r);
-})
-
-fetch()
 
 function myFunction() {
 alert(idSession);
+console.log('oj');
+fetch(`/petco/publicacion/likes/${idSession}/${idPublicacion}`)
+.then((res)=>res.json)
+.then((res) =>{
+    console.log(res)
+})
+
 }
