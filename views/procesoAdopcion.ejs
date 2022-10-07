@@ -46,6 +46,39 @@
       --info-paso-bg-color: #d7e2e9;
       --info-paso-text-color: #415a80;
     }
+
+    .inputMessageChatProceso input,
+    .inputMessageChatProceso input:focus,
+    .inputMessageChatProceso button,
+    .inputMessageChatProceso button:focus,
+    .inputMessageChatProceso button:hover {
+      background-color: transparent;
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+      transition: none !important;
+    }
+
+    .fotoPerfilSolicitud {
+      /* background-image: url("https://m.media-amazon.com/images/I/71ZcXHsUk1L.__AC_SX300_SY300_QL70_FMwebp_.jpg"); */
+      /* background-size: 100% 100%; */
+      width: 10vh;
+      text-align: center;
+      position: relative;
+      padding-bottom: 10vh;
+      border-radius: 50%;
+      overflow: hidden;
+      background-color: blue;
+    }
+    .fotoPerfilSolicitud img {
+      position: absolute;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      object-fit: fill;
+    }
     .pasoInfoContainer {
       height: 50%;
       width: 50%;
@@ -141,7 +174,7 @@
       overflow-x: scroll;
     }
 
-    @media (max-width: 374px) {
+    @media (max-width: 320px) {
       .progress-bar-dot {
         max-width: 30%;
         min-width: 30%;
@@ -153,9 +186,9 @@
         height: 2%;
       }
       .pasoInfoContainer {
-      height: 75%;
-      width: 75%;
-    }
+        height: 75%;
+        width: 75%;
+      }
     }
 
     @media (min-width: 375px) and (max-width: 600px) {
@@ -208,95 +241,185 @@
     </div>
     <div
       class="mainContainer"
-      style="height: 100vh !important; max-height: 100vh !important"
+      style="
+        height: 100vh !important;
+        max-height: 100vh !important;
+        width: 100%;
+      "
     >
-      <div class="progress-bar mx-auto">
-        <ul class="d-flex align-items-center justify-content-start px-0"></ul>
-      </div>
-      <div class="mx-auto pasoInfoContainer">
-        <div class="d-flex justify-content-end controlesPasoProceso mb-3">
-          <!--Solo para paso activo-->
-          <button class="btn btn-info me-3">
-            <i class="fa-solid fa-phone-flip"></i>
-          </button>
-          <button class="btn btn-info">
-            <i class="fa-regular fa-comments"></i>
-          </button>
-          <!--Solo para paso activo-->
+      <div
+        class="offcanvas offcanvas-start"
+        data-bs-scroll="true"
+        tabindex="-1"
+        id="offcanvasWithBothOptions"
+        aria-labelledby="offcanvasWithBothOptionsLabel"
+        style="max-width: 100%; min-width: 100%"
+      >
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel">
+            Chat
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close"
+          ></button>
         </div>
-        <div class="infoPasoProceso card" style="max-height: 100%;">
-          <div class="card-header d-flex justify-content-between">
-            <div>Paso Activo</div>
-            <div>
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="flexRadioDefault"
-                  id="pasoCompletado"
-                />
-                <label class="form-check-label" for="pasoCompletado">
-                  Completado
-                </label>
+        <div class="offcanvas-body w-100" style="overflow-x: visible">
+          <div class="messsagesChatProceso w-100">
+            <div class="you w-100">
+              <div class="row flex-nowrap">
+                <!-- Foto -->
+                <div class="col-3 col-md-1 pe-0">
+                  <div class="row fotoPerfilSolicitud mx-auto">
+                    <img
+                      src="https://yt3.ggpht.com/ytc/AMLnZu9cgXf9IDqf7I1NTL0-IJ1xA7fZphgi0cuemiljig=s900-c-k-c0x00ffffff-no-rj"
+                    />
+                  </div>
+                </div>
+                <div class="col-9 col-md-11 ps-0">
+                  <div class="row nombreChatProceso">
+                    <p>Gus Fring</p>
+                  </div>
+                  <div class="row contenidoChatProceso w-100">
+                    <p class="text-break" style="display: inline-flex">
+                      pilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilin
+                    </p>
+                  </div>
+                  <!-- Nombre y mensaje -->
+                </div>
+              </div>
+            </div>
+            <div class="someone w-100">
+              <div class="row flex-nowrap flex-row-reverse">
+                <!-- Foto -->
+                <div class="col-3 col-md-1 ps-0">
+                  <div class="row fotoPerfilSolicitud mx-auto flex-flow-reverse">
+                    <img
+                      src="https://yt3.ggpht.com/ytc/AMLnZu9cgXf9IDqf7I1NTL0-IJ1xA7fZphgi0cuemiljig=s900-c-k-c0x00ffffff-no-rj"
+                    />
+                  </div>
+                </div>
+                <div class="col-9 col-md-11 pe-2">
+                  <div class="row nombreChatProceso flex-flow-reverse">
+                  <p class="text-end text-break">Gus Fring</p>
+                </div>
+                <div class="row contenidoChatProceso w-100 flex-flow-reverse ms-0">
+                  <p class="text-end text-break pe-0" style="">
+                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
+                  </p>
+                </div>
+                <!-- Nombre y mensaje -->
               </div>
             </div>
           </div>
-          <div class="card-body pb-3" style="overflow-y: scroll">
-            <h4 class="tituloPasoProceso card-title">Paso 1</h4>
-            <p class="descripcionPasoProceso card-text">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos
-              similique animi ea sit aspernatur magnam enim laboriosam amet ex
-              quam consectetur quae, nulla suscipit unde culpa est! Sapiente,
-              mollitia laboriosam.
-            </p>
-            <div class="d-none" id="descargarArchivoProtocolo">
-              <!--Se activa cuando el paso tiene un archivo subido -->
-              <h4>Descarga archivo protocolo</h4>
-              <button class="btn btn-info">
-                <i class="fa-solid fa-file-arrow-down"></i>
-              </button>
+        </div>
+        <div
+          class="inputMessageChatProceso px-2 py-2 d-flex align-items-center"
+          style="border-radius: 50px; background-color: #415a80; width: 100%"
+        >
+          <div class="input-group my-auto">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Recipient's username"
+              aria-label="Recipient's username"
+              aria-describedby="button-addon2"
+            />
+            <button class="btn-primary" type="button" id="button-addon2">
+              <i class="fa-regular fa-comment"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="progress-bar mx-auto">
+      <ul class="d-flex align-items-center justify-content-start px-0"></ul>
+    </div>
+    <div class="mx-auto pasoInfoContainer">
+      <div class="d-flex justify-content-start controlesPasoProceso mb-3">
+        <!--Solo para paso activo-->
+        <button
+          class="btn btn-info me-3"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#offcanvasWithBothOptions"
+          aria-controls="offcanvasWithBothOptions"
+        >
+          <i class="fa-regular fa-comments"></i>
+        </button>
+        <button class="btn btn-info">
+          <i class="fa-solid fa-phone-flip"></i>
+        </button>
+        <!--Solo para paso activo-->
+      </div>
+      <div class="infoPasoProceso card" style="max-height: 100%">
+        <div class="card-header d-flex justify-content-between">
+          <div>Paso Activo</div>
+          <div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="flexRadioDefault"
+                id="pasoCompletado"
+              />
+              <label class="form-check-label" for="pasoCompletado">
+                Completado
+              </label>
             </div>
-            <div class="d-none"style="width: 100%; height: 40vh">
-              <% if(tipo==0) {%>
-              <!--Se activa cuando el usuario es el adoptante para subir un archivo-->
-              <h4>Subir archivo</h4>
+          </div>
+        </div>
+        <div class="card-body pb-3" style="overflow-y: scroll">
+          <h4 class="tituloPasoProceso card-title">Paso 1</h4>
+          <p class="descripcionPasoProceso card-text">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos
+            similique animi ea sit aspernatur magnam enim laboriosam amet ex
+            quam consectetur quae, nulla suscipit unde culpa est! Sapiente,
+            mollitia laboriosam.
+          </p>
+          <div class="d-none" id="descargarArchivoProtocolo">
+            <!--Se activa cuando el paso tiene un archivo subido -->
+            <h4>Descarga archivo protocolo</h4>
+            <button class="btn btn-info">
+              <i class="fa-solid fa-file-arrow-down"></i>
+            </button>
+          </div>
+          <div class="d-none" style="width: 100%; height: 40vh">
+            <% if(tipo==0) {%>
+            <!--Se activa cuando el usuario es el adoptante para subir un archivo-->
+            <h4>Subir archivo</h4>
+            <div
+              class="uploadFileBox mb-3 mx-auto"
+              style="width: 75%; height: 75%"
+              id="subirArchivo"
+            >
               <div
-                class="uploadFileBox mb-3 mx-auto"
-                style="width: 75%; height: 75%"
-                id="subirArchivo"
+                class="upload-file position-relative border border-info mx-auto"
+                style="width: 100%; height: 100%"
               >
-                <div
-                  class="upload-file position-relative border border-info mx-auto"
-                  style="width: 100%; height: 100%"
+                <button
+                  class="btn btn-success position-absolute top-50 start-50 translate-middle"
                 >
-                  <button
-                    class="btn btn-success position-absolute top-50 start-50 translate-middle"
-                  >
-                    <i class="fa-solid fa-file-arrow-up"></i>
-                    <input
-                      type="file"
-                      id="inputFilePasoProceso"
-                      class="d-none"
-                    />
-                  </button>
-                </div>
-
-                <br />
+                  <i class="fa-solid fa-file-arrow-up"></i>
+                  <input type="file" id="inputFilePasoProceso" class="d-none" />
+                </button>
               </div>
 
-              <%}%>
-              <!-- </div> -->
+              <br />
             </div>
-            <div class="d-none" id="descargarArchivoSubido">
-              <h4>Descarga archivo subido</h4>
-              <!--Se activa cuando hay un archivo subido en este paso del proceso-->
-              <button class="btn btn-info">
-                <i class="fa-solid fa-file-arrow-down"></i>
-              </button>
-            </div>
-          
+
+            <%}%>
+            <!-- </div> -->
+          </div>
+          <div class="d-none" id="descargarArchivoSubido">
+            <h4>Descarga archivo subido</h4>
+            <!--Se activa cuando hay un archivo subido en este paso del proceso-->
+            <button class="btn btn-info">
+              <i class="fa-solid fa-file-arrow-down"></i>
+            </button>
+          </div>
         </div>
-        
       </div>
     </div>
     <script type="module" src="/javascripts/ProcesoAdopcion.js"></script>
