@@ -46,6 +46,10 @@
       --info-paso-bg-color: #d7e2e9;
       --info-paso-text-color: #415a80;
     }
+    .pasoInfoContainer {
+      height: 50%;
+      width: 50%;
+    }
     li {
       list-style-type: none;
     }
@@ -72,18 +76,19 @@
     .progress-bar {
       height: 30%;
       /* cambiar a 30% esto */
-      max-width: 70%;
-      min-width: 70%;
-      overflow-x: scroll;
+      max-width: 80%;
+      min-width: 20%;
       margin: 0 auto;
     }
 
-    .progress-bar::-webkit-scrollbar {
+    .progress-bar ul::-webkit-scrollbar,
+    .infoPasoProceso .card-body::-webkit-scrollbar {
       width: 14px;
       /* margin-right: 1px; */
     }
 
-    .progress-bar::-webkit-scrollbar-thumb {
+    .progress-bar ul::-webkit-scrollbar-thumb,
+    .infoPasoProceso .card-body::-webkit-scrollbar-thumb {
       border: 4px solid rgba(0, 0, 0, 0);
       background-clip: padding-box;
       border-radius: 9999px;
@@ -92,14 +97,16 @@
       background-color: #9a9a9a;
     }
 
-    .progress-bar::-webkit-scrollbar-track-piece:end {
+    .progress-bar ul::-webkit-scrollbar-track-piece:end,
+    .infoPasoProceso .card-body::-webkit-scrollbar-track-piece:end {
       background: transparent;
-      margin-bottom: 1em;
+      /* margin-bottom: 1em; */
     }
 
-    .progress-bar::-webkit-scrollbar-track-piece:start {
+    .progress-bar ul::-webkit-scrollbar-track-piece:start,
+    .infoPasoProceso .card-body::-webkit-scrollbar-track-piece:start {
       background: transparent;
-      margin-top: 1em;
+      /* margin-top: 1em; */
     }
 
     .active-paso-progressbar {
@@ -116,6 +123,24 @@
       color: var(--pending-text-color-paso-progressbar);
     }
 
+    .infoPasoProceso .card-header {
+      background-color: var(--info-paso-bg-color);
+      color: var(--info-paso-text-color);
+    }
+
+    .infoPasoProceso {
+      width: 100%;
+      /* height: 100%; */
+      margin: 0 auto;
+    }
+    .uploadFileBox {
+      width: 100%;
+      height: 50%;
+    }
+    .progress-bar ul {
+      overflow-x: scroll;
+    }
+
     @media (max-width: 374px) {
       .progress-bar-dot {
         max-width: 30%;
@@ -123,15 +148,14 @@
         padding-bottom: 30%;
       }
       .progress-bar-line {
-        max-width: 8vh;
-        min-width: 8vh;
+        max-width: 4vh;
+        min-width: 4vh;
         height: 2%;
       }
+      .pasoInfoContainer {
+      height: 75%;
+      width: 75%;
     }
-
-    .infoPasoProceso .card-header {
-      background-color: var(--info-paso-bg-color);
-      color: var(--info-paso-text-color);
     }
 
     @media (min-width: 375px) and (max-width: 600px) {
@@ -156,7 +180,7 @@
       }
     }
   </style>
-  <body style="height: 100vh">
+  <body style="min-height: 100vh; max-height: 100vh">
     <div class="d-none templateElmentsPasosProgressBar">
       <li
         class="rounded-circle d-flex align-items-center position-relative progress-bar-dot pending-paso-progressbar"
@@ -182,18 +206,14 @@
         >
       </li>
     </div>
-    <div class="mainContainer h-100 w-100">
-      <div class="progress-bar">
-        <ul
-          class="d-flex align-items-center px-0"
-          style="max-width: 100%; height: 100%"
-        >
-          <li class="p-4"></li>
-
-          <li class="p-4"></li>
-        </ul>
+    <div
+      class="mainContainer"
+      style="height: 100vh !important; max-height: 100vh !important"
+    >
+      <div class="progress-bar mx-auto">
+        <ul class="d-flex align-items-center justify-content-start px-0"></ul>
       </div>
-      <div class="w-50 mx-auto">
+      <div class="mx-auto pasoInfoContainer">
         <div class="d-flex justify-content-end controlesPasoProceso mb-3">
           <!--Solo para paso activo-->
           <button class="btn btn-info me-3">
@@ -202,10 +222,9 @@
           <button class="btn btn-info">
             <i class="fa-regular fa-comments"></i>
           </button>
-          <div class="marcarCompletadoPaso"></div>
           <!--Solo para paso activo-->
         </div>
-        <div class="infoPasoProceso card w-100 mx-auto">
+        <div class="infoPasoProceso card" style="max-height: 100%;">
           <div class="card-header d-flex justify-content-between">
             <div>Paso Activo</div>
             <div>
@@ -214,15 +233,15 @@
                   class="form-check-input"
                   type="radio"
                   name="flexRadioDefault"
-                  id="flexRadioDefault1"
+                  id="pasoCompletado"
                 />
-                <label class="form-check-label" for="flexRadioDefault1">
+                <label class="form-check-label" for="pasoCompletado">
                   Completado
                 </label>
               </div>
             </div>
           </div>
-          <div class="card-body">
+          <div class="card-body pb-3" style="overflow-y: scroll">
             <h4 class="tituloPasoProceso card-title">Paso 1</h4>
             <p class="descripcionPasoProceso card-text">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos
@@ -230,8 +249,54 @@
               quam consectetur quae, nulla suscipit unde culpa est! Sapiente,
               mollitia laboriosam.
             </p>
-          </div>
+            <div class="d-none" id="descargarArchivoProtocolo">
+              <!--Se activa cuando el paso tiene un archivo subido -->
+              <h4>Descarga archivo protocolo</h4>
+              <button class="btn btn-info">
+                <i class="fa-solid fa-file-arrow-down"></i>
+              </button>
+            </div>
+            <div class="d-none"style="width: 100%; height: 40vh">
+              <% if(tipo==0) {%>
+              <!--Se activa cuando el usuario es el adoptante para subir un archivo-->
+              <h4>Subir archivo</h4>
+              <div
+                class="uploadFileBox mb-3 mx-auto"
+                style="width: 75%; height: 75%"
+                id="subirArchivo"
+              >
+                <div
+                  class="upload-file position-relative border border-info mx-auto"
+                  style="width: 100%; height: 100%"
+                >
+                  <button
+                    class="btn btn-success position-absolute top-50 start-50 translate-middle"
+                  >
+                    <i class="fa-solid fa-file-arrow-up"></i>
+                    <input
+                      type="file"
+                      id="inputFilePasoProceso"
+                      class="d-none"
+                    />
+                  </button>
+                </div>
+
+                <br />
+              </div>
+
+              <%}%>
+              <!-- </div> -->
+            </div>
+            <div class="d-none" id="descargarArchivoSubido">
+              <h4>Descarga archivo subido</h4>
+              <!--Se activa cuando hay un archivo subido en este paso del proceso-->
+              <button class="btn btn-info">
+                <i class="fa-solid fa-file-arrow-down"></i>
+              </button>
+            </div>
+          
         </div>
+        
       </div>
     </div>
     <script type="module" src="/javascripts/ProcesoAdopcion.js"></script>
