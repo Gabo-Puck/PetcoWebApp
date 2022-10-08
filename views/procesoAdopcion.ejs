@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Proceso adoción</title>
     <script
+      src="https://cdn.socket.io/4.5.0/socket.io.min.js"
+      integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k"
+      crossorigin="anonymous"
+    ></script>
+    <script
       src="https://kit.fontawesome.com/f0156fc078.js"
       crossorigin="anonymous"
     ></script>
@@ -33,6 +38,7 @@
 
     <script>
       const PasosProceso = <%-JSON.stringify(PasosProceso)%>;
+      const Usuario = <%-JSON.stringify(Usuario)%>;
     </script>
   </head>
   <style>
@@ -59,7 +65,7 @@
       transition: none !important;
     }
 
-    .fotoPerfilSolicitud {
+    .fotoMensajeUsuarioChat {
       /* background-image: url("https://m.media-amazon.com/images/I/71ZcXHsUk1L.__AC_SX300_SY300_QL70_FMwebp_.jpg"); */
       /* background-size: 100% 100%; */
       width: 90%;
@@ -70,7 +76,7 @@
       overflow: hidden;
       background-color: blue;
     }
-    .fotoPerfilSolicitud img {
+    .fotoMensajeUsuarioChat img {
       position: absolute;
       padding: 0;
       width: 100%;
@@ -115,13 +121,13 @@
     }
 
     .progress-bar ul::-webkit-scrollbar,
-    .infoPasoProceso .card-body::-webkit-scrollbar {
+    .infoPasoProceso .card-body::-webkit-scrollbar,.messagesChatProceso::-webkit-scrollbar {
       width: 14px;
       /* margin-right: 1px; */
     }
 
     .progress-bar ul::-webkit-scrollbar-thumb,
-    .infoPasoProceso .card-body::-webkit-scrollbar-thumb {
+    .infoPasoProceso .card-body::-webkit-scrollbar-thumb,.messagesChatProceso::-webkit-scrollbar-thumb {
       border: 4px solid rgba(0, 0, 0, 0);
       background-clip: padding-box;
       border-radius: 9999px;
@@ -131,15 +137,25 @@
     }
 
     .progress-bar ul::-webkit-scrollbar-track-piece:end,
-    .infoPasoProceso .card-body::-webkit-scrollbar-track-piece:end {
+    .infoPasoProceso .card-body::-webkit-scrollbar-track-piece:end,.messagesChatProceso::-webkit-scrollbar-track-piece:end {
       background: transparent;
       /* margin-bottom: 1em; */
     }
 
     .progress-bar ul::-webkit-scrollbar-track-piece:start,
-    .infoPasoProceso .card-body::-webkit-scrollbar-track-piece:start {
+    .infoPasoProceso .card-body::-webkit-scrollbar-track-piece:start,.messagesChatProceso::-webkit-scrollbar-track-piece:start {
       background: transparent;
       /* margin-top: 1em; */
+    }
+
+    .messagesChatProceso::-webkit-scrollbar-track-piece:end {
+      background: transparent;
+      margin-bottom: 1em;
+    }
+
+    .messagesChatProceso::-webkit-scrollbar-track-piece:start {
+      background: transparent;
+      margin-top: 1em;
     }
 
     .active-paso-progressbar {
@@ -178,26 +194,37 @@
       background-color: #d7fdff;
     }
 
-    
-
     .inputMessageChatProceso{
       background-color: white !important;
     }
+
     .messagesChatProceso{
       border-radius: 30px;
         overflow-y: scroll;
+        overflow-x: hidden;
       background-color: white;
-      min-height: 85%;
-      max-height: 85%;
+      min-height: 87%;
+      max-height: 87%;
 
 
     }
 
     .you, .someone{
-      width: 90%;
-      margin: 0 auto;
+      width: 100%;
+      max-width: 99%;
+      margin: 0;
+      box-sizing: content-box;
     }
 
+    div{
+      margin:0 !important;
+    }
+.messagesChatProceso {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
     @media (min-width: 320px) and (max-width:800px){
       
       .pasoInfoContainer {
@@ -228,7 +255,60 @@
       }
     }
   </style>
+  <script>
+    const MascotaID = <%=MascotaID%>;
+  </script>
   <body style="min-height: 100vh; max-height: 100vh">
+    <div class="d-none templateElementsMensajes" >
+<div class="you mb-2 mx-1">
+                <div class="row flex-nowrap">
+                  <!-- Foto -->
+                  <div class="col-3 col-sm-2 col-md-1 pe-0">
+                    <div class="row fotoMensajeUsuarioChat mx-auto">
+                      <img
+                        src="https://yt3.ggpht.com/ytc/AMLnZu9cgXf9IDqf7I1NTL0-IJ1xA7fZphgi0cuemiljig=s900-c-k-c0x00ffffff-no-rj"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-9 col-sm-10 ps-0 col-md-11">
+                    <div class="row nombreChatProceso">
+                      <p class="font-weight-bold fs-5"></p>
+                    </div>
+                    <div class="row contenidoChatProceso w-100">
+                      
+                    </div>
+                    <!-- Nombre y mensaje -->
+                  </div>
+                </div>
+              </div>
+              <div class="someone mb-2 me-0">
+                <div class="row flex-nowrap flex-row-reverse">
+                  <!-- Foto -->
+                  <div class="col-3 col-sm-2 col-md-1 pe-0">
+                    <div class="row fotoMensajeUsuarioChat mx-auto flex-flow-reverse">
+                      <img
+                        src="https://yt3.ggpht.com/ytc/AMLnZu9cgXf9IDqf7I1NTL0-IJ1xA7fZphgi0cuemiljig=s900-c-k-c0x00ffffff-no-rj"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-9 col-sm-10 col-md-11 pe-2">
+                    <div class="row nombreChatProceso flex-flow-reverse">
+                    <p class="text-end text-break font-weight-bold fs-5"></p>
+                  </div>
+                  <div class="row contenidoChatProceso w-100 flex-flow-reverse ms-0">
+                    
+                  </div>
+                  <!-- Nombre y mensaje -->
+                </div>
+              </div>
+          </div>
+          <p class="text-end text-break pe-0 mb-0 someoneMessage" style="">
+                      
+          </p>
+          <p class="text-break youMessage mb-0" style="display: inline-flex">
+          </p>
+    </div>
+
     <div class="d-none templateElmentsPasosProgressBar">
       <li
         class="rounded-circle d-flex align-items-center position-relative progress-bar-dot pending-paso-progressbar"
@@ -281,93 +361,28 @@
             aria-label="Close"
           ></button>
         </div>
-        <div class="offcanvas-body w-100" style="overflow-x: visible">
-          <div class="messagesChatProceso w-100 mb-2">
-              <div class="you">
-                <div class="row flex-nowrap">
-                  <!-- Foto -->
-                  <div class="col-3 col-sm-2 col-md-1 pe-0">
-                    <div class="row fotoPerfilSolicitud mx-auto">
-                      <img
-                        src="https://yt3.ggpht.com/ytc/AMLnZu9cgXf9IDqf7I1NTL0-IJ1xA7fZphgi0cuemiljig=s900-c-k-c0x00ffffff-no-rj"
-                      />
-                    </div>
-                  </div>
-                  <div class="col-9 col-sm-10 ps-0 col-md-11">
-                    <div class="row nombreChatProceso">
-                      <p>Gus Fring</p>
-                    </div>
-                    <div class="row contenidoChatProceso w-100">
-                      <p class="text-break" style="display: inline-flex">
-                        pilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilin
-                      </p>
-                    </div>
-                    <!-- Nombre y mensaje -->
-                  </div>
-                </div>
-              </div>
-              <div class="someone">
-                <div class="row flex-nowrap flex-row-reverse">
-                  <!-- Foto -->
-                  <div class="col-3 col-sm-2 col-md-1 ps-0">
-                    <div class="row fotoPerfilSolicitud mx-auto flex-flow-reverse">
-                      <img
-                        src="https://yt3.ggpht.com/ytc/AMLnZu9cgXf9IDqf7I1NTL0-IJ1xA7fZphgi0cuemiljig=s900-c-k-c0x00ffffff-no-rj"
-                      />
-                    </div>
-                  </div>
-                  <div class="col-9 col-sm-10 col-md-11 pe-2">
-                    <div class="row nombreChatProceso flex-flow-reverse">
-                    <p class="text-end text-break">Gus Fring</p>
-                  </div>
-                  <div class="row contenidoChatProceso w-100 flex-flow-reverse ms-0">
-                    <p class="text-end text-break pe-0" style="">
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
-                    </p>
-                  </div>
-                  <!-- Nombre y mensaje -->
-                </div>
-              </div>
-          </div>
-        </div>
-        <div
-          class="inputMessageChatProceso px-2 py-2 d-flex align-items-center position-absolute bottom-0 start-50 translate-middle-x mb-2"
-          style="border-radius: 50px; background-color: #415a80; width: 100%"
-        >
-          <div class="input-group my-auto">
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Recipient's username"
-              aria-label="Recipient's username"
-              aria-describedby="button-addon2"
-            />
-            <button class="btn-primary" type="button" id="button-addon2">
-              <i class="fa-regular fa-comment"></i>
-            </button>
+        <div class="offcanvas-body w-100">
+          <div class="messagesChatProceso w-100 mb-2 pt-3">
+              
+          <div
+            class="inputMessageChatProceso px-2 py-2 d-flex align-items-center position-absolute bottom-0 start-50 translate-middle-x my-3"
+            style="border-radius: 50px; background-color: #415a80; width: 100%"
+          >
+          <form id="enviarMensajeChatProceso" class="w-100">
+            <div class="input-group my-auto w-100">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="¡Escribe algo!"
+                aria-label="¡Escribe algo!"
+                aria-describedby="button-addon2"
+              />
+              <button class="btn-primary">
+                <i class="fa-regular fa-comment"></i>
+              </button>
+            </div>
+
+          </form>
           </div>
         </div>
       </div>
@@ -460,6 +475,7 @@
         </div>
       </div>
     </div>
+    <script type="module" src="/javascripts/socketUtils.js"></script>
     <script type="module" src="/javascripts/ProcesoAdopcion.js"></script>
   </body>
 </html>

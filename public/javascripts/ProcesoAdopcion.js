@@ -1,5 +1,6 @@
 import { insertAfter } from "/javascripts/FormulariosFunctions.js";
 import { loadingScreen } from "/javascripts/FormulariosFunctions.js";
+import { initSocket } from "/javascripts/socketUtils.js";
 
 const progressBarSteps = document.querySelector(".progress-bar ul");
 const pasoPendiente = document.querySelector(
@@ -15,6 +16,18 @@ const pasoActivo = document.querySelector(
 const progressBarLine = document.querySelector(
   ".templateElmentsPasosProgressBar .progress-bar-line"
 );
+
+const enviarMensajeChatProceso = document.querySelector(
+  "#enviarMensajeChatProceso"
+);
+
+const chatBox = document.querySelector(".messagesChatProceso");
+
+const mensajeYou = document.querySelector(".you");
+const mensajeSomeone = document.querySelector(".someone");
+const mensajeYouTemplate = document.querySelector(".youMessage");
+const mensajeSomeoneTemplate = document.querySelector(".someoneMessage");
+const socket = initSocket();
 
 var archivoProtocolo;
 var archivoPasoSubido;
@@ -53,10 +66,17 @@ window.addEventListener("DOMContentLoaded", () => {
   buttonDescargarArchivoSubido.addEventListener("click", (e) => {
     downloadFile(archivoPasoSubido);
   });
-
-  let buttonUpload = infoPasoProceso.subirArchivo.querySelector("button");
-  addListenerSubirArchivo(buttonUpload);
+  if (infoPasoProceso.subirArchivo !== null) {
+    let buttonUpload = infoPasoProceso.subirArchivo.querySelector("button");
+    addListenerSubirArchivo(buttonUpload);
+  }
+  emitConnectionData();
+  addListenerMandarMensajeButton();
 });
+
+function emitConnectionData() {
+  socket.emit("join-proceso", MascotaID);
+}
 
 function addListenerSubirArchivo(button) {
   let inputImage = button.querySelector("input[type='file']");
@@ -186,14 +206,15 @@ function addListenerToProgressDot(dot) {
       archivoProtocolo = "";
       infoPasoProceso.descargarArchivoProtocolo.classList.add("d-none");
     }
-    if (
-      PasosProceso[idPaso].AceptaArchivo == "1" &&
-      infoPasoProceso.subirArchivo &&
-      pasos[idPaso].classList.contains("active-paso-progressbar")
-    ) {
-      infoPasoProceso.subirArchivo.parentNode.classList.remove("d-none");
-    } else {
-      infoPasoProceso.subirArchivo.parentNode.classList.add("d-none");
+    if (infoPasoProceso.subirArchivo !== null) {
+      if (
+        PasosProceso[idPaso].AceptaArchivo == "1" &&
+        pasos[idPaso].classList.contains("active-paso-progressbar")
+      ) {
+        infoPasoProceso.subirArchivo.parentNode.classList.remove("d-none");
+      } else {
+        infoPasoProceso.subirArchivo.parentNode.classList.add("d-none");
+      }
     }
 
     if (PasosProceso[idPaso].PasoProceso[0].Archivo !== null) {
@@ -222,3 +243,56 @@ function downloadFile(path) {
   newAnchor.click();
   newAnchor.remove();
 }
+
+function addListenerMandarMensajeButton() {
+  enviarMensajeChatProceso.addEventListener("submit", (e) => {
+    e.preventDefault();
+    let input = enviarMensajeChatProceso.querySelector("input");
+    let message = input.value;
+    if (message !== "") {
+      socket.emit("mensaje-chat-proceso", {
+        nombreUsuario: Usuario["Usuario"].Nombre,
+        message: message,
+        userID: socket.userID,
+        foto: Usuario["foto"],
+      });
+    }
+    input.value = "";
+  });
+}
+
+socket.on("mensaje-chat-proceso", ({ nombre, message, userID, foto }) => {
+  let newMessage;
+  let newContentParagraph;
+  let lastChild = chatBox.lastElementChild;
+
+  if (userID == socket.userID) {
+    newContentParagraph = mensajeYouTemplate.cloneNode(true);
+    if (lastChild.classList.contains("you")) {
+      newContentParagraph.textContent = message;
+      lastChild
+        .querySelector(".contenidoChatProceso")
+        .appendChild(newContentParagraph);
+
+      return;
+    }
+    newMessage = mensajeYou.cloneNode(true);
+  } else {
+    newContentParagraph = mensajeSomeoneTemplate.cloneNode(true);
+    if (lastChild.classList.contains("someone")) {
+      newContentParagraph.textContent = message;
+      lastChild
+        .querySelector(".contenidoChatProceso")
+        .appendChild(newContentParagraph);
+      return;
+    }
+    newMessage = mensajeSomeone.cloneNode(true);
+  }
+  newMessage.querySelector(".nombreChatProceso p").textContent = nombre;
+  newContentParagraph.textContent = message;
+  newMessage
+    .querySelector(".contenidoChatProceso")
+    .appendChild(newContentParagraph);
+  newMessage.querySelector(".fotoMensajeUsuarioChat img").src = foto;
+  chatBox.appendChild(newMessage);
+});

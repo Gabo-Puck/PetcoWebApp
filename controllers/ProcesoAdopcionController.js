@@ -1,12 +1,15 @@
 const Mascota = require("../models/Mascota");
 const Pasos_Mascota = require("../models/Pasos_Mascota");
+const Usuario = require("../models/Usuario");
 const { fetchInput, uploadFiles } = require("../utils/multipartRequestHandle");
+const { secureRegistro } = require("../utils/formDatabaseClean");
 
 var acceptedTypes = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   "application/pdf",
 ];
 exports.getProceso = [
+  getUsuario,
   isAdoptante,
   isDuenoMascota,
   (req, res, next) => {
@@ -25,6 +28,8 @@ exports.getProceso = [
           res.render("procesoAdopcion", {
             PasosProceso: PasosProceso[0].MascotasPasos,
             tipo: tipoUSuario,
+            MascotaID: req.params.MascotaID,
+            Usuario: res.usuarioProceso,
           });
         });
     } else {
@@ -33,6 +38,32 @@ exports.getProceso = [
     }
   },
 ];
+
+function getUsuario(req, res, next) {
+  Usuario.query()
+    .withGraphJoined("UsuarioRegistro")
+    .findOne({ "usuario.ID": req.session.IdSession })
+    .then((usuario) => {
+      let resUsuario = {};
+      resUsuario["Usuario"] = secureRegistro(usuario.UsuarioRegistro, [
+        "Contrasena",
+        "Correo",
+        "Documento_Identidad",
+        "Telefono",
+        "Municipio",
+        "Tipo_Usuario",
+        "ID",
+      ]);
+      resUsuario["foto"] = usuario.Foto_Perfil;
+      res.usuarioProceso = resUsuario;
+      next();
+    })
+    .catch((err) => {
+      console.log(err);
+      console.log("Algo ha salido mal");
+      next(err);
+    });
+}
 
 exports.uploadFile = [
   fetchInput(acceptedTypes, "./public/archivosPasos"),

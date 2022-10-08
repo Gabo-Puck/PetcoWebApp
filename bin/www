@@ -90,6 +90,31 @@ io.on("connection", (socket) => {
     });
   });
 
+  socket.on("join-proceso", (mascotaID) => {
+    console.log("An user has joined the proceso room");
+    socket.join(mascotaID);
+    socket.on(
+      "mensaje-chat-proceso",
+      ({ nombreUsuario, message, userID, foto }) => {
+        console.log(nombreUsuario);
+        console.log(userID);
+        console.log(socket.userID);
+        let indentifier = "";
+        if (userID == socket.userID) {
+          indentifier = "you";
+        } else indentifier = "someone";
+        console.log(indentifier);
+
+        io.to(mascotaID).emit("mensaje-chat-proceso", {
+          nombre: nombreUsuario,
+          message: message,
+          userID: userID,
+          foto: foto,
+        });
+      }
+    );
+  });
+
   socket.join(socket.userID); //Metemos al socket a la room del usuario
   //Esto lo hacemos con el fin de considerar la posibilidad de que el usuario abra diferentes pestañas en el mismo navegador
   //Entonces cada vez que entre un usuario con la misma sessionID, metemos a la misma room todos sus sockets
@@ -117,17 +142,15 @@ io.on("connection", (socket) => {
       });
   });
 
-
   //Comentarios // Se establece el contexto de los comentarios dentro de la publicacion
-  socket.on('publicacion', (id) => {
+  socket.on("publicacion", (id) => {
     console.log(id);
-    socket.join('publicacion' + id)
-
-  })
+    socket.join("publicacion" + id);
+  });
 
   //Evento para comentarios
-  socket.on('comentario', ({ msg, id, nombre, imagen, fecha }) => {
-    console.log('Comentario: ' + msg)
+  socket.on("comentario", ({ msg, id, nombre, imagen, fecha }) => {
+    console.log("Comentario: " + msg);
     console.log("El usuario del comentario es " + socket.userID);
     console.log(fecha);
     //Se procesan los datos correspondientes
@@ -139,38 +162,52 @@ io.on("connection", (socket) => {
         Texto: msg,
         Fecha_Envio: fecha,
         ID_Usuario: socket.userID,
-      }).then((resultado) => {
-        console.log(resultado.ID)
-        //Se emite el comentario por parte del cliente dentro del contexto de la publicacion
-        io.to('publicacion' + id).emit('comentario', { msg: msg, nombre: nombre, imagen: imagen, fecha: fecha, idcomentario: resultado.ID })
       })
-  })
+      .then((resultado) => {
+        console.log(resultado.ID);
+        //Se emite el comentario por parte del cliente dentro del contexto de la publicacion
+        io.to("publicacion" + id).emit("comentario", {
+          msg: msg,
+          nombre: nombre,
+          imagen: imagen,
+          fecha: fecha,
+          idcomentario: resultado.ID,
+        });
+      });
+  });
 
-  socket.on('respuesta', ({ msg, idP, idcomentario, nombre, imagen, fecha}) => {
-    console.log(msg);
-    console.log(idP);
-    console.log(idcomentario);
-    console.log(nombre);
-    console.log(imagen);
-    console.log(fecha);
+  socket.on(
+    "respuesta",
+    ({ msg, idP, idcomentario, nombre, imagen, fecha }) => {
+      console.log(msg);
+      console.log(idP);
+      console.log(idcomentario);
+      console.log(nombre);
+      console.log(imagen);
+      console.log(fecha);
 
-    Comentario.query()
-    .insertAndFetch({
-      ID_Publicacion: idP,
-      Comentario_Padre: idcomentario,
-      Texto: msg,
-      Fecha_Envio: fecha,
-      ID_Usuario: socket.userID,
-    }).then((resultado) => {
-      console.log(resultado.ID)
-      //Se emite el comentario por parte del cliente dentro del contexto de la publicacion
-      io.to('publicacion'+ idP ).emit('respuesta', {msg:msg, idP: idP, idcomentario:idcomentario, nombre:nombre, imagen:imagen, fecha:fecha})
-    })
-
-  })
-
-
-
+      Comentario.query()
+        .insertAndFetch({
+          ID_Publicacion: idP,
+          Comentario_Padre: idcomentario,
+          Texto: msg,
+          Fecha_Envio: fecha,
+          ID_Usuario: socket.userID,
+        })
+        .then((resultado) => {
+          console.log(resultado.ID);
+          //Se emite el comentario por parte del cliente dentro del contexto de la publicacion
+          io.to("publicacion" + idP).emit("respuesta", {
+            msg: msg,
+            idP: idP,
+            idcomentario: idcomentario,
+            nombre: nombre,
+            imagen: imagen,
+            fecha: fecha,
+          });
+        });
+    }
+  );
 });
 
 /**
