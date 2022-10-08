@@ -174,6 +174,30 @@
       overflow-x: scroll;
     }
 
+    .chatBoxProceso{
+      background-color: #d7fdff;
+    }
+
+    
+
+    .inputMessageChatProceso{
+      background-color: white !important;
+    }
+    .messagesChatProceso{
+      border-radius: 30px;
+        overflow-y: scroll;
+      background-color: white;
+      min-height: 85%;
+      max-height: 85%;
+
+
+    }
+
+    .you, .someone{
+      width: 90%;
+      margin: 0 auto;
+    }
+
     @media (max-width: 320px) {
       .progress-bar-dot {
         max-width: 30%;
@@ -248,7 +272,7 @@
       "
     >
       <div
-        class="offcanvas offcanvas-start"
+        class="offcanvas offcanvas-start chatBoxProceso"
         data-bs-scroll="true"
         tabindex="-1"
         id="offcanvasWithBothOptions"
@@ -267,56 +291,79 @@
           ></button>
         </div>
         <div class="offcanvas-body w-100" style="overflow-x: visible">
-          <div class="messsagesChatProceso w-100">
-            <div class="you w-100">
-              <div class="row flex-nowrap">
-                <!-- Foto -->
-                <div class="col-3 col-md-1 pe-0">
-                  <div class="row fotoPerfilSolicitud mx-auto">
-                    <img
-                      src="https://yt3.ggpht.com/ytc/AMLnZu9cgXf9IDqf7I1NTL0-IJ1xA7fZphgi0cuemiljig=s900-c-k-c0x00ffffff-no-rj"
-                    />
+          <div class="messagesChatProceso w-100 mb-2">
+              <div class="you">
+                <div class="row flex-nowrap">
+                  <!-- Foto -->
+                  <div class="col-3 col-md-1 pe-0">
+                    <div class="row fotoPerfilSolicitud mx-auto">
+                      <img
+                        src="https://yt3.ggpht.com/ytc/AMLnZu9cgXf9IDqf7I1NTL0-IJ1xA7fZphgi0cuemiljig=s900-c-k-c0x00ffffff-no-rj"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-9 col-md-11 ps-0">
+                    <div class="row nombreChatProceso">
+                      <p>Gus Fring</p>
+                    </div>
+                    <div class="row contenidoChatProceso w-100">
+                      <p class="text-break" style="display: inline-flex">
+                        pilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilin
+                      </p>
+                    </div>
+                    <!-- Nombre y mensaje -->
                   </div>
                 </div>
-                <div class="col-9 col-md-11 ps-0">
-                  <div class="row nombreChatProceso">
-                    <p>Gus Fring</p>
+              </div>
+              <div class="someone">
+                <div class="row flex-nowrap flex-row-reverse">
+                  <!-- Foto -->
+                  <div class="col-3 col-md-1 ps-0">
+                    <div class="row fotoPerfilSolicitud mx-auto flex-flow-reverse">
+                      <img
+                        src="https://yt3.ggpht.com/ytc/AMLnZu9cgXf9IDqf7I1NTL0-IJ1xA7fZphgi0cuemiljig=s900-c-k-c0x00ffffff-no-rj"
+                      />
+                    </div>
                   </div>
-                  <div class="row contenidoChatProceso w-100">
-                    <p class="text-break" style="display: inline-flex">
-                      pilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilinpilin
+                  <div class="col-9 col-md-11 pe-2">
+                    <div class="row nombreChatProceso flex-flow-reverse">
+                    <p class="text-end text-break">Gus Fring</p>
+                  </div>
+                  <div class="row contenidoChatProceso w-100 flex-flow-reverse ms-0">
+                    <p class="text-end text-break pe-0" style="">
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
                     </p>
                   </div>
                   <!-- Nombre y mensaje -->
                 </div>
               </div>
-            </div>
-            <div class="someone w-100">
-              <div class="row flex-nowrap flex-row-reverse">
-                <!-- Foto -->
-                <div class="col-3 col-md-1 ps-0">
-                  <div class="row fotoPerfilSolicitud mx-auto flex-flow-reverse">
-                    <img
-                      src="https://yt3.ggpht.com/ytc/AMLnZu9cgXf9IDqf7I1NTL0-IJ1xA7fZphgi0cuemiljig=s900-c-k-c0x00ffffff-no-rj"
-                    />
-                  </div>
-                </div>
-                <div class="col-9 col-md-11 pe-2">
-                  <div class="row nombreChatProceso flex-flow-reverse">
-                  <p class="text-end text-break">Gus Fring</p>
-                </div>
-                <div class="row contenidoChatProceso w-100 flex-flow-reverse ms-0">
-                  <p class="text-end text-break pe-0" style="">
-                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam veritatis aliquam, nisi maiores atque numquam hic animi explicabo est iusto perferendis impedit ducimus, doloribus nulla odio expedita, aspernatur quam facilis.
-                  </p>
-                </div>
-                <!-- Nombre y mensaje -->
-              </div>
-            </div>
           </div>
         </div>
         <div
-          class="inputMessageChatProceso px-2 py-2 d-flex align-items-center"
+          class="inputMessageChatProceso px-2 py-2 d-flex align-items-center position-absolute bottom-0 start-50 translate-middle-x mb-2"
           style="border-radius: 50px; background-color: #415a80; width: 100%"
         >
           <div class="input-group my-auto">
