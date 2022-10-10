@@ -11,6 +11,7 @@ var http = require("http");
 var { InMemorySessionStore } = require("../utils/socketUtils/SessionStore");
 var { randomId } = require("../utils/cryptoUtils/randomId");
 const Comentario = require("../models/Comentario");
+const Mensajes = require("../models/Mensajes");
 var sessionStore = new InMemorySessionStore();
 const cors = require("cors");
 /**
@@ -95,22 +96,27 @@ io.on("connection", (socket) => {
     socket.join(mascotaID);
     socket.on(
       "mensaje-chat-proceso",
-      ({ nombreUsuario, message, userID, foto }) => {
-        console.log(nombreUsuario);
-        console.log(userID);
+      ({ message, userID, fecha, SolicitudID }) => {
+        console.log(fecha);
         console.log(socket.userID);
-        let indentifier = "";
-        if (userID == socket.userID) {
-          indentifier = "you";
-        } else indentifier = "someone";
-        console.log(indentifier);
 
-        io.to(mascotaID).emit("mensaje-chat-proceso", {
-          nombre: nombreUsuario,
-          message: message,
-          userID: userID,
-          foto: foto,
-        });
+        Mensajes.query()
+          .insert({
+            Usuario_Remitente: userID,
+            Texto: message,
+            Fecha_Envio: fecha,
+            ID_Solicitud: SolicitudID,
+          })
+          .then(() => {
+            io.to(mascotaID).emit("mensaje-chat-proceso", {
+              message: message,
+              userID: userID,
+              fecha: fecha,
+            });
+          })
+          .catch((err) => {
+            console.log("Error al guardar mensaje: " + err);
+          });
       }
     );
   });

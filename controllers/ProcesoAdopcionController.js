@@ -3,6 +3,7 @@ const Pasos_Mascota = require("../models/Pasos_Mascota");
 const Usuario = require("../models/Usuario");
 const { fetchInput, uploadFiles } = require("../utils/multipartRequestHandle");
 const { secureRegistro } = require("../utils/formDatabaseClean");
+const Mensajes = require("../models/Mensajes");
 
 var acceptedTypes = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -12,6 +13,7 @@ exports.getProceso = [
   getUsuario,
   isAdoptante,
   isDuenoMascota,
+  getMensajes,
   (req, res, next) => {
     if (res.isAdoptante || res.isDuenoMascota) {
       console.log("Si es valido para entrar");
@@ -30,6 +32,9 @@ exports.getProceso = [
             tipo: tipoUSuario,
             MascotaID: req.params.MascotaID,
             Usuario: res.usuarioProceso,
+            UsuarioPeer: res.PeerProceso,
+            SolicitudID: res.SolicitudID,
+            Mensajes: res.MensajesSolicitud,
           });
         });
     } else {
@@ -38,6 +43,33 @@ exports.getProceso = [
     }
   },
 ];
+
+function getMensajes(req, res, next) {
+  try {
+    if (req.params.MascotaID) {
+      MascotaID = req.params.MascotaID;
+    } else if (req.body.MascotaID) {
+      MascotaID = req.body.MascotaID;
+    }
+  } catch (err) {
+    next(err);
+  }
+  if (res.isAdoptante || res.isDuenoMascota) {
+    Mascota.query()
+      .withGraphJoined("MascotasSolicitudes.[MensajesSolicitud]")
+      .where("mascota.ID", "=", MascotaID)
+      .then((MascotaMensajes) => {
+        console.log("Estamos en mascota mensajes");
+        res.MensajesSolicitud =
+          MascotaMensajes[0].MascotasSolicitudes[0].MensajesSolicitud;
+
+        next();
+      })
+      .catch((err) => next(err));
+  } else {
+    next();
+  }
+}
 
 function getUsuario(req, res, next) {
   Usuario.query()
@@ -107,11 +139,15 @@ function isAdoptante(req, res, next) {
   } catch (err) {
     next(err);
   }
+
   Mascota.query()
-    .withGraphJoined("MascotasSolicitudes")
+    .withGraphJoined(
+      "[MascotasSolicitudes,MascotasPublicacion.[PublicacionUsuario.UsuarioRegistro]]",
+      { minimize: true }
+    )
     .where("mascota.ID", "=", MascotaID)
-    .andWhere("MascotasSolicitudes.ID_Usuario", "=", req.session.IdSession)
-    .andWhere("MascotasSolicitudes.Estado", "=", 1)
+    .andWhere("_t0.ID_Usuario", "=", req.session.IdSession)
+    .andWhere("_t0.Estado", "=", 1)
     // .debug()
     .then((usuarioSolicitud) => {
       console.log(usuarioSolicitud);
@@ -119,7 +155,17 @@ function isAdoptante(req, res, next) {
         //hacer algo cuando el usuario encontrado es el adoptante
         // res.render("procesoAdopcion")
         // console.log(usuarioSolicitud);
-        console.log("Si es adoptante");
+        // console.log("Si es adoptante");
+        // console.log(usuarioSolicitud);
+        // console.log(usuarioSolicitud[0].MascotasSolicitudes[0]);
+        res.SolicitudID = usuarioSolicitud[0].MascotasSolicitudes[0].ID;
+        let UsuarioQuery =
+          usuarioSolicitud[0].MascotasPublicacion.PublicacionUsuario;
+        res.PeerProceso = {
+          Nombre: UsuarioQuery.UsuarioRegistro.Nombre,
+          Foto_Perfil: UsuarioQuery.Foto_Perfil,
+        };
+        console.log(res.PeerProceso);
         res.isAdoptante = true;
       } else {
         console.log("No es adoptante");
@@ -134,16 +180,28 @@ function isDuenoMascota(req, res, next) {
   console.log("Estamos en dueno");
   if (!res.isAdoptante) {
     Mascota.query()
-      .withGraphJoined("[MascotasSolicitudes,MascotasPublicacion]")
+      .withGraphJoined(
+        "[MascotasPublicacion,MascotasSolicitudes.[Usuario.[UsuarioRegistro]]]",
+        { minimize: true }
+      )
       .where("mascota.ID", "=", req.params.MascotaID)
-      .andWhere("MascotasPublicacion.ID_Usuario", "=", req.session.IdSession)
-      .andWhere("MascotasSolicitudes.Estado", "=", 1)
+      .andWhere("_t0.ID_Usuario", "=", req.session.IdSession)
+      .andWhere("_t1.Estado", "=", 1)
       .then((usuarioDueno) => {
         console.log(usuarioDueno);
         if (usuarioDueno.length == 1) {
           //hacer algo cuando el usuario encontrado es el adoptante
           console.log("Si es dueno");
-
+          // console.log(usuarioDueno);
+          // console.log(usuarioDueno[0].MascotasSolicitudes[0]);
+          // console.log(usuarioDueno[0].MascotasSolicitudes[0]);
+          let UsuarioQuery = usuarioDueno[0].MascotasSolicitudes[0].Usuario;
+          res.SolicitudID = usuarioDueno[0].MascotasSolicitudes[0].ID;
+          res.PeerProceso = {
+            Nombre: UsuarioQuery.UsuarioRegistro.Nombre,
+            Foto_Perfil: UsuarioQuery.Foto_Perfil,
+          };
+          console.log(res.ProcesoPeer);
           res.isDuenoMascota = true;
         } else {
           console.log("No es dueno");

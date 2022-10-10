@@ -27,7 +27,7 @@ const mensajeYou = document.querySelector(".you");
 const mensajeSomeone = document.querySelector(".someone");
 const mensajeYouTemplate = document.querySelector(".youMessage");
 const mensajeSomeoneTemplate = document.querySelector(".someoneMessage");
-const socket = initSocket();
+let socket = initSocket();
 
 var archivoProtocolo;
 var archivoPasoSubido;
@@ -73,6 +73,19 @@ window.addEventListener("DOMContentLoaded", () => {
   emitConnectionData();
   addListenerMandarMensajeButton();
 });
+
+insertPreviousMessages();
+
+function insertPreviousMessages() {
+  Mensajes.forEach((mensaje) => {
+    insertNewMensaje(
+      mensaje.Texto,
+      mensaje.Usuario_Remitente,
+      mensaje.Fecha_Envio,
+      socket
+    );
+  });
+}
 
 function emitConnectionData() {
   socket.emit("join-proceso", MascotaID);
@@ -249,50 +262,51 @@ function addListenerMandarMensajeButton() {
     e.preventDefault();
     let input = enviarMensajeChatProceso.querySelector("input");
     let message = input.value;
+    let today = new Date();
+    let date =
+      today.getFullYear() +
+      "-" +
+      (today.getMonth() + 1) +
+      "-" +
+      today.getDate();
+    let time =
+      today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    let dateTime = date + " " + time;
     if (message !== "") {
       socket.emit("mensaje-chat-proceso", {
-        nombreUsuario: Usuario["Usuario"].Nombre,
         message: message,
         userID: socket.userID,
-        foto: Usuario["foto"],
+        fecha: dateTime,
+        SolicitudID: SolicitudID,
       });
     }
     input.value = "";
   });
 }
 
-socket.on("mensaje-chat-proceso", ({ nombre, message, userID, foto }) => {
+socket.on("mensaje-chat-proceso", ({ message, userID, fecha }) => {
+  insertNewMensaje(message, userID, fecha, socket);
+});
+
+function insertNewMensaje(message, userID, fecha, socket) {
   let newMessage;
   let newContentParagraph;
   let lastChild = chatBox.lastElementChild;
 
   if (userID == socket.userID) {
     newContentParagraph = mensajeYouTemplate.cloneNode(true);
-    if (lastChild.classList.contains("you")) {
-      newContentParagraph.textContent = message;
-      lastChild
-        .querySelector(".contenidoChatProceso")
-        .appendChild(newContentParagraph);
-
-      return;
-    }
     newMessage = mensajeYou.cloneNode(true);
   } else {
     newContentParagraph = mensajeSomeoneTemplate.cloneNode(true);
-    if (lastChild.classList.contains("someone")) {
-      newContentParagraph.textContent = message;
-      lastChild
-        .querySelector(".contenidoChatProceso")
-        .appendChild(newContentParagraph);
-      return;
-    }
     newMessage = mensajeSomeone.cloneNode(true);
   }
-  newMessage.querySelector(".nombreChatProceso p").textContent = nombre;
-  newContentParagraph.textContent = message;
+  // newMessage.querySelector(".nombreChatProceso p").textContent = nombre;
+  newContentParagraph.querySelector("p").textContent = message;
   newMessage
     .querySelector(".contenidoChatProceso")
     .appendChild(newContentParagraph);
-  newMessage.querySelector(".fotoMensajeUsuarioChat img").src = foto;
+  // newMessage.querySelector(".fotoMensajeUsuarioChat img").src = foto;
+  newContentParagraph.querySelector(".contenidoMensaje").textContent = message;
+  newContentParagraph.querySelector(".fecha").textContent = fecha;
   chatBox.appendChild(newMessage);
-});
+}

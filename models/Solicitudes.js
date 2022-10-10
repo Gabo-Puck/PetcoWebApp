@@ -12,6 +12,7 @@ class Solicitudes extends BaseModel {
     const Respuestas = require("./Respuestas");
     const Usuario = require("./Usuario");
     const Mascota = require("./Mascota");
+    const Mensajes = require("./Mensajes");
     return {
       RespuestasFormulario: {
         relation: Model.HasManyRelation,
@@ -35,6 +36,14 @@ class Solicitudes extends BaseModel {
         join: {
           from: "solicitudes.ID_Mascota",
           to: "mascota.ID",
+        },
+      },
+      MensajesSolicitud: {
+        relation: Model.HasManyRelation,
+        modelClass: Mensajes,
+        join: {
+          from: "solicitudes.ID",
+          to: "mensajes.ID_Solicitud",
         },
       },
     };

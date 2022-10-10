@@ -35,10 +35,12 @@
     />
     <!-- Sweetalert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="module" src="/javascripts/socketUtils.js"></script>
 
     <script>
       const PasosProceso = <%-JSON.stringify(PasosProceso)%>;
       const Usuario = <%-JSON.stringify(Usuario)%>;
+      const UsuarioPeer = <%-JSON.stringify(UsuarioPeer)%>;
     </script>
   </head>
   <style>
@@ -68,10 +70,10 @@
     .fotoMensajeUsuarioChat {
       /* background-image: url("https://m.media-amazon.com/images/I/71ZcXHsUk1L.__AC_SX300_SY300_QL70_FMwebp_.jpg"); */
       /* background-size: 100% 100%; */
-      width: 90%;
+      width: 10vh;
       text-align: center;
       position: relative;
-      padding-bottom:90%;
+      padding-bottom:10vh;
       border-radius: 50%;
       overflow: hidden;
       background-color: blue;
@@ -216,6 +218,15 @@
       box-sizing: content-box;
     }
 
+    .containerMessageContenidoProceso{
+      background-color: var(--pending-bg-color-paso-progressbar);
+    }
+
+    .fecha{
+      color:#9a9a9a;
+
+    }
+
     div{
       margin:0 !important;
     }
@@ -257,57 +268,58 @@
   </style>
   <script>
     const MascotaID = <%=MascotaID%>;
+    const SolicitudID = <%=SolicitudID%>;
+    const Mensajes = <%-JSON.stringify(Mensajes)%>;
   </script>
   <body style="min-height: 100vh; max-height: 100vh">
     <div class="d-none templateElementsMensajes" >
-<div class="you mb-2 mx-1">
-                <div class="row flex-nowrap">
-                  <!-- Foto -->
-                  <div class="col-3 col-sm-2 col-md-1 pe-0">
-                    <div class="row fotoMensajeUsuarioChat mx-auto">
-                      <img
-                        src="https://yt3.ggpht.com/ytc/AMLnZu9cgXf9IDqf7I1NTL0-IJ1xA7fZphgi0cuemiljig=s900-c-k-c0x00ffffff-no-rj"
-                      />
-                    </div>
-                  </div>
-                  <div class="col-9 col-sm-10 ps-0 col-md-11">
-                    <div class="row nombreChatProceso">
-                      <p class="font-weight-bold fs-5"></p>
-                    </div>
-                    <div class="row contenidoChatProceso w-100">
+      <div class="someone mb-2 mx-1">
+        <div class="row flex-nowrap w-100">
+            <div class="row contenidoChatProceso ms-0">
                       
-                    </div>
-                    <!-- Nombre y mensaje -->
-                  </div>
-                </div>
-              </div>
-              <div class="someone mb-2 me-0">
-                <div class="row flex-nowrap flex-row-reverse">
-                  <!-- Foto -->
-                  <div class="col-3 col-sm-2 col-md-1 pe-0">
-                    <div class="row fotoMensajeUsuarioChat mx-auto flex-flow-reverse">
-                      <img
-                        src="https://yt3.ggpht.com/ytc/AMLnZu9cgXf9IDqf7I1NTL0-IJ1xA7fZphgi0cuemiljig=s900-c-k-c0x00ffffff-no-rj"
-                      />
-                    </div>
-                  </div>
-                  <div class="col-9 col-sm-10 col-md-11 pe-2">
-                    <div class="row nombreChatProceso flex-flow-reverse">
-                    <p class="text-end text-break font-weight-bold fs-5"></p>
-                  </div>
-                  <div class="row contenidoChatProceso w-100 flex-flow-reverse ms-0">
-                    
-                  </div>
-                  <!-- Nombre y mensaje -->
-                </div>
-              </div>
+            </div>
+        </div>
+      </div>
+
+      <div class="you mb-2 me-0">
+        <div class="row flex-nowrap flex-row-reverse w-100">
+          <div class="row contenidoChatProceso justify-content-end flex-flow-reverse ms-0 pe-0">
+                      
+          </div>  
+        </div>
+                  
+      </div>
+      <div class="youMessage d-flex justify-content-end px-0" style="max-width: 90%;">
+        <div class="d-flex rounded-start p-3 pb-0 flex-column containerMessageContenidoProceso">
+          <div cl>
+            <p class="text-end text-break pe-0 mb-0 contenidoMensaje me-2 fs-5" style="flex-grow: 1;">
+            </p>
           </div>
-          <p class="text-end text-break pe-0 mb-0 someoneMessage" style="">
-                      
-          </p>
-          <p class="text-break youMessage mb-0" style="display: inline-flex">
-          </p>
+          <div class="d-flex justify-content-end">
+            <p class=" text-end text-break fecha d-inline fs-6 mb-1">
+            </p>
+          </div>
+        </div>
+
+      </div>
+      <div class="someoneMessage d-flex justify-content-start px-1 rounded" style="max-width: 90%;">
+        <div class="d-flex rounded-end p-3 pb-0 flex-column containerMessageContenidoProceso">
+          <div class="">
+            <p class="text-break mb-0 contenidoMensaje me-2 fs-5" style="">
+            </p>
+          </div>
+          <div class="d-flex justify-content-end">
+            <p class=" d-inline fecha fs-6 mb-1">
+            </p>
+          </div>
+
+        </div>
+          
+          
+
+      </div>
     </div>
+
 
     <div class="d-none templateElmentsPasosProgressBar">
       <li
@@ -351,9 +363,15 @@
         style="max-width: 100%; min-width: 100%"
       >
         <div class="offcanvas-header">
-          <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel">
-            Chat
-          </h5>
+          <div class="d-flex">
+            <div class="fotoMensajeUsuarioChat me-3">
+                        <img src="<%=UsuarioPeer.Foto_Perfil%>"
+                        />
+              </div>
+            <h5 class="offcanvas-title my-auto" id="offcanvasWithBothOptionsLabel">
+              <%=UsuarioPeer.Nombre%>
+            </h5>
+          </div>
           <button
             type="button"
             class="btn-close"
@@ -475,7 +493,6 @@
         </div>
       </div>
     </div>
-    <script type="module" src="/javascripts/socketUtils.js"></script>
     <script type="module" src="/javascripts/ProcesoAdopcion.js"></script>
   </body>
 </html>
