@@ -1,4 +1,4 @@
-export function initSocket() {
+export function initSocket(init) {
   var socket = io({ autoConnect: false });
   var sessionID;
 
@@ -17,6 +17,7 @@ export function initSocket() {
     localStorage.setItem("petcoWebAppIDSession", sessionID);
     //Guardamos la id del usuario para las comunicaciones
     socket.userID = userID;
+    init();
   });
   return socket;
 }

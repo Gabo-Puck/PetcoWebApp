@@ -58,6 +58,8 @@ function getMensajes(req, res, next) {
     Mascota.query()
       .withGraphJoined("MascotasSolicitudes.[MensajesSolicitud]")
       .where("mascota.ID", "=", MascotaID)
+      .orderBy("MascotasSolicitudes:MensajesSolicitud.Fecha_Envio", "asc")
+
       .then((MascotaMensajes) => {
         console.log("Estamos en mascota mensajes");
         res.MensajesSolicitud =

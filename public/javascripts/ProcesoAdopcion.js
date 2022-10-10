@@ -27,7 +27,6 @@ const mensajeYou = document.querySelector(".you");
 const mensajeSomeone = document.querySelector(".someone");
 const mensajeYouTemplate = document.querySelector(".youMessage");
 const mensajeSomeoneTemplate = document.querySelector(".someoneMessage");
-let socket = initSocket();
 
 var archivoProtocolo;
 var archivoPasoSubido;
@@ -73,22 +72,26 @@ window.addEventListener("DOMContentLoaded", () => {
   emitConnectionData();
   addListenerMandarMensajeButton();
 });
+let socket;
 
-insertPreviousMessages();
-
-function insertPreviousMessages() {
+const insertPreviousMessages = () => {
   Mensajes.forEach((mensaje) => {
+    let formattedDate = new Date(mensaje.Fecha_Envio);
+    formattedDate = getFormatedDate(formattedDate);
     insertNewMensaje(
       mensaje.Texto,
       mensaje.Usuario_Remitente,
-      mensaje.Fecha_Envio,
+      formattedDate,
       socket
     );
   });
-}
+};
+socket = initSocket(insertPreviousMessages);
 
 function emitConnectionData() {
+  socket.connect();
   socket.emit("join-proceso", MascotaID);
+  console.log("Emitting connection data...");
 }
 
 function addListenerSubirArchivo(button) {
@@ -263,15 +266,7 @@ function addListenerMandarMensajeButton() {
     let input = enviarMensajeChatProceso.querySelector("input");
     let message = input.value;
     let today = new Date();
-    let date =
-      today.getFullYear() +
-      "-" +
-      (today.getMonth() + 1) +
-      "-" +
-      today.getDate();
-    let time =
-      today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-    let dateTime = date + " " + time;
+    let dateTime = getFormatedDate(today);
     if (message !== "") {
       socket.emit("mensaje-chat-proceso", {
         message: message,
@@ -284,6 +279,23 @@ function addListenerMandarMensajeButton() {
   });
 }
 
+function getFormatedDate(dateToFormat) {
+  let date =
+    dateToFormat.getFullYear() +
+    "-" +
+    (dateToFormat.getMonth() + 1) +
+    "-" +
+    dateToFormat.getDate();
+  let time =
+    dateToFormat.getHours() +
+    ":" +
+    dateToFormat.getMinutes() +
+    ":" +
+    dateToFormat.getSeconds();
+  let dateTime = date + " " + time;
+  return dateTime;
+}
+
 socket.on("mensaje-chat-proceso", ({ message, userID, fecha }) => {
   insertNewMensaje(message, userID, fecha, socket);
 });
@@ -291,7 +303,6 @@ socket.on("mensaje-chat-proceso", ({ message, userID, fecha }) => {
 function insertNewMensaje(message, userID, fecha, socket) {
   let newMessage;
   let newContentParagraph;
-  let lastChild = chatBox.lastElementChild;
 
   if (userID == socket.userID) {
     newContentParagraph = mensajeYouTemplate.cloneNode(true);
@@ -309,4 +320,5 @@ function insertNewMensaje(message, userID, fecha, socket) {
   newContentParagraph.querySelector(".contenidoMensaje").textContent = message;
   newContentParagraph.querySelector(".fecha").textContent = fecha;
   chatBox.appendChild(newMessage);
+  chatBox.scrollTop = chatBox.scrollHeight;
 }
