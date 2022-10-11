@@ -57,7 +57,7 @@
  
     </style>
     <!-- <div style="height: 100vh;"> -->
-
+      
       <div class="card border-info container-fluid my-5" style="width: 85%; margin: auto">
         <h1 class="d-flex justify-content-center mt-5 mb-6 card-title"><%=title%></h1>
         <div class="card-body">
@@ -73,10 +73,27 @@
                   <h3 style="text-align: center;">Tipo de cuenta:</h3>
                 </div>
                 <div class="mb-3 mx-auto form-row tipos">
-                  <div class="col">
+                  <%let displayOrg =""%>
+                  <%let displayCom =""%>
+                    <%let checkedOrg =""%>
+                    <%let checkedCom =""%>
+                    <%if(RegistroPrevio==null){%>
+                      <%checkedOrg = "checked"%>
+                    <%}else{%>
+                      <%if(RegistroPrevio.Tipo_Usuario==2){%>
+                        <%checkedCom = "checked"%>
+                        <%displayOrg = "d-none"%>
+                      <%}%>
+                      <%if(RegistroPrevio.Tipo_Usuario==1){%>
+                        <%checkedOrg = "checked"%>
+                        <%displayCom = "d-none"%>
+                      <%}%>
+                    <%}%>
+                  <div class="col <%=displayOrg%>">
                     <div class="d-flex justify-content-center">
                       <label for="Tipo1">Organizacion</label>
                     </div>
+                    
                     <div>
                       <input
                         id="Tipo1"
@@ -85,14 +102,14 @@
                         type="radio"
                         placeholder=""
                         name="Tipo"
-                        checked
+                        <%=checkedOrg%>
                         value="1"
                         
                       />
 
                     </div>
                   </div>
-                  <div class="col" id="me">
+                  <div class="col <%=displayCom%>" id="me">
                     <div class="d-flex justify-content-center">
                       <label for="Tipo2">Común</label>
                     </div>
@@ -102,7 +119,7 @@
                         class="form-check-input d-block mx-auto"
                         type="radio"
                         style="position: relative;"
-
+                        <%=checkedCom%>
                         placeholder=""
                         name="Tipo"
                         id="Tipo2"
@@ -152,6 +169,7 @@
                 </div>
     
                 <div id="correoForm" class="form-row">
+                  
                   <div class="col">
                     <label for="Correo">Correo</label>
                     <input
@@ -160,7 +178,7 @@
                       type="email"
                       placeholder="miura@gmail.com"
                       name="Correo"
-                      value=""
+                      value="<%= RegistroPrevio!=null ? RegistroPrevio.Correo : ''%>"
                     />
                   </div>
                 </div>
@@ -173,7 +191,7 @@
                       type="tel"
                       placeholder="3323980011"
                       name="Telefono"
-                      value=""
+                      value="<%= RegistroPrevio!=null ? RegistroPrevio.Telefono : ''%>"
                     />
                   </div>
                   <div class="col-md">
@@ -207,9 +225,18 @@
                     <div class="input-group has-validation">
                       <span class="input-group-text">Estado</span>
                       <select class="custom-select" id="Estado">
+                        <%let selectedEstado = ""%>
                         <% if(EstadosMunicipios)%> <%
                         EstadosMunicipios.forEach(estado=>{%>
-                        <option value="<%=estado.ID%>"><%=estado.Nombre%></option>
+                          <%if(RegistroPrevio!=null&&selectedEstado==""){%>
+                            <%if(RegistroPrevio.muni.ID_Estado==estado.ID){%>
+                              <%selectedEstado = "selected"%>
+                            <%}%>
+                          <%}%>
+    
+                          <option value="<%=estado.ID%>" <%=selectedEstado%>><%=estado.Nombre%></option>
+                          <%selectedEstado = ""%>
+
                         <%})%>
                       </select>
                     </div>
@@ -221,11 +248,22 @@
                     <div class="input-group">
                       <span class="input-group-text">Municipio</span>
                       <select class="custom-select" name="Municipio" id="Municipio">
+                        <%let selectedMunicipio = ""%>
+                        <%let estadoID = 0%>
+                        <%if(RegistroPrevio){%>
+                          <%estadoID = RegistroPrevio.muni.ID_Estado-1%>
+                        <%}%>
                         <% if(EstadosMunicipios)%> <%
-                        EstadosMunicipios[0].municipios.forEach(municipio=>{ %>
-                        <option value="<%=municipio.ID%>">
+                        EstadosMunicipios[estadoID].municipios.forEach(municipio=>{ %>
+                          <%if(RegistroPrevio!=null&&selectedMunicipio==""){%>
+                            <%if(RegistroPrevio.Municipio==municipio.ID){%>
+                              <%selectedMunicipio = "selected"%>
+                            <%}%>
+                          <%}%>
+                        <option value="<%=municipio.ID%>" <%=selectedMunicipio%>>
                           <%=municipio.Nombre%>
                         </option>
+                        <%selectedMunicipio = ""%>
                         <%})%>
                       </select>
                     </div>
@@ -246,6 +284,18 @@
               <div id="errorsBox"></div>
               <div id="SegundaParte" class="pt-3" style="display: none">
                 <div class="d-flex justify-content-center mb-1"><h4>Sube tus fotografías</h4></div>
+                <%let imgComFrontal = ""%>
+                <%let imgComTrasera = ""%>
+                <%let imgOrg = ""%>
+                <%if(RegistroPrevio!=null){%>
+                  
+                  <%if(RegistroPrevio.Tipo_Usuario==1){ %>
+                    <%imgOrg = RegistroPrevio.Documento_Identidad.split(";")[0]%>
+                    <%imgOrg = imgOrg.replace(/public/g, "")%>
+                    <%imgOrg = imgOrg.replaceAll("\\", "/")%>
+                  <%}%>
+                
+                <%}%>
                 <div class="form-row" id="TipoComun">
                     <div class="row d-flex flex-column align-items-center align-content-center" style="width: 100%">
                       <div class="form-row d-flex justify-content-center my-2">
@@ -306,7 +356,8 @@
                       Fotografía CIF o Factura
                     </div>
                     <div class="form-row d-flex justify-content-center">
-                      <img id="PreviewOrg" class="my-3" style="max-width: 95%;" src="" alt="" />
+                      <p><%=imgOrg%></p>
+                      <img src="<%=imgOrg%>" id="PreviewOrg" class="my-3" style="max-width: 95%;"  alt="" />
                     </div>
                     <div class="form-group d-flex justify-content-center">
                       <div class="custom-file" style="width: 100%;">
@@ -429,7 +480,9 @@
       xhrSubmit.onerror = function (){
         // errorScreen.fire();
       }
-      xhrSubmit.open("POST", "/registro/crear");
+
+      let urlGrabar = "<%=urlGrabarReq%>"
+      xhrSubmit.open("POST", urlGrabar);
       xhrSubmit.send(formData);
     }
 
@@ -477,7 +530,9 @@
             }
           }
         };
-      xhr.open("POST", "/registro/verify", true);//Especificamos que tipo de request se va a hacer, el uri y si es sincrono o asincrona.
+      let urlVerificar = "<%=urlVerificarReq%>"
+
+      xhr.open("POST", urlVerificar, true);//Especificamos que tipo de request se va a hacer, el uri y si es sincrono o asincrona.
       xhr.send(formData);//Mandamos la información del form data
     });
 
@@ -683,8 +738,9 @@
         inputSelector.selectedOptions[0].value
       );
       chargeInputToFormData(formData, inputText);
+      let urlVerificar = "<%=urlVerificarReq%>"
 
-      xhr.open("POST", "/registro/verify", true);//Especificamos que tipo de request se va a hacer, el uri y si es sincrono o no
+      xhr.open("POST", urlVerificar, true);//Especificamos que tipo de request se va a hacer, el uri y si es sincrono o no
       xhr.send(formData);
 
     });
@@ -728,7 +784,7 @@
         ApellidoP.name = "";
         ApellidoM.name = "";
         Nombre.placeholder = "Nombre de tu Organización";
-        PreviewOrg.src = "";
+        // PreviewOrg.src = "";
       }
       if (activeType == 2) {
         //- Tipo Comun
@@ -743,8 +799,9 @@
         Nombre.placeholder = "Nombre de tu INE";
         ApellidoP.placeholder = "Apellido paterno de tu INE";
         ApellidoM.placeholder = "Apellido materno de tu INE";
-        PreviewComunFrente.src = "";
-        PreviewComunTrasera.src = "";
+        
+          // PreviewComunFrente.src = "";
+          // PreviewComunTrasera.src = "";
         ApellidoP.name = "ApellidoP";
         ApellidoM.name = "ApellidoM";
       }

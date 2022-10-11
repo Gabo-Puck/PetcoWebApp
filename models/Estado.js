@@ -15,7 +15,7 @@ class Estado extends BaseModel {
         modelClass: Municipio,
         join: {
           from: "estado.ID",
-          to: "mnicipio.ID_Estado",
+          to: "municipio.ID_Estado",
         },
       },
     };

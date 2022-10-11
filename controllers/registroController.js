@@ -11,18 +11,9 @@ const {
   validateFilesExtension,
 } = require("./requestValidator");
 
+const { deleteFiles } = require("../utils/multipartRequestHandle");
+
 const RegistroSchema = checkSchema({
-  // Municipio: {
-  //   in: "body",
-  //   custom: {
-  //     options: (value, { req, location, path }) => {
-  //       if (value == 1) {
-  //         throw new Error("Inga tu roña we vives en Aguascalientes");
-  //       }
-  //       return "a";
-  //     },
-  //   },
-  // },
   Correo: {
     in: "body",
     trim: true,
@@ -38,6 +29,7 @@ const RegistroSchema = checkSchema({
         return Registro.query()
           .findOne({ Correo: value })
           .then((CorreoFind) => {
+            console.log(req);
             if (CorreoFind) {
               throw new Error("Ese correo ya ha sido registrado");
             }
@@ -139,8 +131,126 @@ const RegistroSchema = checkSchema({
     trim: true,
   },
 });
-// const { initialize } = require("objection");
 
+const RegistroSchemaEditar = checkSchema({
+  Correo: {
+    in: "body",
+    trim: true,
+    isLength: {
+      options: { min: 1 },
+      errorMessage: "El campo de correo es obligatorio",
+    },
+    isEmail: {
+      errorMessage: "Correo en formato incorrecto",
+    },
+    custom: {
+      options: (value, { req, location, path }) => {
+        return Registro.query()
+          .where("Correo", "=", value)
+          .andWhere("ID", "!=", req.params.registroID)
+          .then((CorreoFind) => {
+            console.log(req);
+            if (CorreoFind.length != 0) {
+              throw new Error("Ese correo ya ha sido registrado");
+            }
+            var nombreUsuario = value.split("@");
+            if (nombreUsuario[0].length < 5) {
+              throw new Error(
+                "Correo en formato incorrecto. El nombre de usuario debe de constar de 5 o más caracteres"
+              );
+            }
+          });
+      },
+    },
+  },
+  Contrasena: {
+    in: "body",
+    isLength: {
+      options: { min: 8 },
+      errorMessage: "La contraseña debe tener al menos 8 caracteres de largo",
+    },
+    custom: {
+      options: (value, { req, location, path }) => {
+        if (value == req.body.ContrasenaVer) {
+          return true;
+        }
+        throw new Error("La contraseña no coinciden");
+      },
+    },
+  },
+  ContrasenaVer: {
+    in: "body",
+    custom: {
+      options: (value, { req, location, path }) => {
+        if (value == req.body.Contrasena && value.length > 8) {
+          return true;
+        }
+        throw new Error(" ");
+      },
+    },
+  },
+  Telefono: {
+    in: "body",
+    trim: true,
+    isNumeric: {
+      errorMessage: "El telefono solo debe constar de numeros",
+    },
+    isLength: {
+      options: { min: 10, max: 10 },
+      errorMessage: "El telefono debe tener 10 digitos",
+    },
+  },
+  Nombre: {
+    in: "body",
+    trim: true,
+    isLength: {
+      options: { min: 1 },
+      errorMessage: "El campo de nombre es obligatorio",
+    },
+  },
+  ApellidoP: {
+    in: "body",
+    // isLength: {
+    //   options: { min: 1 },
+    //   errorMessage: "El campo de Apellido Paterno es obligatorio",
+    // },
+    custom: {
+      options: (val, { req, location, path }) => {
+        if (val == null) {
+          return true;
+          // throw new Error("EEEEE");
+        }
+
+        val = val.trim();
+
+        if (val.length <= 1) {
+          throw new Error("El apellido paterno es un campo obligatorio");
+        }
+        return "a";
+      },
+    },
+    trim: true,
+  },
+  ApellidoM: {
+    in: "body",
+    custom: {
+      options: (val, { req, location, path }) => {
+        if (val == null) {
+          return true;
+          // throw new Error("EEEEE");
+        }
+
+        val = val.trim();
+
+        if (val.length <= 1) {
+          throw new Error("El apellido materno es un campo obligatorio");
+        }
+        return "a";
+      },
+    },
+    trim: true,
+  },
+});
 const renderRegistroMiddleware = (req, res, next) => {
   if (res.stuff) {
     console.log("si hay estados");
@@ -149,27 +259,82 @@ const renderRegistroMiddleware = (req, res, next) => {
     title: "Registrarse",
     EstadosMunicipios: res.stuff,
     errors: res.errors,
+    RegistroPrevio: null,
+    urlVerificarReq: "/registro/verify",
+    urlGrabarReq: "/registro/crear",
   });
 };
-const hacerRegistroMiddleware = [
-  (req, res, next) => {
-    Estado.query()
-      .withGraphFetched("municipios")
-      .then((Estados) => {
-        console.log("Agregue estados");
-        res.stuff = Estados;
-        next();
-      })
-      .catch((err) => next(err));
-  },
-  renderRegistroMiddleware,
-];
+const getAllEstados = (req, res, next) => {
+  Estado.query()
+    .withGraphFetched("municipios")
+    .then((Estados) => {
+      console.log("Agregue estados");
+      res.stuff = Estados;
+      next();
+    })
+    .catch((err) => next(err));
+};
+const hacerRegistroMiddleware = [getAllEstados, renderRegistroMiddleware];
 
-exports.registro_list = (req, res) => {
-  Registro.query().then((Result) => {
-    res.json(Result);
-  });
+const getRegistroPrevio = (req, res, next) => {
+  Registro.query()
+    .withGraphJoined("muni")
+    .findOne({ "registro.ID": req.params.registroID })
+    .then((RegistroPrevio) => {
+      if (RegistroPrevio) {
+        res.RegistroPrevio = RegistroPrevio;
+        next();
+      } else {
+        res.redirect("/login");
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      next(err);
+    });
 };
+
+// const getRegistroPrevio2 = (req, res, next) => {
+//   Registro.query()
+//     .withGraphJoined("muni")
+//     .findOne({ "registro.ID": req.params.registroID })
+//     .then((RegistroPrevio) => {
+//       if (RegistroPrevio) {
+//         res.RegistroPrevio = RegistroPrevio;
+//         console.log(RegistroPrevio);
+
+//         res.render("HacerRegistro", {
+//           title: "Editar Registro",
+//           EstadosMunicipios: res.stuff,
+//           errors: res.errors,
+//           RegistroPrevio: res.RegistroPrevio,
+//           urlVerificarReq: `/registro/verifyEditar/${req.params.registroID}`,
+//           urlGrabarReq: `/registro/editarPatch/${req.params.registroID}`,
+//         });
+//       } else {
+//         res.redirect("/login");
+//       }
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//       next(err);
+//     });
+// };
+
+exports.registro_edit_get = [
+  getAllEstados,
+  getRegistroPrevio,
+  (req, res, next) => {
+    res.render("HacerRegistro", {
+      title: "Editar Registro",
+      EstadosMunicipios: res.stuff,
+      errors: res.errors,
+      RegistroPrevio: res.RegistroPrevio,
+      urlVerificarReq: `/registro/verifyEditar/${req.params.registroID}`,
+      urlGrabarReq: `/registro/editarPatch/${req.params.registroID}`,
+    });
+  },
+];
 
 exports.registro_details = (req, res) => {
   Registro.query()
@@ -216,6 +381,52 @@ exports.registro_crear_post = [
   },
 ];
 
+exports.registro_editar_patch = [
+  validateRequestFiles("images/imagenesRegistros"),
+  RegistroSchemaEditar,
+  validateRequest,
+  getRegistroPrevio,
+  (req, res, next) => {
+    console.log("im in registro controller");
+    console.log(res.errors);
+    console.log(req.body.Nombre);
+    if (res.errors) {
+      console.log("si se paso we");
+      return res.json({ errors: res.errors });
+    } else {
+      if (req.body.pathFilesSaved) {
+        console.log(req.body);
+        Registro.query()
+          .findById(req.params.registroID)
+          .patch({
+            Tipo_Usuario: req.body.Tipo,
+            Nombre: req.body.Nombre,
+            Correo: req.body.Correo,
+            Municipio: req.body.Municipio,
+            Telefono: req.body.Telefono,
+            Contrasena: req.body.Contrasena,
+            Documento_Identidad: req.body.pathFilesSaved,
+          })
+          .then((registroCreado) => {
+            let as = "";
+            as.split(";");
+            let filesPath = res.RegistroPrevio.split(";");
+            req.deleteFilesPath = filesPath;
+            deleteDocumentosIdentidad(req).then(() => {
+              return res.json({ res: "ok i did it" });
+            });
+          });
+      }
+    }
+  },
+];
+
+function deleteDocumentosIdentidad(req) {
+  let deletePromises = deleteFiles(req);
+  return new Promise((resolve, reject) => {
+    resolve(Promise.all(deletePromises));
+  });
+}
 exports.registro_redirect = (req, res) => {
   res.json({ registro: "completed" });
 };
@@ -224,6 +435,20 @@ module.exports.registro_verify = [
   getTextFields.none(),
   validateFilesExtension([".png", ".jpg", ".bmp", ".jpeg"]),
   RegistroSchema,
+  validateRequest,
+  (req, res) => {
+    if (res.errors) {
+      return res.json({ errors: res.errors, correct: res.correctFields });
+    } else {
+      return res.json({ res: "ok" });
+    }
+  },
+];
+
+module.exports.registro_verify_editar = [
+  getTextFields.none(),
+  validateFilesExtension([".png", ".jpg", ".bmp", ".jpeg"]),
+  RegistroSchemaEditar,
   validateRequest,
   (req, res) => {
     if (res.errors) {
@@ -266,4 +491,10 @@ exports.registro_esme = async (req, res) => {
   };
   // Registro.query().insert(Esme).then(res.json(Esme));
   Registro.query().then((ez) => console.log(ez));
+};
+
+exports.registro_list = (req, res) => {
+  Registro.query().then((Result) => {
+    res.json(Result);
+  });
 };

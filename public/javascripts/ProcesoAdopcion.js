@@ -1,50 +1,50 @@
-import { insertAfter } from "/javascripts/FormulariosFunctions.js";
-import { loadingScreen } from "/javascripts/FormulariosFunctions.js";
-import { initSocket } from "/javascripts/socketUtils.js";
+import { loadingScreen } from "/javascripts/FormulariosFunctions.js"; //Importamos la pantalla de carga
+import { initSocket } from "/javascripts/socketUtils.js"; //Importamos la función para inicilizar el socket
 
-const progressBarSteps = document.querySelector(".progress-bar ul");
+const progressBarSteps = document.querySelector(".progress-bar ul"); //Obtenemos la barra de progreso de los pasos
 const pasoPendiente = document.querySelector(
   ".templateElmentsPasosProgressBar .pending-paso-progressbar"
-);
+); //Obtenemos la plantilla para los pasos pendientes
 const pasoCompletado = document.querySelector(
   ".templateElmentsPasosProgressBar .completed-paso-progressbar"
-);
+); //Obtenemos la plantilla para los pasos completados
 const pasoActivo = document.querySelector(
   ".templateElmentsPasosProgressBar .active-paso-progressbar"
-);
+); //Obtenemos la plantilla para el paso activo
 
 const progressBarLine = document.querySelector(
   ".templateElmentsPasosProgressBar .progress-bar-line"
-);
+); //Obtenemos la linea que se usa para la unión de dos pasos
 
 const enviarMensajeChatProceso = document.querySelector(
   "#enviarMensajeChatProceso"
-);
+); //Obtenemos el formulario para mandar mensajes
 
-const chatBox = document.querySelector(".messagesChatProceso");
+const chatBox = document.querySelector(".messagesChatProceso"); //Obtenemos el elemento que contiene los mensajes del chat
 
-const mensajeYou = document.querySelector(".you");
-const mensajeSomeone = document.querySelector(".someone");
-const mensajeYouTemplate = document.querySelector(".youMessage");
-const mensajeSomeoneTemplate = document.querySelector(".someoneMessage");
+const mensajeYou = document.querySelector(".you"); //Obtenemos la plantilla de el contenedor de un mensaje. Esta es la plantilla para el contenedor de un mensaje que el cliente envia
+const mensajeSomeone = document.querySelector(".someone"); //Obtenemos la plantilla de el contenedor de un mensaje. Esta es la plantilla para el contenedor de un mensaje que el cliente recibe
+const mensajeYouTemplate = document.querySelector(".youMessage"); //Obtenemos la plantilla de el texto de un mensaje. Esta es la plantilla para el text de un mensaje que el cliente envia
+const mensajeSomeoneTemplate = document.querySelector(".someoneMessage"); //Obtenemos la plantilla de el texto de un mensaje. Esta es la plantilla para el text de un mensaje que el cliente recibe
 
-var archivoProtocolo;
-var archivoPasoSubido;
-var idPaso;
-var defaultTimer = 400;
+var archivoProtocolo; //Objeto que representa la ruta del archivo de protocolo
+var archivoPasoSubido; //Objeto que representa la ruta del archivo que el usuario adoptante ha subido
+var idPaso; //ID del paso seleccionado actual por el usuario
+var defaultTimer = 400; //Esta variable es el tiempo minimo para que una petición al servidor se realice. Se usa para mostrar la pantalla de carga
 
 const infoPasoProceso = {
-  infoPasoProceso: document.querySelector(".infoPasoProceso"),
-  header: document.querySelector(".infoPasoProceso .card-header"),
-  title: document.querySelector(".infoPasoProceso .card-title "),
-  body: document.querySelector(".infoPasoProceso .card.body"),
-  text: document.querySelector(".infoPasoProceso .card-text"),
-  subirArchivo: document.querySelector("#subirArchivo"),
-  descargarArchivoSubido: document.querySelector("#descargarArchivoSubido"),
+  infoPasoProceso: document.querySelector(".infoPasoProceso"), //Propiedad que representa el contenedor de la información de un paso
+  header: document.querySelector(".infoPasoProceso .card-header"), //Propiedad que representa el encabezado del elemento "card" de bootstrap
+  title: document.querySelector(".infoPasoProceso .card-title "), //Propiedad que representa el titulo del encabezado del elemento "card" de bootstrap
+  body: document.querySelector(".infoPasoProceso .card.body"), //Propiedad que representa el cuerpo del elemento "card" de bootstrap
+  text: document.querySelector(".infoPasoProceso .card-text"), //Propiedad que representa el texto dentro del cuerpo del elemento "card" de bootstrap
+  subirArchivo: document.querySelector("#subirArchivo"), //Propiedad que representa el boton para subir archivo dentro del cuerpo del elemento "card" de bootstrap
+  descargarArchivoSubido: document.querySelector("#descargarArchivoSubido"), //Propiedad que representa el boton para descargar el archivo subido por el usuario adoptante
   descargarArchivoProtocolo: document.querySelector(
+    //Propiedad que representa el boton para descargar el archivo subido por el creador del protocolo
     "#descargarArchivoProtocolo"
   ),
-};
+}; //Objeto que define la estructura del contenedor para la información de unp paso
 
 window.addEventListener("DOMContentLoaded", () => {
   var popoverTriggerList = [].slice.call(
@@ -167,8 +167,6 @@ function addPasosToProgressBarSteps(progressBar, PasosProceso) {
     if (index < PasosProceso.length - 1)
       // progressBar.insertBefore(newBar, progressBar.lastChild);
       progressBar.appendChild(newBar);
-    //   insertAfter(progressBar.childNodes[progressBarSteps.childElementCount-1]);
-    //   insertAfter(referenceNode, newNode)
   }
   //   if (!thereIsCompletado) {
   //     pasos[0].classList.remove("pending-paso-progressbar");
