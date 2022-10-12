@@ -410,7 +410,7 @@ exports.registro_editar_patch = [
           .then((registroCreado) => {
             let as = "";
             as.split(";");
-            let filesPath = res.RegistroPrevio.split(";");
+            let filesPath = res.RegistroPrevio.Documento_Identidad.split(";");
             req.deleteFilesPath = filesPath;
             deleteDocumentosIdentidad(req).then(() => {
               return res.json({ res: "ok i did it" });

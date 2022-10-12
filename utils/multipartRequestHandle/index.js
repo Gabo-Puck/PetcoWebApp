@@ -179,7 +179,7 @@ function createDelete(path) {
   }).catch();
 }
 
-function deleteFiles(req) {
+exports.deleteFiles = (req) => {
   let deleteFilesPromises = [];
 
   if (req.deleteFilesPath) {
@@ -191,7 +191,7 @@ function deleteFiles(req) {
     }
   }
   return deleteFilesPromises;
-}
+};
 
 exports.cleanInputID = (input) => {
   for (const key in input) {
