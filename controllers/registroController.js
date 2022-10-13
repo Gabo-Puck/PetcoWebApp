@@ -488,7 +488,16 @@ exports.registro_editar_patch = [
             let as = "";
             as.split(";");
             let filesPath = res.RegistroPrevio.Documento_Identidad.split(";");
-            req.deleteFilesPath = filesPath;
+            let filesPathCorrected = [];
+            filesPath.forEach((path) => {
+              if (path != "") {
+                let newFilePath = `public/${path}`;
+                filesPathCorrected.push(newFilePath);
+              }
+            });
+            console.log(filesPathCorrected);
+
+            req.deleteFilesPath = filesPathCorrected;
             deleteDocumentosIdentidad(req).then(() => {
               return res.json({ res: "ok i did it" });
             });
