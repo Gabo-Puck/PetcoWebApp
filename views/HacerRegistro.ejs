@@ -492,11 +492,11 @@
 
         <%if(RegistroPrevio.Tipo_Usuario==2){%>
           
-          let imgUrlIneFront =  "<%=RegistroPrevio.Documento_Identidad.split(";")[0].replaceAll("\\","/")%>";
-          imgUrlIneFront = formatURL(imgUrlIneFront)      
+          let imgUrlIneFront =  "<%=RegistroPrevio.Documento_Identidad.split(";")[0]%>";
+          imgUrlIneFront =imgUrlIneFront
           getImage(imgUrlIneFront,archivoComunFront,InputFileINEFrontal)    
-          let imgUrlIneBack = "<%=RegistroPrevio.Documento_Identidad.split(";")[1].replaceAll("\\","/")%>";
-          imgUrlIneBack = formatURL(imgUrlIneBack)          
+          let imgUrlIneBack = "<%=RegistroPrevio.Documento_Identidad.split(";")[1]%>";
+          imgUrlIneBack = imgUrlIneBack         
           getImage(imgUrlIneBack,archivoComunBack,InputFileINETrasera)    
 
         <%}%>

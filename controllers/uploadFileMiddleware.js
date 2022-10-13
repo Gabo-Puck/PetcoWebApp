@@ -6,6 +6,7 @@ const { ValidationError } = require("objection");
 module.exports.uploadFile = (folder) => {
   return (req, res, next) => {
     console.log("Estoy en uploadFile");
+
     const storage = multer.diskStorage({
       destination: function (req, file, cb) {
         cb(null, `./public/${folder}`);

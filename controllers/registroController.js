@@ -5,6 +5,7 @@ var objection = require("objection");
 const { validationResult, checkSchema } = require("express-validator");
 const multer = require("multer");
 const { uploadFile } = require("./uploadFileMiddleware");
+const { secureRegistro } = require("../utils/formDatabaseClean");
 const {
   validateRequest,
   validateRequestFiles,
@@ -12,6 +13,7 @@ const {
 } = require("./requestValidator");
 
 const { deleteFiles } = require("../utils/multipartRequestHandle");
+const Usuario = require("../models/Usuario");
 
 const RegistroSchema = checkSchema({
   Correo: {
@@ -268,13 +270,85 @@ const getAllEstados = (req, res, next) => {
   Estado.query()
     .withGraphFetched("municipios")
     .then((Estados) => {
-      console.log("Agregue estados");
       res.stuff = Estados;
       next();
     })
     .catch((err) => next(err));
 };
 const hacerRegistroMiddleware = [getAllEstados, renderRegistroMiddleware];
+
+exports.registro_estado = (req, res, next) => {
+  Registro.query()
+    .withGraphJoined("muni.[estado]")
+    .findOne({ "registro.ID": req.params.registroID })
+    .then((RegistroEncontrado) => {
+      if (RegistroEncontrado) {
+        RegistroEncontrado = secureRegistro(RegistroEncontrado, [
+          "Correo",
+          "Telefono",
+          "Contrasena",
+          "Pendiente",
+          "Municipio",
+        ]);
+        res.json({ RegistroEncontrado: RegistroEncontrado });
+      } else {
+        res.json("failed");
+      }
+    })
+    .catch((err) => {
+      console.log("Algo ha salido mal en registro_estado");
+      next(err);
+    });
+};
+
+exports.registro_aprobar = (req, res, next) => {
+  Registro.query()
+    .findOne({ ID: req.params.registroID })
+    .then((registro) => checkIfPendiente(registro, res))
+    .then((registro) => patchRegistroPendiente(registro))
+    .then((registroCambiado) => crearUsuarioPromise(registroCambiado))
+    .then((registro) => {
+      if (registro) {
+        res.json("ok");
+      }
+    })
+    .catch((err) => {
+      console.log("Algo ha salido mal en registro_aprobar");
+      next(err);
+    });
+};
+
+const checkIfPendiente = (registro, res) => {
+  return new Promise((resolve, reject) => {
+    if (registro) {
+      if (registro.Pendiente == 1) {
+        resolve(registro);
+      } else {
+        return res.json("aprobadoPreviamente");
+      }
+    }
+  });
+};
+
+const patchRegistroPendiente = (registro) => {
+  return new Promise((resolve, reject) => {
+    resolve(Registro.query().patchAndFetchById(registro.ID, { Pendiente: 0 }));
+  });
+};
+
+const crearUsuarioPromise = (registro) => {
+  return new Promise((resolve, reject) => {
+    resolve(
+      Usuario.query().insertAndFetch({
+        Foto_Perfil: "/images/ImagenesPerfilUsuario/default.png",
+        FK_Registro: registro.ID,
+        Reputacion: 0,
+      })
+    );
+  });
+};
+
+exports.registro_devolver = (req, res, next) => {};
 
 const getRegistroPrevio = (req, res, next) => {
   Registro.query()
@@ -325,6 +399,7 @@ exports.registro_edit_get = [
   getAllEstados,
   getRegistroPrevio,
   (req, res, next) => {
+    console.log(res.RegistroPrevio);
     res.render("HacerRegistro", {
       title: "Editar Registro",
       EstadosMunicipios: res.stuff,
@@ -372,6 +447,7 @@ exports.registro_crear_post = [
             Telefono: req.body.Telefono,
             Contrasena: req.body.Contrasena,
             Documento_Identidad: req.body.pathFilesSaved,
+            Pendiente: 1,
           })
           .then((registroCreado) => {
             return res.json({ res: "ok i did it" });
@@ -406,6 +482,7 @@ exports.registro_editar_patch = [
             Telefono: req.body.Telefono,
             Contrasena: req.body.Contrasena,
             Documento_Identidad: req.body.pathFilesSaved,
+            Pendiente: 1,
           })
           .then((registroCreado) => {
             let as = "";
@@ -493,8 +570,18 @@ exports.registro_esme = async (req, res) => {
   Registro.query().then((ez) => console.log(ez));
 };
 
-exports.registro_list = (req, res) => {
-  Registro.query().then((Result) => {
-    res.json(Result);
-  });
+exports.registros_pendientes_list = (req, res, next) => {
+  Registro.query()
+    .withGraphJoined("muni.[estado]")
+    // .whereNot("RegistroUsuario.ID", ">", "0")
+    .andWhere("registro.Pendiente", "=", "1")
+    .then((registrosPendientes) => {
+      res.render("listaRegistros", { registros: registrosPendientes });
+      // res.json(Result);
+    })
+    .catch((err) => {
+      console.log("Algo ha salido mal en registros_pendientes_list");
+      console.log(err);
+      next(err);
+    });
 };
