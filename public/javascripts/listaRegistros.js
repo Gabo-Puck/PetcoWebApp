@@ -1,3 +1,5 @@
+import { loadingScreen } from "/javascripts/FormulariosFunctions.js";
+
 const loadingScreenLayer = document.querySelector(".loadingScreenLayer");
 const exampleModal = document.getElementById("modalRegistroView");
 const DocumentosIdentidadImagenes = document.querySelector(
@@ -11,7 +13,12 @@ const devolverRegistroListaPendiente = document.querySelector(
   "#devolverRegistroListaPendiente"
 );
 
+const enviarRazon = document.querySelector("#enviarRazon");
+const textareaRazon = document.querySelector("#textareaRazonListaRegistros");
+
 const defaultTimer = 400;
+
+const eventoRemoveRegistroLista = new Event("registro-removido");
 let actualID;
 exampleModal.addEventListener("show.bs.modal", (event) => {
   // Button that triggered the modal
@@ -24,21 +31,48 @@ exampleModal.addEventListener("show.bs.modal", (event) => {
   // Update the modal's content.
   const modalTitle = exampleModal.querySelector(".modal-title");
   const modalBodyInput = exampleModal.querySelector(".modal-body input");
+
   loadingScreenLayer.classList.remove("d-none");
   setTimeout(() => {
     getRegistroData(idRegistro);
   }, defaultTimer);
 });
 
-aceptarRegistroListaPendiente.addEventListener("click", (e) => {
+enviarRazon.addEventListener("click", (e) => {
   let id = actualID.split("-")[1];
-  fetch(`/registro/aprobar/${id}`, { method: "POST" })
+  let value = { razon: textareaRazon.value };
+  let newFormData = new FormData();
+  newFormData.append("razon", value);
+  if (value.length < 10) {
+    Swal.fire({
+      title: "¡Aviso!",
+      html: "<p>La razon tiene que tener por lo menos 10 caracteres</p>",
+      icon: "warning",
+      confirmButtonText: "Ok",
+    });
+    return;
+  }
+  loadingScreen.fire();
+  setTimeout(() => {
+    enviarRazonCallback(value, id);
+  }, defaultTimer);
+});
+
+const enviarRazonCallback = (value, id) => {
+  fetch(`/registro/devolver/${id}`, {
+    method: "POST",
+    body: JSON.stringify(value),
+    headers: {
+      "Content-Type": "application/json",
+      // 'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  })
     .then((res) => res.json())
     .then((res) => {
       if (res == "ok") {
         Swal.fire({
-          title: "¡Registro aprobado!",
-          html: "Gracias por tu ayuda <3",
+          title: "¡Registro devuelto!",
+          html: "Gracias por tu ayuda 💙",
           icon: "success",
           confirmButtonText: "Ok",
         });
@@ -46,12 +80,22 @@ aceptarRegistroListaPendiente.addEventListener("click", (e) => {
       if (res == "aprobadoPreviamente") {
         Swal.fire({
           title: "¡Este registro ya ha sido revisado!",
-          html: "<p>Gracias por tu ayuda <3</p>",
+          html: "<p>Gracias por tu ayuda 💙</p>",
           icon: "info",
           confirmButtonText: "Ok",
+        }).then((resp) => {
+          Swal.close();
+          let exampleModal = new bootstrap.Modal(
+            document.getElementById("modalRegistroView")
+          );
+          exampleModal.hide();
         });
       }
-      document.querySelector(`#${actualID}`).remove();
+      if (document.querySelector(`#${actualID}`)) {
+        document.querySelector(`#${actualID}`).remove();
+        exampleModal.dispatchEvent(eventoRemoveRegistroLista);
+        count--;
+      }
     })
     .catch((err) => {
       console.log(err);
@@ -62,6 +106,52 @@ aceptarRegistroListaPendiente.addEventListener("click", (e) => {
         confirmButtonText: "Ok",
       });
     });
+};
+
+const aceptarRegistro = (id) => {
+  fetch(`/registro/aprobar/${id}`, { method: "POST" })
+    .then((res) => res.json())
+    .then((res) => {
+      if (res == "ok") {
+        Swal.fire({
+          title: "¡Registro aprobado!",
+          html: "Gracias por tu ayuda 💙",
+          icon: "success",
+          confirmButtonText: "Ok",
+        });
+      }
+      if (res == "aprobadoPreviamente") {
+        Swal.fire({
+          title: "¡Este registro ya ha sido revisado!",
+          html: "<p>Gracias por tu ayuda 💙</p>",
+          icon: "info",
+          confirmButtonText: "Ok",
+        });
+      }
+      if (document.querySelector(`#${actualID}`)) {
+        document.querySelector(`#${actualID}`).remove();
+        count--;
+        exampleModal.dispatchEvent(eventoRemoveRegistroLista);
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      Swal.fire({
+        title: "¡Algo ha salido mal!",
+        html: "<p>Intenta más tarde</p>",
+        icon: "info",
+        confirmButtonText: "Ok",
+      });
+    });
+};
+
+aceptarRegistroListaPendiente.addEventListener("click", (e) => {
+  let id = actualID.split("-")[1];
+  loadingScreen.fire();
+
+  setTimeout(() => {
+    aceptarRegistro(id);
+  }, defaultTimer);
 });
 
 function getRegistroData(idRegistro) {
@@ -118,3 +208,15 @@ function displayRegistroData(registro, modalRegistro) {
   });
   actualID = `r-${registro.ID}`;
 }
+
+exampleModal.addEventListener("registro-removido", (e) => {
+  count--;
+  let mainContainer = document.querySelector(".mainContainerListaRegistros");
+
+  if (count == 0) {
+    let aviso = document.querySelector(".avisoListaRegistros").cloneNode(true);
+    aviso.classList.remove("d-none");
+    mainContainer.appendChild(aviso);
+    document.querySelector(".ListaRegistrosPendientes").classList.add("d-none");
+  }
+});

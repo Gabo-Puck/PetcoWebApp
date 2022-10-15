@@ -106,41 +106,51 @@
       }
     </style>
   </head>
-  <body>
-    
+  <body style="height: 100vh;">
+    <div class="mx-auto my-auto h-100 w-100 d-flex align-items-center justify-content-center d-none avisoListaRegistros">
+      <h2 class="">No hay registros para validar</h2>
+    </div>
     <div class="mainContainerListaRegistros w-100 h-100">
-      <div class="ListaRegistrosPendientes w-75 mx-auto">
-        <ul class="px-0">
-          <!-- cartaTipoComun cartaTipoOrganizacion -->
-          <%for(var i = 0;i<registros.length;i++){%>
-            <%let tipoClase = ""%>
-            <%let tipoTexto = ""%>
-            <%if(registros[i].Tipo_Usuario==1){%>
-                <%tipoClase = "cartaTipoOrganizacion"%>
-                <%tipoTexto = "Organización"%>
+      <%var countLista = 0 %> 
+      <%if(registros.length!=0){%>
+        <div class="ListaRegistrosPendientes w-75 mx-auto">
+          <ul class="px-0">
+            <!-- cartaTipoComun cartaTipoOrganizacion -->
+            <%for(var i = 0;i<registros.length;i++){%>
+              <%countLista++%>
+              <%let tipoClase = ""%>
+              <%let tipoTexto = ""%>
+              <%if(registros[i].Tipo_Usuario==1){%>
+                  <%tipoClase = "cartaTipoOrganizacion"%>
+                  <%tipoTexto = "Organización"%>
+              <%}%>
+              <%if(registros[i].Tipo_Usuario==2){%>
+                  <%tipoClase = "cartaTipoComun"%>
+                  <%tipoTexto = "Común"%>
+              <%}%>
+              <li class="listElementRegistro <%=tipoClase%> rounded-end position-relative mb-4" data-bs-toggle="modal" data-bs-target="#modalRegistroView" data-bs-whatever="r-<%=registros[i].ID%>" id="r-<%=registros[i].ID%>">
+                  <div class="row ps-1">
+                  <div class="row pt-2">
+                      <p class="NombreRegistro fs-5 mb-1"><%=registros[i].Nombre%></p>
+                  </div>
+                  <div class="row">
+                      <p class="Ubicacion mb-0"><%=registros[i].muni.estado.Abreviatura%>, <%=registros[i].muni.Nombre%></p>
+                  </div>
+                  <div class="row justify-content-end">
+                      <div class="TipoRegistro my-1 pe-0">
+                      <p class="Tipo my-0 fs-6"><%=tipoTexto%></p>
+                      </div>
+                  </div>
+                  </div>
+              </li>
             <%}%>
-            <%if(registros[i].Tipo_Usuario==2){%>
-                <%tipoClase = "cartaTipoComun"%>
-                <%tipoTexto = "Común"%>
-            <%}%>
-            <li class="listElementRegistro <%=tipoClase%> rounded-end position-relative mb-4" data-bs-toggle="modal" data-bs-target="#modalRegistroView" data-bs-whatever="r-<%=registros[i].ID%>" id="r-<%=registros[i].ID%>">
-                <div class="row ps-1">
-                <div class="row pt-2">
-                    <p class="NombreRegistro fs-5 mb-1"><%=registros[i].Nombre%></p>
-                </div>
-                <div class="row">
-                    <p class="Ubicacion mb-0"><%=registros[i].muni.estado.Abreviatura%>, <%=registros[i].muni.Nombre%></p>
-                </div>
-                <div class="row justify-content-end">
-                    <div class="TipoRegistro my-1 pe-0">
-                    <p class="Tipo my-0 fs-6"><%=tipoTexto%></p>
-                    </div>
-                </div>
-                </div>
-            </li>
-          <%}%>
-        </ul>
-      </div>
+          </ul>
+        </div>
+      <%}else{%>
+        <div class="mx-auto my-auto h-100 w-100 d-flex align-items-center justify-content-center">
+          <h2 class="">No hay registros para validar</h2>
+        </div>
+      <%}%>
       <div class="modal fade" id="modalRegistroView" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-fullscreen">
             <div
@@ -187,12 +197,35 @@
             </div>
             <div class="modal-footer">
                 <button type="button" id="aceptarRegistroListaPendiente" class="btn btn-success">Aceptar</button>
-                <button type="button" id="devolverRegistroListaPendiente"class="btn btn-warning">Devolver</button>
+                <button type="button" id="devolverRegistroListaPendiente" data-bs-target="#exampleModalToggle2" data-bs-toggle="modal" data-bs-dismiss="modal" class="btn btn-warning">Devolver</button>
             </div>
             </div>
         </div>
+        </div>
+        <div class="modal fade" tabindex="-1" id="exampleModalToggle2">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Devolver registro</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <p>Escribe la razón de devolución</p>
+                <div class="form-floating">
+                  <textarea class="form-control" placeholder="Escribe tu razón aquí" id="textareaRazonListaRegistros" style="height: 100px"></textarea>
+                  <label for="floatingTextarea2">Razón</label>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="enviarRazon">Enviar razon</button>
+              </div>
+            </div>
+          </div>
         </div>
     </div>
+    <script> let count = <%=countLista%></script>
     <script type="module" src="/javascripts/listaRegistros.js"></script>
+    
   </body>
 </html>

@@ -12,6 +12,10 @@ const {
   validateFilesExtension,
 } = require("./requestValidator");
 
+const { encrypt, decrypt } = require("../utils/cryptoUtils/randomId");
+
+const { sendMail } = require("./email");
+
 const { deleteFiles } = require("../utils/multipartRequestHandle");
 const Usuario = require("../models/Usuario");
 
@@ -149,7 +153,7 @@ const RegistroSchemaEditar = checkSchema({
       options: (value, { req, location, path }) => {
         return Registro.query()
           .where("Correo", "=", value)
-          .andWhere("ID", "!=", req.params.registroID)
+          .andWhere("ID", "!=", req.registroIdDecrypted)
           .then((CorreoFind) => {
             console.log(req);
             if (CorreoFind.length != 0) {
@@ -253,6 +257,27 @@ const RegistroSchemaEditar = checkSchema({
     trim: true,
   },
 });
+const encryptIdRegistro = (req, res, next) => {
+  if (res.RegistroPrevio) {
+    res.registroIdEncrypted = encrypt(res.RegistroPrevio.ID.toString());
+    next();
+  } else {
+    next(new Error("no hay registro previo"));
+  }
+};
+
+const decryptIdRegistro = (req, res, next) => {
+  console.log(req.params);
+  if (req.params.registroID) {
+    req.registroIdDecrypted = decrypt(req.params.registroID);
+    if (req.registroIdDecrypted == "error") {
+      return res.redirect("/login");
+    }
+    next();
+  } else {
+    next(new Error("no hay registro previo"));
+  }
+};
 const renderRegistroMiddleware = (req, res, next) => {
   if (res.stuff) {
     console.log("si hay estados");
@@ -301,22 +326,45 @@ exports.registro_estado = (req, res, next) => {
     });
 };
 
-exports.registro_aprobar = (req, res, next) => {
-  Registro.query()
-    .findOne({ ID: req.params.registroID })
-    .then((registro) => checkIfPendiente(registro, res))
-    .then((registro) => patchRegistroPendiente(registro))
-    .then((registroCambiado) => crearUsuarioPromise(registroCambiado))
-    .then((registro) => {
-      if (registro) {
-        res.json("ok");
+exports.registro_aprobar = [
+  (req, res, next) => {
+    Registro.query()
+      .findOne({ ID: req.params.registroID })
+      .then((registro) => checkIfPendiente(registro, res))
+      .then((registro) => patchRegistroPendiente(registro, 0))
+      .then((registroCambiado) => crearUsuarioPromise(registroCambiado, res))
+      .then((registro) => {
+        if (registro) {
+          next();
+        }
+      })
+      .catch((err) => {
+        console.log("Algo ha salido mal en registro_aprobar");
+        next(err);
+      });
+  },
+  (req, res, next) => {
+    res.subjectCorreo = "Registro Cuenta aprobada";
+
+    res.render(
+      "correoCuentaVerificada",
+      {
+        login: "/login",
+        Nombre: res.registroPatch.Nombre,
+        Titulo: "¡Bienvenido!",
+      },
+      (err, html) => {
+        if (err) {
+          next(err);
+        } else {
+          res.htmlCorreo = html;
+          next();
+        }
       }
-    })
-    .catch((err) => {
-      console.log("Algo ha salido mal en registro_aprobar");
-      next(err);
-    });
-};
+    );
+  },
+  sendMail,
+];
 
 const checkIfPendiente = (registro, res) => {
   return new Promise((resolve, reject) => {
@@ -330,13 +378,16 @@ const checkIfPendiente = (registro, res) => {
   });
 };
 
-const patchRegistroPendiente = (registro) => {
+const patchRegistroPendiente = (registro, pendiente) => {
   return new Promise((resolve, reject) => {
-    resolve(Registro.query().patchAndFetchById(registro.ID, { Pendiente: 0 }));
+    resolve(
+      Registro.query().patchAndFetchById(registro.ID, { Pendiente: pendiente })
+    );
   });
 };
 
-const crearUsuarioPromise = (registro) => {
+const crearUsuarioPromise = (registro, res) => {
+  res.registroPatch = registro;
   return new Promise((resolve, reject) => {
     resolve(
       Usuario.query().insertAndFetch({
@@ -348,14 +399,53 @@ const crearUsuarioPromise = (registro) => {
   });
 };
 
-exports.registro_devolver = (req, res, next) => {};
+exports.registro_devolver = [
+  (req, res, next) => {
+    Registro.query()
+      .findOne({ ID: req.params.registroID })
+      .then((registro) => checkIfPendiente(registro, res))
+      .then((registro) => patchRegistroPendiente(registro, 0))
+      .then((registro) => {
+        if (registro) {
+          res.registroPatch = registro;
+          res.RegistroPrevio = registro;
+          next();
+        }
+      });
+  },
+  encryptIdRegistro,
+  (req, res, next) => {
+    res.subjectCorreo = "Registro devuelto";
+    console.log(req.body);
+    console.log(req.body.razon);
+    res.render(
+      "correoCuentaDevuelta",
+      {
+        editarUrl: `/registro/editar/${res.registroIdEncrypted}`,
+        Nombre: res.registroPatch.Nombre,
+        Titulo: "¡Hola!",
+        razon: req.body.razon,
+      },
+      (err, html) => {
+        if (err) {
+          next(err);
+        } else {
+          res.htmlCorreo = html;
+          next();
+        }
+      }
+    );
+  },
+  sendMail,
+];
 
 const getRegistroPrevio = (req, res, next) => {
   Registro.query()
-    .withGraphJoined("muni")
-    .findOne({ "registro.ID": req.params.registroID })
+    .withGraphJoined("[muni,RegistroUsuario]")
+    .findOne({ "registro.ID": req.registroIdDecrypted })
     .then((RegistroPrevio) => {
       if (RegistroPrevio) {
+        console.log(RegistroPrevio.Pendiente);
         res.RegistroPrevio = RegistroPrevio;
         next();
       } else {
@@ -368,46 +458,27 @@ const getRegistroPrevio = (req, res, next) => {
     });
 };
 
-// const getRegistroPrevio2 = (req, res, next) => {
-//   Registro.query()
-//     .withGraphJoined("muni")
-//     .findOne({ "registro.ID": req.params.registroID })
-//     .then((RegistroPrevio) => {
-//       if (RegistroPrevio) {
-//         res.RegistroPrevio = RegistroPrevio;
-//         console.log(RegistroPrevio);
-
-//         res.render("HacerRegistro", {
-//           title: "Editar Registro",
-//           EstadosMunicipios: res.stuff,
-//           errors: res.errors,
-//           RegistroPrevio: res.RegistroPrevio,
-//           urlVerificarReq: `/registro/verifyEditar/${req.params.registroID}`,
-//           urlGrabarReq: `/registro/editarPatch/${req.params.registroID}`,
-//         });
-//       } else {
-//         res.redirect("/login");
-//       }
-//     })
-//     .catch((err) => {
-//       console.log(err);
-//       next(err);
-//     });
-// };
-
 exports.registro_edit_get = [
   getAllEstados,
+  decryptIdRegistro,
   getRegistroPrevio,
   (req, res, next) => {
-    console.log(res.RegistroPrevio);
-    res.render("HacerRegistro", {
-      title: "Editar Registro",
-      EstadosMunicipios: res.stuff,
-      errors: res.errors,
-      RegistroPrevio: res.RegistroPrevio,
-      urlVerificarReq: `/registro/verifyEditar/${req.params.registroID}`,
-      urlGrabarReq: `/registro/editarPatch/${req.params.registroID}`,
-    });
+    if (
+      res.RegistroPrevio.RegistroUsuario == null &&
+      res.RegistroPrevio.Pendiente == 0
+    ) {
+      console.log(res.RegistroPrevio);
+      res.render("HacerRegistro", {
+        title: "Editar Registro",
+        EstadosMunicipios: res.stuff,
+        errors: res.errors,
+        RegistroPrevio: res.RegistroPrevio,
+        urlVerificarReq: `/registro/verifyEditar/${req.params.registroID}`,
+        urlGrabarReq: `/registro/editarPatch/${req.params.registroID}`,
+      });
+    } else {
+      res.redirect("/login");
+    }
   },
 ];
 
@@ -437,6 +508,12 @@ exports.registro_crear_post = [
       return res.json({ errors: res.errors });
     } else {
       if (req.body.pathFilesSaved) {
+        if (req.body.ApellidoP && req.body.ApellidoM) {
+          req.body.Nombre = req.body.Nombre.concat(
+            " ",
+            req.body.ApellidoP
+          ).concat(" ", req.body.ApellidoM);
+        }
         console.log(req.body);
         Registro.query()
           .insert({
@@ -459,9 +536,11 @@ exports.registro_crear_post = [
 
 exports.registro_editar_patch = [
   validateRequestFiles("images/imagenesRegistros"),
+  decryptIdRegistro,
   RegistroSchemaEditar,
   validateRequest,
   getRegistroPrevio,
+
   (req, res, next) => {
     console.log("im in registro controller");
     console.log(res.errors);
@@ -472,8 +551,14 @@ exports.registro_editar_patch = [
     } else {
       if (req.body.pathFilesSaved) {
         console.log(req.body);
+        if (req.body.ApellidoP && req.body.ApellidoM) {
+          req.body.Nombre = req.body.Nombre.concat(
+            " ",
+            req.body.ApellidoP
+          ).concat(" ", req.body.ApellidoM);
+        }
         Registro.query()
-          .findById(req.params.registroID)
+          .findById(req.registroIdDecrypted)
           .patch({
             Tipo_Usuario: req.body.Tipo,
             Nombre: req.body.Nombre,
@@ -513,9 +598,11 @@ function deleteDocumentosIdentidad(req) {
     resolve(Promise.all(deletePromises));
   });
 }
+
 exports.registro_redirect = (req, res) => {
   res.json({ registro: "completed" });
 };
+
 var getTextFields = multer();
 module.exports.registro_verify = [
   getTextFields.none(),
@@ -534,6 +621,7 @@ module.exports.registro_verify = [
 module.exports.registro_verify_editar = [
   getTextFields.none(),
   validateFilesExtension([".png", ".jpg", ".bmp", ".jpeg"]),
+  decryptIdRegistro,
   RegistroSchemaEditar,
   validateRequest,
   (req, res) => {

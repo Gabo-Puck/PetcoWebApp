@@ -11,6 +11,7 @@ router.get("/lista_pendientes", registro_controller.registros_pendientes_list);
 router.get("/editar/:registroID", registro_controller.registro_edit_get);
 router.get("/getEstado/:registroID", registro_controller.registro_estado);
 router.post("/aprobar/:registroID", registro_controller.registro_aprobar);
+router.post("/devolver/:registroID", registro_controller.registro_devolver);
 router.post(
   "/verifyEditar/:registroID",
   registro_controller.registro_verify_editar
