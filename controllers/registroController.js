@@ -349,7 +349,7 @@ exports.registro_aprobar = [
     res.render(
       "correoCuentaVerificada",
       {
-        login: "/login",
+        login: `${process.env.SERVER_DOMAIN}/login`,
         Nombre: res.registroPatch.Nombre,
         Titulo: "¡Bienvenido!",
       },
@@ -418,10 +418,11 @@ exports.registro_devolver = [
     res.subjectCorreo = "Registro devuelto";
     console.log(req.body);
     console.log(req.body.razon);
+
     res.render(
       "correoCuentaDevuelta",
       {
-        editarUrl: `/registro/editar/${res.registroIdEncrypted}`,
+        editarUrl: `${process.env.SERVER_DOMAIN}/registro/editar/${res.registroIdEncrypted}`,
         Nombre: res.registroPatch.Nombre,
         Titulo: "¡Hola!",
         razon: req.body.razon,
@@ -668,6 +669,7 @@ exports.registro_esme = async (req, res) => {
 };
 
 exports.registros_pendientes_list = (req, res, next) => {
+  console.log(process.env.SERVER_DOMAIN);
   Registro.query()
     .withGraphJoined("muni.[estado]")
     // .whereNot("RegistroUsuario.ID", ">", "0")

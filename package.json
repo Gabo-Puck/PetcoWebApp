@@ -11,6 +11,7 @@
     "busboy": "^1.6.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
+    "dotenv": "^16.0.3",
     "ejs": "^3.1.8",
     "express": "~4.16.1",
     "express-json-validator-middleware": "^3.0.1",

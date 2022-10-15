@@ -1,3 +1,7 @@
+var enviroment = process.env.NODE_ENV || "development";
+if (enviroment === "development") {
+  require("dotenv").config();
+}
 var createError = require("http-errors");
 var express = require("express");
 var path = require("path");
