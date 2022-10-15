@@ -2,6 +2,8 @@ import { loadingScreen } from "/javascripts/FormulariosFunctions.js";
 
 const loadingScreenLayer = document.querySelector(".loadingScreenLayer");
 const exampleModal = document.getElementById("modalRegistroView");
+let modalRazon = document.getElementById("modalRazon");
+
 const DocumentosIdentidadImagenes = document.querySelector(
   ".DocumentosIdentidadImagenes"
 );
@@ -75,6 +77,8 @@ const enviarRazonCallback = (value, id) => {
           html: "Gracias por tu ayuda 💙",
           icon: "success",
           confirmButtonText: "Ok",
+        }).then((resp) => {
+          Swal.close();
         });
       }
       if (res == "aprobadoPreviamente") {
@@ -85,16 +89,12 @@ const enviarRazonCallback = (value, id) => {
           confirmButtonText: "Ok",
         }).then((resp) => {
           Swal.close();
-          let exampleModal = new bootstrap.Modal(
-            document.getElementById("modalRegistroView")
-          );
-          exampleModal.hide();
         });
       }
       if (document.querySelector(`#${actualID}`)) {
         document.querySelector(`#${actualID}`).remove();
         exampleModal.dispatchEvent(eventoRemoveRegistroLista);
-        count--;
+        modalRazon.querySelector(".closeModal").click();
       }
     })
     .catch((err) => {
@@ -130,8 +130,8 @@ const aceptarRegistro = (id) => {
       }
       if (document.querySelector(`#${actualID}`)) {
         document.querySelector(`#${actualID}`).remove();
-        count--;
         exampleModal.dispatchEvent(eventoRemoveRegistroLista);
+        exampleModal.querySelector(".closeModal").click();
       }
     })
     .catch((err) => {
