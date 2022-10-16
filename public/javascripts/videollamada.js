@@ -20,6 +20,8 @@ const iconMicrophoneDeactive = "fa-microphone-slash";
 const iconCameraActive = "fa-video";
 const iconCameraDeactive = "fa-video-slash";
 
+const colgarLlamadaButton = document.querySelector(".colgarLlamadaButton");
+
 var isVideo = false;
 var isAudio = false;
 myVideo.muted = true;
@@ -192,4 +194,8 @@ socket.on("message-recieved", ({ nombre, message }) => {
   messageBox.appendChild(mensaje);
   messagesBox.appendChild(messageBox);
   messagesBox.scrollTop = messagesBox.scrollHeight;
+});
+
+colgarLlamadaButton.addEventListener("click", () => {
+  window.close();
 });
