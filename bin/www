@@ -172,21 +172,56 @@ io.on("connection", (socket) => {
               } else {
                 //enviar socket error
                 console.log("no haciendo query verf archivo");
-
+                console.log(socket.userID);
                 let mensaje =
                   c1 == false
                     ? "Este paso requiere que subas un archivo"
                     : "Algo ha salido mal";
-                socket
-                  .to(socket.userID)
-                  .emit("error-paso-completado-lista-registro", {
+                io.to(socket.userID).emit(
+                  "error-paso-completado-lista-registro",
+                  {
                     error: mensaje,
-                  });
+                    idPasoAfectado: idPasoArray,
+                  }
+                );
               }
             }
           });
       }
     );
+    socket.on(
+      "paso-incompleto-intento",
+      ({ tipo, idPasoMascota, idPasoArray }) => {
+        Pasos_Mascota.query()
+          .withGraphJoined("Paso")
+          .findOne({ "paso_mascota.ID": idPasoMascota })
+          .then((PasoActual) => {
+            console.log(PasoActual);
+            let completado = PasoActual.Completado;
+            if (tipo == 1) {
+              //Dueno
+              completado -= 1;
+            } else {
+              //Adoptante
+              completado -= 2;
+            }
+            PasoActual.$query()
+              .patchAndFetch({ "paso_mascota.Completado": completado })
+              .then((PasoActualPatch) => {
+                io.to(mascotaID).emit("paso-completado", {
+                  Completado: PasoActualPatch.Completado,
+                  idPasoAfectado: idPasoArray,
+                });
+              });
+          });
+      }
+    );
+    socket.on("archivo-subido-paso", ({ path, idPasoAfectado }) => {
+      io.to(mascotaID).emit("archivo-subido-paso", {
+        path: path,
+        idPasoAfectado: idPasoAfectado,
+      });
+    });
 
     // socket.on();
   });

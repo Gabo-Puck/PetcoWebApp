@@ -1,136 +1,74 @@
 [
-    {
-      "ID": 1,
-      "Tipo_Usuario": 4,
-      "Nombre": "Petco",
-      "Correo": "petcoOrgMex2022@gmail.com",
-      "Municipio": 656,
-      "Telefono": "3323821711",
-      "Contrasena": "petcoOrgMex2022",
-      "Documento_Identidad": "public\\images\\imagenesRegistros\\DocumentoOrg-1660938249166-749410205.jpeg;",
-      "RegistroUsuario": {
-        "ID": 1,
-        "Foto_Perfil": "default.png",
-        "Reputacion": 10000
-      }
-    },
-    {
-      "ID": 2,
-      "Tipo_Usuario": 2,
-      "Nombre": "Diego Armando",
-      "Correo": "santos@gmail.com",
-      "Municipio": 656,
-      "Telefono": "3323821711",
-      "Contrasena": "123456789",
-      "Documento_Identidad": "/images/imagenesRegistros/Documento_Identidad2-1665589875975-80709314.jpeg;/images/imagenesRegistros/Documento_Identidad3-1665589875978-691798723.jpeg;",
-      "RegistroUsuario": {
-        "ID": 2,
-        "Foto_Perfil": "/images/ImagenesMascotas/Tsuki1.jpeg",
-        "Reputacion": 0
-      }
-    },
-    {
-      "ID": 3,
-      "Tipo_Usuario": 1,
-      "Nombre": "Organización Croquetas",
-      "Correo": "skyshcoke@gmail.com",
-      "Municipio": 918,
-      "Telefono": "3323821711",
-      "Contrasena": "123456789",
-      "Documento_Identidad": "/images/imagenesRegistros/DocumentoOrg-1665589941359-604810032.jpeg;",
-      "RegistroUsuario": {
-        "ID": 4,
-        "Foto_Perfil": "/images/ImagenesMascotas/Emma1.jpeg",
-        "Reputacion": 10000
-      }
-    },
-    {
-      "ID": 4,
-      "Tipo_Usuario": 1,
-      "Nombre": "Gabriel",
-      "Correo": "skyshcok12@gmail.com",
-      "Municipio": 1,
-      "Telefono": "3323821711",
-      "Contrasena": "gabogabogabo",
-      "Documento_Identidad": "/images/imagenesRegistros/DocumentoOrg-1662523223783-288075001.jpeg;",
-      "RegistroUsuario": {
-        "ID": 5,
-        "Foto_Perfil": "/images/ImagenesMascotas/Emma1.jpeg",
-        "Reputacion": 1
-      }
-    },
-    {
-      "ID": 11,
-      "Tipo_Usuario": 2,
-      "Nombre": "Gabriel",
-      "Correo": "miura@gmail.com",
-      "Municipio": 1,
-      "Telefono": "3323821711",
-      "Contrasena": "123456789",
-      "Documento_Identidad": "/images/imagenesRegistros/Documento_Identidad2-1665589362146-609709553.jpeg;",
-      "RegistroUsuario": null
-    }
-  ]
-
-[
   {
     "ID": 1,
-    "Tipo_Usuario": 4,
-    "Nombre": "Petco",
-    "Correo": "petcoOrgMex2022@gmail.com",
-    "Municipio": 656,
-    "Telefono": "3323821711",
-    "Contrasena": "petcoOrgMex2022",
-    "Documento_Identidad": "public\\images\\imagenesRegistros\\DocumentoOrg-1660938249166-749410205.jpeg;",
-    "RegistroUsuario": {
-      "ID": 1,
-      "Foto_Perfil": "default.png",
-      "Reputacion": 10000
-    }
+    "Titulo_Paso": "Llenar formulario",
+    "Descripcion": "Al llenar el formulario, se mandará tu solicitud al dueño de la publicación. El dueño revisará las solicitudes y eligirá una de ellas para iniciar el proceso de adopción",
+    "DiasEstimados": 0,
+    "Archivo": "",
+    "ID_Protocolo": 1,
+    "AceptaArchivo": 0,
+    "PasoProceso": [
+      {
+        "ID": 58,
+        "ID_Mascota": 63,
+        "ID_Paso": 1,
+        "Completado": 3,
+        "Archivo": null
+      }
+    ]
   },
   {
     "ID": 2,
-    "Tipo_Usuario": 2,
-    "Nombre": "Diego Armando",
-    "Correo": "santos@gmail.com",
-    "Municipio": 656,
-    "Telefono": "3323821711",
-    "Contrasena": "123456789",
-    "Documento_Identidad": "/images/imagenesRegistros/Documento_Identidad2-1665589875975-80709314.jpeg;/images/imagenesRegistros/Documento_Identidad3-1665589875978-691798723.jpeg;",
-    "RegistroUsuario": {
-      "ID": 2,
-      "Foto_Perfil": "/images/ImagenesMascotas/Tsuki1.jpeg",
-      "Reputacion": 0
-    }
+    "Titulo_Paso": "Comunicación por chat o videochat",
+    "Descripcion": "Es el primer contacto directo entre el adoptante y el dueño de la publicación. A través del chat podrán ponerse de acuerdo si desean hablar y aclarar dudas por chat o realizar una videollamada. Esta comunicación tiene la finalidad de resolver dudas, intercambiar información y discutir los pasos",
+    "DiasEstimados": 3,
+    "Archivo": "",
+    "ID_Protocolo": 1,
+    "AceptaArchivo": 0,
+    "PasoProceso": [
+      {
+        "ID": 59,
+        "ID_Mascota": 63,
+        "ID_Paso": 2,
+        "Completado": 0,
+        "Archivo": null
+      }
+    ]
   },
   {
-    "ID": 3,
-    "Tipo_Usuario": 1,
-    "Nombre": "Organización Croquetas",
-    "Correo": "skyshcoke@gmail.com",
-    "Municipio": 918,
-    "Telefono": "3323821711",
-    "Contrasena": "123456789",
-    "Documento_Identidad": "/images/imagenesRegistros/DocumentoOrg-1665589941359-604810032.jpeg;",
-    "RegistroUsuario": {
-      "ID": 4,
-      "Foto_Perfil": "/images/ImagenesMascotas/Emma1.jpeg",
-      "Reputacion": 10000
-    }
+    "ID": 82,
+    "Titulo_Paso": "Titulo del paso 1 de formulario de prueba",
+    "Descripcion": "Este paso no contiene un archivo y permite subir archivos",
+    "DiasEstimados": 10,
+    "Archivo": "",
+    "ID_Protocolo": 38,
+    "AceptaArchivo": 1,
+    "PasoProceso": [
+      {
+        "ID": 60,
+        "ID_Mascota": 63,
+        "ID_Paso": 82,
+        "Completado": 0,
+        "Archivo": "public\\archivosPasos\\1665105537141-166835810.pdf"
+      }
+    ]
   },
   {
-    "ID": 4,
-    "Tipo_Usuario": 1,
-    "Nombre": "Gabriel",
-    "Correo": "skyshcok12@gmail.com",
-    "Municipio": 1,
-    "Telefono": "3323821711",
-    "Contrasena": "gabogabogabo",
-    "Documento_Identidad": "/images/imagenesRegistros/DocumentoOrg-1662523223783-288075001.jpeg;",
-    "RegistroUsuario": {
-      "ID": 5,
-      "Foto_Perfil": "/images/ImagenesMascotas/Emma1.jpeg",
-      "Reputacion": 1
-    }
+    "ID": 83,
+    "Titulo_Paso": "Titulo del paso 2 de formulario de prueba",
+    "Descripcion": "Este paso contiene un archivo y no permite subir archivos",
+    "DiasEstimados": 2,
+    "Archivo": "public\\archivosPasos\\1665019719054-610178437.pdf",
+    "ID_Protocolo": 38,
+    "AceptaArchivo": 0,
+    "PasoProceso": [
+      {
+        "ID": 61,
+        "ID_Mascota": 63,
+        "ID_Paso": 83,
+        "Completado": 0,
+        "Archivo": null
+      }
+    ]
   }
 ]

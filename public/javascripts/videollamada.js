@@ -4,7 +4,6 @@ const socket = io("/");
 const myPeer = new Peer(undefined, {});
 const myVideo = document.getElementById("you");
 const user = document.getElementById("user");
-const ROOM_ID = "10f";
 const messageForm = document.getElementById("messageForm");
 const messageInput = document.getElementById("messageInput");
 const messagesBox = document.getElementById("messages");

@@ -20,6 +20,8 @@ const enviarMensajeChatProceso = document.querySelector(
   "#enviarMensajeChatProceso"
 ); //Obtenemos el formulario para mandar mensajes
 
+const videollamadaButton = document.querySelector("#videollamadaButton");
+
 var idPaso; //ID del paso seleccionado actual por el usuario
 
 const pasoCompletadoCheckBox = document.querySelector("#pasoCompletado");
@@ -59,7 +61,11 @@ pasoCompletadoCheckBox.addEventListener("change", (e) => {
       if (result.isConfirmed) {
         // Swal.fire('Saved!', '', 'success')
         //hacer algo para guardar el paso
-        socket.emit("paso-incompleto-intento", { tipo, MascotaID, idPaso });
+        socket.emit("paso-incompleto-intento", {
+          tipo: tipo,
+          idPasoMascota: PasosProceso[idPaso].PasoProceso[0].ID,
+          idPasoArray: idPaso,
+        });
       } else if (result.isDenied) {
         pasoCompletadoCheckBox.checked = 1;
         Swal.close();
@@ -158,19 +164,19 @@ function addListenerSubirArchivo(button) {
       fetch(`/proceso/subirArchivo`, { method: "POST", body: formData })
         .then((res) => res.json())
         .then((res) => {
-          if (res == "ok") {
+          if (res.state == "ok") {
             Swal.fire(
               "Correcto!",
               "Se ha subido correctamente el archivo",
               "success"
             );
             // socket.
+            socket.emit("archivo-subido-paso", {
+              path: res.path,
+              idPasoAfectado: idPaso,
+            });
           } else {
-            Swal.fire(
-              "Error!",
-              "Algo ha ido mal, intentelo más tarde",
-              "error"
-            );
+            Swal.fire("¡Aviso!", `${res.errors[0].msg}`, "error");
           }
         });
     }, defaultTimer);
@@ -302,6 +308,9 @@ function addListenerToProgressDot(dot) {
       infoPasoProceso.infoPasoProceso.classList.remove(
         "pasoActualCompletadoAdoptante"
       );
+      infoPasoProceso.infoPasoProceso.classList.remove(
+        "pasoActualCompletadoAmbos"
+      );
     }
     if (PasosProceso[idPaso].PasoProceso[0].Completado == 2) {
       infoPasoProceso.infoPasoProceso.classList.remove(
@@ -309,6 +318,9 @@ function addListenerToProgressDot(dot) {
       );
       infoPasoProceso.infoPasoProceso.classList.add(
         "pasoActualCompletadoAdoptante"
+      );
+      infoPasoProceso.infoPasoProceso.classList.remove(
+        "pasoActualCompletadoAmbos"
       );
       infoPasoProceso.infoPasoProceso.classList.remove(
         "pasoActualCompletadoAmbos"
@@ -395,19 +407,31 @@ socket.on("mensaje-chat-proceso", ({ message, userID, fecha }) => {
 
 socket.on("paso-completado", ({ Completado, idPasoAfectado }) => {
   PasosProceso[idPasoAfectado].PasoProceso[0].Completado = Completado;
-  if (Completado == 1 || Completado == 2) {
-    pasos[idPasoAfectado].click();
-  } else if (Completado == 3) {
+  pasos[idPasoAfectado].click();
+  if (Completado == 3) {
     pasos[idPasoAfectado].classList = pasoCompletado.classList;
     if (idPasoAfectado < PasosProceso.length - 1) {
       pasos[Number(idPasoAfectado) + 1].classList = pasoActivo.classList;
       infoPasoProceso.header.querySelector("div").textContent =
-        "Paso Completado";
+        "Paso completado";
       infoPasoProceso.header
         .querySelector("#pasoCompletado")
         .parentElement.classList.add("d-none");
     }
   }
+});
+
+socket.on(
+  "error-paso-completado-lista-registro",
+  ({ error, idPasoAfectado }) => {
+    Swal.fire("Atención", `<p>${error}</p>`, "warning");
+    pasos[idPasoAfectado].click();
+  }
+);
+
+socket.on("archivo-subido-paso", ({ path, idPasoAfectado }) => {
+  PasosProceso[idPasoAfectado].PasoProceso[0].Archivo = path;
+  pasos[idPasoAfectado].click();
 });
 
 function insertNewMensaje(message, userID, fecha, socket) {
@@ -432,3 +456,7 @@ function insertNewMensaje(message, userID, fecha, socket) {
   chatBox.appendChild(newMessage);
   chatBox.scrollTop = chatBox.scrollHeight;
 }
+
+videollamadaButton.addEventListener("click", () => {
+  window.open(`/videollamada/${ROOM_ID}`, "_parent");
+});

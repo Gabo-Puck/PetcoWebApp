@@ -53,7 +53,9 @@
       --info-paso-bg-color: #d7e2e9;
       --info-paso-text-color: #415a80;
       --info-paso-border-dueno:#A5D4DC ;
+      --info-paso-text-header-dueno:#415A80;
       --info-paso-border-adoptante:#CAABBF;
+      --info-paso-text-header-adoptante:#BE3154;
       --info-paso-border-completado:#415a80;
     }
 
@@ -231,9 +233,7 @@
 
     }
 
-    div{
-      margin:0 !important;
-    }
+    
 .messagesChatProceso {
   padding-left: 0 !important;
   padding-right: 0 !important;
@@ -243,10 +243,25 @@
   .pasoActualCompletadoDueno{
     border-color: var(--info-paso-border-dueno);
   }
+
+  .pasoActualCompletadoDueno .card-header{
+    border-color: var(--info-paso-border-dueno);
+    background-color: var(--info-paso-border-dueno);
+
+  }
+
   .pasoActualCompletadoAdoptante{
     border-color: var(--info-paso-border-adoptante);
   }
+
+  .pasoActualCompletadoAdoptante .card-header{
+    border-color: var(--info-paso-border-adoptante);
+    background-color: var(--info-paso-border-adoptante);
+  }
   .pasoActualCompletadoAmbos{
+    border-color: var(--info-paso-border-completado);
+  }
+  .pasoActualCompletadoAmbos .card-header{
     border-color: var(--info-paso-border-completado);
   }
     @media (min-width: 320px) and (max-width:800px){
@@ -284,6 +299,7 @@
     const SolicitudID = <%=SolicitudID%>;
     const Mensajes = <%-JSON.stringify(Mensajes)%>;
     const tipo = "<%=tipo%>";
+    const ROOM_ID = "<%=ROOM_ID%>"
   </script>
   <body style="min-height: 100vh; max-height: 100vh">
     <div class="d-none templateElementsMensajes" >
@@ -433,7 +449,7 @@
         >
           <i class="fa-regular fa-comments"></i>
         </button>
-        <button class="btn btn-info">
+        <button class="btn btn-info" id="videollamadaButton">
           <i class="fa-solid fa-phone-flip"></i>
         </button>
         <!--Solo para paso activo-->

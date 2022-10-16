@@ -4,11 +4,17 @@ const Usuario = require("../models/Usuario");
 const { fetchInput, uploadFiles } = require("../utils/multipartRequestHandle");
 const { secureRegistro } = require("../utils/formDatabaseClean");
 const Mensajes = require("../models/Mensajes");
+const { encrypt } = require("../utils/cryptoUtils/randomId");
+const {
+  isAdoptante,
+  isDuenoMascota,
+} = require("../utils/procesoAdopcionUtils");
 
 var acceptedTypes = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   "application/pdf",
 ];
+
 exports.getProceso = [
   getUsuario,
   isAdoptante,
@@ -27,6 +33,7 @@ exports.getProceso = [
         )
         .then((PasosProceso) => {
           let tipoUsuario = res.isAdoptante ? 2 : 1; //Si existe res.isAdoptante el usuario será adoptante (2), si no existe entonces será dueño (1)
+          let ROOM_ID = encrypt(req.params.MascotaID);
           res.render("procesoAdopcion", {
             PasosProceso: PasosProceso[0].MascotasPasos,
             tipo: tipoUsuario,
@@ -35,6 +42,7 @@ exports.getProceso = [
             UsuarioPeer: res.PeerProceso,
             SolicitudID: res.SolicitudID,
             Mensajes: res.MensajesSolicitud,
+            ROOM_ID: ROOM_ID,
           });
         });
     } else {
@@ -104,6 +112,9 @@ exports.uploadFile = [
   isAdoptante,
   (req, res, next) => {
     if (res.isAdoptante) {
+      if (res.errors.length >= 1) {
+        return res.json({ errors: res.errors });
+      }
       uploadFiles(res);
       Pasos_Mascota.query()
         .findOne({
@@ -112,10 +123,11 @@ exports.uploadFile = [
         })
         .patch({ Archivo: req.body.archivoPaso })
         .then((resultFetch) => {
+          console.log(resultFetch);
           if (resultFetch > 0) {
-            res.json("ok");
+            res.json({ state: "ok", path: req.body.archivoPaso });
           } else {
-            res.json("notOk");
+            res.json({ state: "notOk" });
             console.log(
               "Something wrong happened: No se hizo el cambio en la bd"
             );
@@ -129,89 +141,6 @@ exports.uploadFile = [
   },
 ];
 
-function isAdoptante(req, res, next) {
-  console.log("Estamos en adoptante");
-  let MascotaID;
-  try {
-    if (req.params.MascotaID) {
-      MascotaID = req.params.MascotaID;
-    } else if (req.body.MascotaID) {
-      MascotaID = req.body.MascotaID;
-    }
-  } catch (err) {
-    next(err);
-  }
+// exports.isAdoptante = isAdoptante;
 
-  Mascota.query()
-    .withGraphJoined(
-      "[MascotasSolicitudes,MascotasPublicacion.[PublicacionUsuario.UsuarioRegistro]]",
-      { minimize: true }
-    )
-    .where("mascota.ID", "=", MascotaID)
-    .andWhere("_t0.ID_Usuario", "=", req.session.IdSession)
-    .andWhere("_t0.Estado", "=", 1)
-    // .debug()
-    .then((usuarioSolicitud) => {
-      console.log(usuarioSolicitud);
-      if (usuarioSolicitud.length == 1) {
-        //hacer algo cuando el usuario encontrado es el adoptante
-        // res.render("procesoAdopcion")
-        // console.log(usuarioSolicitud);
-        // console.log("Si es adoptante");
-        // console.log(usuarioSolicitud);
-        // console.log(usuarioSolicitud[0].MascotasSolicitudes[0]);
-        res.SolicitudID = usuarioSolicitud[0].MascotasSolicitudes[0].ID;
-        let UsuarioQuery =
-          usuarioSolicitud[0].MascotasPublicacion.PublicacionUsuario;
-        res.PeerProceso = {
-          Nombre: UsuarioQuery.UsuarioRegistro.Nombre,
-          Foto_Perfil: UsuarioQuery.Foto_Perfil,
-        };
-        console.log(res.PeerProceso);
-        res.isAdoptante = true;
-      } else {
-        console.log("No es adoptante");
-
-        res.isAdoptante = false;
-      }
-      next();
-    });
-}
-
-function isDuenoMascota(req, res, next) {
-  console.log("Estamos en dueno");
-  if (!res.isAdoptante) {
-    Mascota.query()
-      .withGraphJoined(
-        "[MascotasPublicacion,MascotasSolicitudes.[Usuario.[UsuarioRegistro]]]",
-        { minimize: true }
-      )
-      .where("mascota.ID", "=", req.params.MascotaID)
-      .andWhere("_t0.ID_Usuario", "=", req.session.IdSession)
-      .andWhere("_t1.Estado", "=", 1)
-      .then((usuarioDueno) => {
-        console.log(usuarioDueno);
-        if (usuarioDueno.length == 1) {
-          //hacer algo cuando el usuario encontrado es el adoptante
-          console.log("Si es dueno");
-          // console.log(usuarioDueno);
-          // console.log(usuarioDueno[0].MascotasSolicitudes[0]);
-          // console.log(usuarioDueno[0].MascotasSolicitudes[0]);
-          let UsuarioQuery = usuarioDueno[0].MascotasSolicitudes[0].Usuario;
-          res.SolicitudID = usuarioDueno[0].MascotasSolicitudes[0].ID;
-          res.PeerProceso = {
-            Nombre: UsuarioQuery.UsuarioRegistro.Nombre,
-            Foto_Perfil: UsuarioQuery.Foto_Perfil,
-          };
-          console.log(res.ProcesoPeer);
-          res.isDuenoMascota = true;
-        } else {
-          console.log("No es dueno");
-          res.isDuenoMascota = false;
-        }
-        next();
-      });
-  } else {
-    next();
-  }
-}
+// exports.isDuenoMascota = isAdoptante;
