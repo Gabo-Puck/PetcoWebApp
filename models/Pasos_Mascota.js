@@ -10,6 +10,20 @@ class Pasos_Mascota extends Model {
   static get idColumn() {
     return ["ID_Mascota", "ID_Paso"];
   }
+
+  static get relationMappings() {
+    const Paso = require("./Paso");
+    return {
+      Paso: {
+        relation: Model.HasOneRelation,
+        modelClass: Paso,
+        join: {
+          from: "paso_mascota.ID_Paso",
+          to: "paso.ID",
+        },
+      },
+    };
+  }
 }
 
 module.exports = Pasos_Mascota;

@@ -35,7 +35,6 @@
     />
     <!-- Sweetalert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script type="module" src="/javascripts/socketUtils.js"></script>
 
     <script>
       const PasosProceso = <%-JSON.stringify(PasosProceso)%>;
@@ -53,6 +52,9 @@
       --pending-text-color-paso-progressbar: #415a80;
       --info-paso-bg-color: #d7e2e9;
       --info-paso-text-color: #415a80;
+      --info-paso-border-dueno:#A5D4DC ;
+      --info-paso-border-adoptante:#CAABBF;
+      --info-paso-border-completado:#415a80;
     }
 
     .inputMessageChatProceso input,
@@ -238,6 +240,15 @@
   overflow-y: scroll;
   overflow-x: hidden;
 }
+  .pasoActualCompletadoDueno{
+    border-color: var(--info-paso-border-dueno);
+  }
+  .pasoActualCompletadoAdoptante{
+    border-color: var(--info-paso-border-adoptante);
+  }
+  .pasoActualCompletadoAmbos{
+    border-color: var(--info-paso-border-completado);
+  }
     @media (min-width: 320px) and (max-width:800px){
       
       .pasoInfoContainer {
@@ -272,6 +283,7 @@
     const MascotaID = <%=MascotaID%>;
     const SolicitudID = <%=SolicitudID%>;
     const Mensajes = <%-JSON.stringify(Mensajes)%>;
+    const tipo = "<%=tipo%>";
   </script>
   <body style="min-height: 100vh; max-height: 100vh">
     <div class="d-none templateElementsMensajes" >
@@ -433,7 +445,7 @@
             <div class="form-check">
               <input
                 class="form-check-input"
-                type="radio"
+                type="checkbox"
                 name="flexRadioDefault"
                 id="pasoCompletado"
               />
@@ -459,7 +471,7 @@
             </button>
           </div>
           <div class="d-none" style="width: 100%; height: 40vh">
-            <% if(tipo==0) {%>
+            <% if(tipo==2) {%>
             <!--Se activa cuando el usuario es el adoptante para subir un archivo-->
             <h4>Subir archivo</h4>
             <div

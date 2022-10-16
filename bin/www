@@ -14,6 +14,8 @@ const Comentario = require("../models/Comentario");
 const Mensajes = require("../models/Mensajes");
 var sessionStore = new InMemorySessionStore();
 const cors = require("cors");
+const Paso = require("../models/Paso");
+const Pasos_Mascota = require("../models/Pasos_Mascota");
 /**
  * Get port from environment and store in Express.
  */
@@ -119,6 +121,74 @@ io.on("connection", (socket) => {
           });
       }
     );
+    socket.on(
+      "paso-completado-intento",
+      ({ tipo, idPasoMascota, idPasoArray }) => {
+        console.log(tipo);
+        console.log(idPasoMascota);
+        console.log(idPasoArray);
+        Pasos_Mascota.query()
+          .withGraphJoined("Paso")
+          .findOne({ "paso_mascota.ID": idPasoMascota })
+          .then((PasoActual) => {
+            console.log(PasoActual);
+            if (tipo == 1) {
+              let completado = PasoActual.Completado;
+              completado += 1;
+              PasoActual.$query()
+                .patchAndFetch({ "paso_mascota.Completado": completado })
+                .then((PasoActualPatch) => {
+                  io.to(mascotaID).emit("paso-completado", {
+                    Completado: PasoActualPatch.Completado,
+                    idPasoAfectado: idPasoArray,
+                  });
+                });
+              //Dueno
+            } else {
+              //Adoptante
+              let c1 =
+                PasoActual.Archivo != null && PasoActual.Paso.AceptaArchivo == 1
+                  ? true
+                  : false;
+              let c2 =
+                PasoActual.Archivo == null && PasoActual.Paso.AceptaArchivo == 0
+                  ? true
+                  : false;
+              console.log(c1);
+              console.log(c2);
+              if (c1 || c2) {
+                //hacer query
+                console.log("haciendo query verf archivo");
+                let completado = PasoActual.Completado;
+                completado += 2;
+                PasoActual.$query()
+                  .patchAndFetch({ "paso_mascota.Completado": completado })
+                  .then((PasoActualPatch) => {
+                    io.to(mascotaID).emit("paso-completado", {
+                      Completado: PasoActualPatch.Completado,
+                      idPasoAfectado: idPasoArray,
+                    });
+                  });
+              } else {
+                //enviar socket error
+                console.log("no haciendo query verf archivo");
+
+                let mensaje =
+                  c1 == false
+                    ? "Este paso requiere que subas un archivo"
+                    : "Algo ha salido mal";
+                socket
+                  .to(socket.userID)
+                  .emit("error-paso-completado-lista-registro", {
+                    error: mensaje,
+                  });
+              }
+            }
+          });
+      }
+    );
+
+    // socket.on();
   });
 
   socket.join(socket.userID); //Metemos al socket a la room del usuario

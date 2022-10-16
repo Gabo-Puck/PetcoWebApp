@@ -26,10 +26,10 @@ exports.getProceso = [
           req.params.MascotaID
         )
         .then((PasosProceso) => {
-          let tipoUSuario = res.isAdoptante ? 0 : 1;
+          let tipoUsuario = res.isAdoptante ? 2 : 1; //Si existe res.isAdoptante el usuario será adoptante (2), si no existe entonces será dueño (1)
           res.render("procesoAdopcion", {
             PasosProceso: PasosProceso[0].MascotasPasos,
-            tipo: tipoUSuario,
+            tipo: tipoUsuario,
             MascotaID: req.params.MascotaID,
             Usuario: res.usuarioProceso,
             UsuarioPeer: res.PeerProceso,

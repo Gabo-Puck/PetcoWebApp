@@ -20,6 +20,54 @@ const enviarMensajeChatProceso = document.querySelector(
   "#enviarMensajeChatProceso"
 ); //Obtenemos el formulario para mandar mensajes
 
+var idPaso; //ID del paso seleccionado actual por el usuario
+
+const pasoCompletadoCheckBox = document.querySelector("#pasoCompletado");
+
+pasoCompletadoCheckBox.addEventListener("change", (e) => {
+  if (pasoCompletadoCheckBox.checked == "1") {
+    Swal.fire({
+      title: "¡Hola!",
+      html: "<p>¿Deseas marcar este paso como compleado?</p>",
+      showDenyButton: true,
+      confirmButtonText: "Si",
+      denyButtonText: `No`,
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        // Swal.fire('Saved!', '', 'success')
+        //hacer algo para guardar el paso
+        socket.emit("paso-completado-intento", {
+          tipo: tipo,
+          idPasoMascota: PasosProceso[idPaso].PasoProceso[0].ID,
+          idPasoArray: idPaso,
+        });
+      } else if (result.isDenied) {
+        pasoCompletadoCheckBox.checked = 0;
+        Swal.close();
+      }
+    });
+  } else {
+    Swal.fire({
+      title: "¡Hola!",
+      html: "<p>¿Deseas desmarcar este paso como compleado?</p>",
+      showDenyButton: true,
+      confirmButtonText: "Si",
+      denyButtonText: `No`,
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        // Swal.fire('Saved!', '', 'success')
+        //hacer algo para guardar el paso
+        socket.emit("paso-incompleto-intento", { tipo, MascotaID, idPaso });
+      } else if (result.isDenied) {
+        pasoCompletadoCheckBox.checked = 1;
+        Swal.close();
+      }
+    });
+  }
+});
+
 const chatBox = document.querySelector(".messagesChatProceso"); //Obtenemos el elemento que contiene los mensajes del chat
 
 const mensajeYou = document.querySelector(".you"); //Obtenemos la plantilla de el contenedor de un mensaje. Esta es la plantilla para el contenedor de un mensaje que el cliente envia
@@ -29,7 +77,6 @@ const mensajeSomeoneTemplate = document.querySelector(".someoneMessage"); //Obte
 
 var archivoProtocolo; //Objeto que representa la ruta del archivo de protocolo
 var archivoPasoSubido; //Objeto que representa la ruta del archivo que el usuario adoptante ha subido
-var idPaso; //ID del paso seleccionado actual por el usuario
 var defaultTimer = 400; //Esta variable es el tiempo minimo para que una petición al servidor se realice. Se usa para mostrar la pantalla de carga
 
 const infoPasoProceso = {
@@ -89,7 +136,6 @@ const insertPreviousMessages = () => {
 socket = initSocket(insertPreviousMessages);
 
 function emitConnectionData() {
-  socket.connect();
   socket.emit("join-proceso", MascotaID);
   console.log("Emitting connection data...");
 }
@@ -118,6 +164,7 @@ function addListenerSubirArchivo(button) {
               "Se ha subido correctamente el archivo",
               "success"
             );
+            // socket.
           } else {
             Swal.fire(
               "Error!",
@@ -178,7 +225,7 @@ function addPasosToProgressBarSteps(progressBar, PasosProceso) {
   let ultimoCompletado = completadoArray[completadoArray.length - 1];
 
   let idUltimoCompletado = Number(ultimoCompletado.id.split("-")[1]);
-  if (idUltimoCompletado < pasos.length) {
+  if (idUltimoCompletado < pasos.length - 1) {
     pasos[idUltimoCompletado + 1].classList.remove("pending-paso-progressbar");
     pasos[idUltimoCompletado + 1].classList.add("active-paso-progressbar");
   }
@@ -233,19 +280,67 @@ function addListenerToProgressDot(dot) {
 
     if (PasosProceso[idPaso].PasoProceso[0].Archivo !== null) {
       infoPasoProceso.descargarArchivoSubido.classList.remove("d-none");
-      archivoPasoSubido = PasosProceso[idPaso].Archivo;
+      archivoPasoSubido = PasosProceso[idPaso].PasoProceso[0].Archivo;
     } else {
       infoPasoProceso.descargarArchivoSubido.classList.add("d-none");
       archivoPasoSubido = "";
     }
-  });
-}
 
-function addListenerToDownloadFile(button, path) {
-  button.addEventListener("click", (e) => {
-    downloadFile(button, path);
+    if (PasosProceso[idPaso].PasoProceso[0].Completado == tipo) {
+      infoPasoProceso.infoPasoProceso.querySelector(
+        "#pasoCompletado"
+      ).checked = 1;
+    } else {
+      infoPasoProceso.infoPasoProceso.querySelector(
+        "#pasoCompletado"
+      ).checked = 0;
+    }
+    if (PasosProceso[idPaso].PasoProceso[0].Completado == 1) {
+      infoPasoProceso.infoPasoProceso.classList.add(
+        "pasoActualCompletadoDueno"
+      );
+      infoPasoProceso.infoPasoProceso.classList.remove(
+        "pasoActualCompletadoAdoptante"
+      );
+    }
+    if (PasosProceso[idPaso].PasoProceso[0].Completado == 2) {
+      infoPasoProceso.infoPasoProceso.classList.remove(
+        "pasoActualCompletadoDueno"
+      );
+      infoPasoProceso.infoPasoProceso.classList.add(
+        "pasoActualCompletadoAdoptante"
+      );
+      infoPasoProceso.infoPasoProceso.classList.remove(
+        "pasoActualCompletadoAmbos"
+      );
+    }
+    if (PasosProceso[idPaso].PasoProceso[0].Completado == 0) {
+      infoPasoProceso.infoPasoProceso.classList.remove(
+        "pasoActualCompletadoDueno"
+      );
+      infoPasoProceso.infoPasoProceso.classList.remove(
+        "pasoActualCompletadoAdoptante"
+      );
+      infoPasoProceso.infoPasoProceso.classList.remove(
+        "pasoActualCompletadoAmbos"
+      );
+      infoPasoProceso.infoPasoProceso.querySelector(
+        "#pasoCompletado"
+      ).checked = 0;
+    }
+    if (PasosProceso[idPaso].PasoProceso[0].Completado == 3) {
+      infoPasoProceso.infoPasoProceso.classList.remove(
+        "pasoActualCompletadoDueno"
+      );
+      infoPasoProceso.infoPasoProceso.classList.remove(
+        "pasoActualCompletadoAdoptante"
+      );
+
+      infoPasoProceso.infoPasoProceso.classList.add(
+        "pasoActualCompletadoAmbos"
+      );
+    }
   });
-  // button.removeEventListener("click", downloadFile(button, path), true);
 }
 
 function downloadFile(path) {
@@ -296,6 +391,23 @@ function getFormatedDate(dateToFormat) {
 
 socket.on("mensaje-chat-proceso", ({ message, userID, fecha }) => {
   insertNewMensaje(message, userID, fecha, socket);
+});
+
+socket.on("paso-completado", ({ Completado, idPasoAfectado }) => {
+  PasosProceso[idPasoAfectado].PasoProceso[0].Completado = Completado;
+  if (Completado == 1 || Completado == 2) {
+    pasos[idPasoAfectado].click();
+  } else if (Completado == 3) {
+    pasos[idPasoAfectado].classList = pasoCompletado.classList;
+    if (idPasoAfectado < PasosProceso.length - 1) {
+      pasos[Number(idPasoAfectado) + 1].classList = pasoActivo.classList;
+      infoPasoProceso.header.querySelector("div").textContent =
+        "Paso Completado";
+      infoPasoProceso.header
+        .querySelector("#pasoCompletado")
+        .parentElement.classList.add("d-none");
+    }
+  }
 });
 
 function insertNewMensaje(message, userID, fecha, socket) {
