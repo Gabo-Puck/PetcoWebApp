@@ -65,3 +65,7 @@ exports.CrearIntereses = (req, res, next) => {
   // res.redirect("/inicio");
   res.redirect(req.baseUrl + "/feed");
 };
+
+fetch(url)
+  .then((response) => response.json())
+  .then(response);
