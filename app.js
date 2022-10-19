@@ -50,6 +50,11 @@ app.use("/videollamada", require("./routes/videollamada"));
 app.use("/solicitudes", require("./routes/SolicitudesRouter"));
 app.use("/proceso", require("./routes/ProcesoAdopcionesRouter"));
 
+var enviroment = process.env.NODE_ENV || "development";
+if (enviroment === "development") {
+  require("dotenv").config();
+}
+
 function isLogged(req, res, next) {
   var IdSession = req.session.IdSession;
   // IdSession = 2;

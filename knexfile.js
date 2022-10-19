@@ -3,7 +3,7 @@
 /**
  * @type { Object.<string, import("knex").Knex.Config> }
  */
- module.exports = {
+module.exports = {
   development: {
     client: "mysql2",
     connection: {
@@ -18,22 +18,22 @@
   staging: {
     client: "mysql2",
     connection: {
-      host: "localhost",
-      port: 3306,
+      host: "containers-us-west-67.railway.app",
+      port: 5801,
       user: "root",
-      password: "halo1234",
-      database: "petcodbv2",
+      password: "lfhlMhu37lvzAcIdfOYs",
+      database: "railway",
     },
   },
 
   production: {
     client: "mysql2",
     connection: {
-      host: "localhost",
-      port: 3306,
+      host: "containers-us-west-67.railway.app",
+      port: 5801,
       user: "root",
-      password: "halo1234",
-      database: "petcodbv2",
+      password: "lfhlMhu37lvzAcIdfOYs",
+      database: "railway",
     },
   },
 };

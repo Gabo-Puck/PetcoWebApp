@@ -1,1 +1,74 @@
-[{"ID":1,"Titulo_Paso":"Llenar formulario","Descripcion":"Al llenar el formulario, se mandará tu solicitud al dueño de la publicación. El dueño revisará las solicitudes y eligirá una de ellas para iniciar el proceso de adopción","DiasEstimados":0,"Archivo":"","ID_Protocolo":1,"AceptaArchivo":0,"PasoProceso":[{"ID":58,"ID_Mascota":63,"ID_Paso":1,"Completado":0,"Archivo":null}]},{"ID":2,"Titulo_Paso":"Comunicación por chat o videochat","Descripcion":"Es el primer contacto directo entre el adoptante y el dueño de la publicación. A través del chat podrán ponerse de acuerdo si desean hablar y aclarar dudas por chat o realizar una videollamada. Esta comunicación tiene la finalidad de resolver dudas, intercambiar información y discutir los pasos","DiasEstimados":3,"Archivo":"","ID_Protocolo":1,"AceptaArchivo":0,"PasoProceso":[{"ID":59,"ID_Mascota":63,"ID_Paso":2,"Completado":0,"Archivo":null}]},{"ID":82,"Titulo_Paso":"Titulo del paso 1 de formulario de prueba","Descripcion":"Este paso no contiene un archivo y permite subir archivos","DiasEstimados":10,"Archivo":"","ID_Protocolo":38,"AceptaArchivo":1,"PasoProceso":[{"ID":60,"ID_Mascota":63,"ID_Paso":82,"Completado":0,"Archivo":null}]},{"ID":83,"Titulo_Paso":"Titulo del paso 2 de formulario de prueba","Descripcion":"Este paso contiene un archivo y no permite subir archivos","DiasEstimados":2,"Archivo":"","ID_Protocolo":38,"AceptaArchivo":0,"PasoProceso":[{"ID":61,"ID_Mascota":63,"ID_Paso":83,"Completado":0,"Archivo":null}]}];
+[
+  {
+    "ID": 1,
+    "Titulo_Paso": "Llenar formulario",
+    "Descripcion": "Al llenar el formulario, se mandará tu solicitud al dueño de la publicación. El dueño revisará las solicitudes y eligirá una de ellas para iniciar el proceso de adopción",
+    "DiasEstimados": 0,
+    "Archivo": "",
+    "ID_Protocolo": 1,
+    "AceptaArchivo": 0,
+    "PasoProceso": [
+      {
+        "ID": 58,
+        "ID_Mascota": 63,
+        "ID_Paso": 1,
+        "Completado": 3,
+        "Archivo": null
+      }
+    ]
+  },
+  {
+    "ID": 2,
+    "Titulo_Paso": "Comunicación por chat o videochat",
+    "Descripcion": "Es el primer contacto directo entre el adoptante y el dueño de la publicación. A través del chat podrán ponerse de acuerdo si desean hablar y aclarar dudas por chat o realizar una videollamada. Esta comunicación tiene la finalidad de resolver dudas, intercambiar información y discutir los pasos",
+    "DiasEstimados": 3,
+    "Archivo": "",
+    "ID_Protocolo": 1,
+    "AceptaArchivo": 0,
+    "PasoProceso": [
+      {
+        "ID": 59,
+        "ID_Mascota": 63,
+        "ID_Paso": 2,
+        "Completado": 0,
+        "Archivo": null
+      }
+    ]
+  },
+  {
+    "ID": 82,
+    "Titulo_Paso": "Titulo del paso 1 de formulario de prueba",
+    "Descripcion": "Este paso no contiene un archivo y permite subir archivos",
+    "DiasEstimados": 10,
+    "Archivo": "",
+    "ID_Protocolo": 38,
+    "AceptaArchivo": 1,
+    "PasoProceso": [
+      {
+        "ID": 60,
+        "ID_Mascota": 63,
+        "ID_Paso": 82,
+        "Completado": 0,
+        "Archivo": "public\\archivosPasos\\1665105537141-166835810.pdf"
+      }
+    ]
+  },
+  {
+    "ID": 83,
+    "Titulo_Paso": "Titulo del paso 2 de formulario de prueba",
+    "Descripcion": "Este paso contiene un archivo y no permite subir archivos",
+    "DiasEstimados": 2,
+    "Archivo": "public\\archivosPasos\\1665019719054-610178437.pdf",
+    "ID_Protocolo": 38,
+    "AceptaArchivo": 0,
+    "PasoProceso": [
+      {
+        "ID": 61,
+        "ID_Mascota": 63,
+        "ID_Paso": 83,
+        "Completado": 0,
+        "Archivo": null
+      }
+    ]
+  }
+]

@@ -21,13 +21,13 @@ class Municipio extends BaseModel {
           from: "municipio.ID",
           to: "registro.Municipio",
         },
-        estado: {
-          relation: Model.BelongsToOneRelation,
-          modelClass: Estado,
-          join: {
-            from: "municipio.ID_Estado",
-            to: "estado.ID",
-          },
+      },
+      estado: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: Estado,
+        join: {
+          from: "municipio.ID_Estado",
+          to: "estado.ID",
         },
       },
     };

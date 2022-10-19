@@ -11,8 +11,11 @@ var http = require("http");
 var { InMemorySessionStore } = require("../utils/socketUtils/SessionStore");
 var { randomId } = require("../utils/cryptoUtils/randomId");
 const Comentario = require("../models/Comentario");
+const Mensajes = require("../models/Mensajes");
 var sessionStore = new InMemorySessionStore();
 const cors = require("cors");
+const Paso = require("../models/Paso");
+const Pasos_Mascota = require("../models/Pasos_Mascota");
 /**
  * Get port from environment and store in Express.
  */
@@ -90,6 +93,139 @@ io.on("connection", (socket) => {
     });
   });
 
+  socket.on("join-proceso", (mascotaID) => {
+    console.log("An user has joined the proceso room");
+    socket.join(mascotaID);
+    socket.on(
+      "mensaje-chat-proceso",
+      ({ message, userID, fecha, SolicitudID }) => {
+        console.log(fecha);
+        console.log(socket.userID);
+
+        Mensajes.query()
+          .insert({
+            Usuario_Remitente: userID,
+            Texto: message,
+            Fecha_Envio: fecha,
+            ID_Solicitud: SolicitudID,
+          })
+          .then(() => {
+            io.to(mascotaID).emit("mensaje-chat-proceso", {
+              message: message,
+              userID: userID,
+              fecha: fecha,
+            });
+          })
+          .catch((err) => {
+            console.log("Error al guardar mensaje: " + err);
+          });
+      }
+    );
+    socket.on(
+      "paso-completado-intento",
+      ({ tipo, idPasoMascota, idPasoArray }) => {
+        console.log(tipo);
+        console.log(idPasoMascota);
+        console.log(idPasoArray);
+        Pasos_Mascota.query()
+          .withGraphJoined("Paso")
+          .findOne({ "paso_mascota.ID": idPasoMascota })
+          .then((PasoActual) => {
+            console.log(PasoActual);
+            if (tipo == 1) {
+              let completado = PasoActual.Completado;
+              completado += 1;
+              PasoActual.$query()
+                .patchAndFetch({ "paso_mascota.Completado": completado })
+                .then((PasoActualPatch) => {
+                  io.to(mascotaID).emit("paso-completado", {
+                    Completado: PasoActualPatch.Completado,
+                    idPasoAfectado: idPasoArray,
+                  });
+                });
+              //Dueno
+            } else {
+              //Adoptante
+              let c1 =
+                PasoActual.Archivo != null && PasoActual.Paso.AceptaArchivo == 1
+                  ? true
+                  : false;
+              let c2 =
+                PasoActual.Archivo == null && PasoActual.Paso.AceptaArchivo == 0
+                  ? true
+                  : false;
+              console.log(c1);
+              console.log(c2);
+              if (c1 || c2) {
+                //hacer query
+                console.log("haciendo query verf archivo");
+                let completado = PasoActual.Completado;
+                completado += 2;
+                PasoActual.$query()
+                  .patchAndFetch({ "paso_mascota.Completado": completado })
+                  .then((PasoActualPatch) => {
+                    io.to(mascotaID).emit("paso-completado", {
+                      Completado: PasoActualPatch.Completado,
+                      idPasoAfectado: idPasoArray,
+                    });
+                  });
+              } else {
+                //enviar socket error
+                console.log("no haciendo query verf archivo");
+                console.log(socket.userID);
+                let mensaje =
+                  c1 == false
+                    ? "Este paso requiere que subas un archivo"
+                    : "Algo ha salido mal";
+                io.to(socket.userID).emit(
+                  "error-paso-completado-lista-registro",
+                  {
+                    error: mensaje,
+                    idPasoAfectado: idPasoArray,
+                  }
+                );
+              }
+            }
+          });
+      }
+    );
+    socket.on(
+      "paso-incompleto-intento",
+      ({ tipo, idPasoMascota, idPasoArray }) => {
+        Pasos_Mascota.query()
+          .withGraphJoined("Paso")
+          .findOne({ "paso_mascota.ID": idPasoMascota })
+          .then((PasoActual) => {
+            console.log(PasoActual);
+            let completado = PasoActual.Completado;
+            if (tipo == 1) {
+              //Dueno
+              completado -= 1;
+            } else {
+              //Adoptante
+              completado -= 2;
+            }
+            PasoActual.$query()
+              .patchAndFetch({ "paso_mascota.Completado": completado })
+              .then((PasoActualPatch) => {
+                io.to(mascotaID).emit("paso-completado", {
+                  Completado: PasoActualPatch.Completado,
+                  idPasoAfectado: idPasoArray,
+                });
+              });
+          });
+      }
+    );
+    socket.on("archivo-subido-paso", ({ path, idPasoAfectado }) => {
+      io.to(mascotaID).emit("archivo-subido-paso", {
+        path: path,
+        idPasoAfectado: idPasoAfectado,
+      });
+    });
+
+    // socket.on();
+  });
+
   socket.join(socket.userID); //Metemos al socket a la room del usuario
   //Esto lo hacemos con el fin de considerar la posibilidad de que el usuario abra diferentes pestañas en el mismo navegador
   //Entonces cada vez que entre un usuario con la misma sessionID, metemos a la misma room todos sus sockets
@@ -117,17 +253,15 @@ io.on("connection", (socket) => {
       });
   });
 
-
   //Comentarios // Se establece el contexto de los comentarios dentro de la publicacion
-  socket.on('publicacion', (id) => {
+  socket.on("publicacion", (id) => {
     console.log(id);
-    socket.join('publicacion' + id)
-
-  })
+    socket.join("publicacion" + id);
+  });
 
   //Evento para comentarios
-  socket.on('comentario', ({ msg, id, nombre, imagen, fecha }) => {
-    console.log('Comentario: ' + msg)
+  socket.on("comentario", ({ msg, id, nombre, imagen, fecha }) => {
+    console.log("Comentario: " + msg);
     console.log("El usuario del comentario es " + socket.userID);
     console.log(fecha);
     //Se procesan los datos correspondientes
@@ -139,38 +273,52 @@ io.on("connection", (socket) => {
         Texto: msg,
         Fecha_Envio: fecha,
         ID_Usuario: socket.userID,
-      }).then((resultado) => {
-        console.log(resultado.ID)
-        //Se emite el comentario por parte del cliente dentro del contexto de la publicacion
-        io.to('publicacion' + id).emit('comentario', { msg: msg, nombre: nombre, imagen: imagen, fecha: fecha, idcomentario: resultado.ID })
       })
-  })
+      .then((resultado) => {
+        console.log(resultado.ID);
+        //Se emite el comentario por parte del cliente dentro del contexto de la publicacion
+        io.to("publicacion" + id).emit("comentario", {
+          msg: msg,
+          nombre: nombre,
+          imagen: imagen,
+          fecha: fecha,
+          idcomentario: resultado.ID,
+        });
+      });
+  });
 
-  socket.on('respuesta', ({ msg, idP, idcomentario, nombre, imagen, fecha}) => {
-    console.log(msg);
-    console.log(idP);
-    console.log(idcomentario);
-    console.log(nombre);
-    console.log(imagen);
-    console.log(fecha);
+  socket.on(
+    "respuesta",
+    ({ msg, idP, idcomentario, nombre, imagen, fecha }) => {
+      console.log(msg);
+      console.log(idP);
+      console.log(idcomentario);
+      console.log(nombre);
+      console.log(imagen);
+      console.log(fecha);
 
-    Comentario.query()
-    .insertAndFetch({
-      ID_Publicacion: idP,
-      Comentario_Padre: idcomentario,
-      Texto: msg,
-      Fecha_Envio: fecha,
-      ID_Usuario: socket.userID,
-    }).then((resultado) => {
-      console.log(resultado.ID)
-      //Se emite el comentario por parte del cliente dentro del contexto de la publicacion
-      io.to('publicacion'+ idP ).emit('respuesta', {msg:msg, idP: idP, idcomentario:idcomentario, nombre:nombre, imagen:imagen, fecha:fecha})
-    })
-
-  })
-
-
-
+      Comentario.query()
+        .insertAndFetch({
+          ID_Publicacion: idP,
+          Comentario_Padre: idcomentario,
+          Texto: msg,
+          Fecha_Envio: fecha,
+          ID_Usuario: socket.userID,
+        })
+        .then((resultado) => {
+          console.log(resultado.ID);
+          //Se emite el comentario por parte del cliente dentro del contexto de la publicacion
+          io.to("publicacion" + idP).emit("respuesta", {
+            msg: msg,
+            idP: idP,
+            idcomentario: idcomentario,
+            nombre: nombre,
+            imagen: imagen,
+            fecha: fecha,
+          });
+        });
+    }
+  );
 });
 
 /**

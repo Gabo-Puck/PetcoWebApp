@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Proceso adoción</title>
     <script
+      src="https://cdn.socket.io/4.5.0/socket.io.min.js"
+      integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k"
+      crossorigin="anonymous"
+    ></script>
+    <script
       src="https://kit.fontawesome.com/f0156fc078.js"
       crossorigin="anonymous"
     ></script>
@@ -33,6 +38,8 @@
 
     <script>
       const PasosProceso = <%-JSON.stringify(PasosProceso)%>;
+      const Usuario = <%-JSON.stringify(Usuario)%>;
+      const UsuarioPeer = <%-JSON.stringify(UsuarioPeer)%>;
     </script>
   </head>
   <style>
@@ -45,6 +52,48 @@
       --pending-text-color-paso-progressbar: #415a80;
       --info-paso-bg-color: #d7e2e9;
       --info-paso-text-color: #415a80;
+      --info-paso-border-dueno:#A5D4DC ;
+      --info-paso-text-header-dueno:#415A80;
+      --info-paso-border-adoptante:#CAABBF;
+      --info-paso-text-header-adoptante:#BE3154;
+      --info-paso-border-completado:#415a80;
+    }
+
+    .inputMessageChatProceso input,
+    .inputMessageChatProceso input:focus,
+    .inputMessageChatProceso button,
+    .inputMessageChatProceso button:focus,
+    .inputMessageChatProceso button:hover {
+      background-color: transparent;
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+      transition: none !important;
+    }
+
+    .fotoMensajeUsuarioChat {
+      /* background-image: url("https://m.media-amazon.com/images/I/71ZcXHsUk1L.__AC_SX300_SY300_QL70_FMwebp_.jpg"); */
+      /* background-size: 100% 100%; */
+      width: 10vh;
+      text-align: center;
+      position: relative;
+      padding-bottom:10vh;
+      border-radius: 50%;
+      overflow: hidden;
+      background-color: blue;
+    }
+    .fotoMensajeUsuarioChat img {
+      position: absolute;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      object-fit: fill;
+    }
+    .pasoInfoContainer {
+      height: 50%;
+      width: 50%;
     }
     li {
       list-style-type: none;
@@ -72,18 +121,20 @@
     .progress-bar {
       height: 30%;
       /* cambiar a 30% esto */
-      max-width: 70%;
-      min-width: 70%;
-      overflow-x: scroll;
+      max-width: 80%;
+      min-width: 20%;
+      scrollbar-color: #0A4C95 #C2D2E4;
       margin: 0 auto;
     }
 
-    .progress-bar::-webkit-scrollbar {
+    .progress-bar ul::-webkit-scrollbar,
+    .infoPasoProceso .card-body::-webkit-scrollbar,.messagesChatProceso::-webkit-scrollbar {
       width: 14px;
       /* margin-right: 1px; */
     }
 
-    .progress-bar::-webkit-scrollbar-thumb {
+    .progress-bar ul::-webkit-scrollbar-thumb,
+    .infoPasoProceso .card-body::-webkit-scrollbar-thumb,.messagesChatProceso::-webkit-scrollbar-thumb {
       border: 4px solid rgba(0, 0, 0, 0);
       background-clip: padding-box;
       border-radius: 9999px;
@@ -92,12 +143,24 @@
       background-color: #9a9a9a;
     }
 
-    .progress-bar::-webkit-scrollbar-track-piece:end {
+    .progress-bar ul::-webkit-scrollbar-track-piece:end,
+    .infoPasoProceso .card-body::-webkit-scrollbar-track-piece:end,.messagesChatProceso::-webkit-scrollbar-track-piece:end {
+      background: transparent;
+      /* margin-bottom: 1em; */
+    }
+
+    .progress-bar ul::-webkit-scrollbar-track-piece:start,
+    .infoPasoProceso .card-body::-webkit-scrollbar-track-piece:start,.messagesChatProceso::-webkit-scrollbar-track-piece:start {
+      background: transparent;
+      /* margin-top: 1em; */
+    }
+
+    .messagesChatProceso::-webkit-scrollbar-track-piece:end {
       background: transparent;
       margin-bottom: 1em;
     }
 
-    .progress-bar::-webkit-scrollbar-track-piece:start {
+    .messagesChatProceso::-webkit-scrollbar-track-piece:start {
       background: transparent;
       margin-top: 1em;
     }
@@ -116,25 +179,100 @@
       color: var(--pending-text-color-paso-progressbar);
     }
 
-    @media (max-width: 374px) {
-      .progress-bar-dot {
-        max-width: 30%;
-        min-width: 30%;
-        padding-bottom: 30%;
-      }
-      .progress-bar-line {
-        max-width: 8vh;
-        min-width: 8vh;
-        height: 2%;
-      }
-    }
-
     .infoPasoProceso .card-header {
       background-color: var(--info-paso-bg-color);
       color: var(--info-paso-text-color);
     }
 
-    @media (min-width: 375px) and (max-width: 600px) {
+    .infoPasoProceso {
+      width: 100%;
+      /* height: 100%; */
+      margin: 0 auto;
+    }
+    .uploadFileBox {
+      width: 100%;
+      height: 50%;
+    }
+    .progress-bar ul {
+      overflow-x: scroll;
+      
+    }
+
+    .chatBoxProceso{
+      background-color: #d7fdff;
+    }
+
+    .inputMessageChatProceso{
+      background-color: white !important;
+    }
+
+    .messagesChatProceso{
+      border-radius: 30px;
+        overflow-y: scroll;
+        overflow-x: hidden;
+      background-color: white;
+      min-height: 87%;
+      max-height: 87%;
+
+
+    }
+
+    .you, .someone{
+      width: 100%;
+      max-width: 99%;
+      margin: 0;
+      box-sizing: content-box;
+    }
+
+    .containerMessageContenidoProceso{
+      background-color: var(--pending-bg-color-paso-progressbar);
+    }
+
+    .fecha{
+      color:#9a9a9a;
+
+    }
+
+    
+.messagesChatProceso {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+  .pasoActualCompletadoDueno{
+    border-color: var(--info-paso-border-dueno);
+  }
+
+  .pasoActualCompletadoDueno .card-header{
+    border-color: var(--info-paso-border-dueno);
+    background-color: var(--info-paso-border-dueno);
+
+  }
+
+  .pasoActualCompletadoAdoptante{
+    border-color: var(--info-paso-border-adoptante);
+  }
+
+  .pasoActualCompletadoAdoptante .card-header{
+    border-color: var(--info-paso-border-adoptante);
+    background-color: var(--info-paso-border-adoptante);
+  }
+  .pasoActualCompletadoAmbos{
+    border-color: var(--info-paso-border-completado);
+  }
+  .pasoActualCompletadoAmbos .card-header{
+    border-color: var(--info-paso-border-completado);
+  }
+    @media (min-width: 320px) and (max-width:800px){
+      
+      .pasoInfoContainer {
+        height: 75% !important;
+        width: 75% !important;
+      }
+    }
+
+    @media (min-width: 320px) and (max-width: 600px) {
       .progress-bar-dot {
         max-width: 23%;
         min-width: 23%;
@@ -156,7 +294,63 @@
       }
     }
   </style>
-  <body style="height: 100vh">
+  <script>
+    const MascotaID = <%=MascotaID%>;
+    const SolicitudID = <%=SolicitudID%>;
+    const Mensajes = <%-JSON.stringify(Mensajes)%>;
+    const tipo = "<%=tipo%>";
+    const ROOM_ID = "<%=ROOM_ID%>"
+  </script>
+  <body style="min-height: 100vh; max-height: 100vh">
+    <div class="d-none templateElementsMensajes" >
+      <div class="someone mb-2 mx-1">
+        <div class="row flex-nowrap w-100">
+            <div class="row contenidoChatProceso ms-0">
+                      
+            </div>
+        </div>
+      </div>
+
+      <div class="you mb-2 me-0">
+        <div class="row flex-nowrap flex-row-reverse w-100">
+          <div class="row contenidoChatProceso justify-content-end flex-flow-reverse ms-0 pe-0">
+                      
+          </div>  
+        </div>
+                  
+      </div>
+      <div class="youMessage d-flex justify-content-end px-0" style="max-width: 90%;">
+        <div class="d-flex rounded-start p-3 pb-0 flex-column containerMessageContenidoProceso">
+          <div cl>
+            <p class="text-end text-break pe-0 mb-0 contenidoMensaje me-2 fs-5" style="flex-grow: 1;">
+            </p>
+          </div>
+          <div class="d-flex justify-content-end">
+            <p class=" text-end text-break fecha d-inline fs-6 mb-1">
+            </p>
+          </div>
+        </div>
+
+      </div>
+      <div class="someoneMessage d-flex justify-content-start px-1 rounded" style="max-width: 90%;">
+        <div class="d-flex rounded-end p-3 pb-0 flex-column containerMessageContenidoProceso">
+          <div class="">
+            <p class="text-break mb-0 contenidoMensaje me-2 fs-5" style="">
+            </p>
+          </div>
+          <div class="d-flex justify-content-end">
+            <p class=" d-inline fecha fs-6 mb-1">
+            </p>
+          </div>
+
+        </div>
+          
+          
+
+      </div>
+    </div>
+
+
     <div class="d-none templateElmentsPasosProgressBar">
       <li
         class="rounded-circle d-flex align-items-center position-relative progress-bar-dot pending-paso-progressbar"
@@ -182,54 +376,149 @@
         >
       </li>
     </div>
-    <div class="mainContainer h-100 w-100">
-      <div class="progress-bar">
-        <ul
-          class="d-flex align-items-center px-0"
-          style="max-width: 100%; height: 100%"
-        >
-          <li class="p-4"></li>
-
-          <li class="p-4"></li>
-        </ul>
-      </div>
-      <div class="w-50 mx-auto">
-        <div class="d-flex justify-content-end controlesPasoProceso mb-3">
-          <!--Solo para paso activo-->
-          <button class="btn btn-info me-3">
-            <i class="fa-solid fa-phone-flip"></i>
-          </button>
-          <button class="btn btn-info">
-            <i class="fa-regular fa-comments"></i>
-          </button>
-          <div class="marcarCompletadoPaso"></div>
-          <!--Solo para paso activo-->
-        </div>
-        <div class="infoPasoProceso card w-100 mx-auto">
-          <div class="card-header d-flex justify-content-between">
-            <div>Paso Activo</div>
-            <div>
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="flexRadioDefault"
-                  id="flexRadioDefault1"
-                />
-                <label class="form-check-label" for="flexRadioDefault1">
-                  Completado
-                </label>
+    <div
+      class="mainContainer"
+      style="
+        height: 100vh !important;
+        max-height: 100vh !important;
+        width: 100%;
+      "
+    >
+      <div
+        class="offcanvas offcanvas-start chatBoxProceso"
+        data-bs-scroll="false"
+        tabindex="-1"
+        id="offcanvasWithBothOptions"
+        aria-labelledby="offcanvasWithBothOptionsLabel"
+        style="max-width: 100%; min-width: 100%"
+      >
+        <div class="offcanvas-header">
+          <div class="d-flex">
+            <div class="fotoMensajeUsuarioChat me-3">
+                        <img src="<%=UsuarioPeer.Foto_Perfil%>"
+                        />
               </div>
+            <h5 class="offcanvas-title my-auto" id="offcanvasWithBothOptionsLabel">
+              <%=UsuarioPeer.Nombre%>
+            </h5>
+          </div>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="offcanvas-body w-100">
+          <div class="messagesChatProceso w-100 mb-2 pt-3">
+              
+          <div
+            class="inputMessageChatProceso px-2 py-2 d-flex align-items-center position-absolute bottom-0 start-50 translate-middle-x my-3"
+            style="border-radius: 50px; background-color: #415a80; width: 100%"
+          >
+          <form id="enviarMensajeChatProceso" class="w-100">
+            <div class="input-group my-auto w-100">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="¡Escribe algo!"
+                aria-label="¡Escribe algo!"
+                aria-describedby="button-addon2"
+              />
+              <button class="btn-primary">
+                <i class="fa-regular fa-comment"></i>
+              </button>
+            </div>
+
+          </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="progress-bar mx-auto">
+      <ul class="d-flex align-items-center justify-content-start px-0 pb-2"></ul>
+    </div>
+    <div class="mx-auto pasoInfoContainer">
+      <div class="d-flex justify-content-start controlesPasoProceso mb-3">
+        <!--Solo para paso activo-->
+        <button
+          class="btn btn-info me-3"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#offcanvasWithBothOptions"
+          aria-controls="offcanvasWithBothOptions"
+        >
+          <i class="fa-regular fa-comments"></i>
+        </button>
+        <button class="btn btn-info" id="videollamadaButton">
+          <i class="fa-solid fa-phone-flip"></i>
+        </button>
+        <!--Solo para paso activo-->
+      </div>
+      <div class="infoPasoProceso card" style="max-height: 100%">
+        <div class="card-header d-flex justify-content-between">
+          <div>Paso Activo</div>
+          <div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                name="flexRadioDefault"
+                id="pasoCompletado"
+              />
+              <label class="form-check-label" for="pasoCompletado">
+                Completado
+              </label>
             </div>
           </div>
-          <div class="card-body">
-            <h4 class="tituloPasoProceso card-title">Paso 1</h4>
-            <p class="descripcionPasoProceso card-text">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos
-              similique animi ea sit aspernatur magnam enim laboriosam amet ex
-              quam consectetur quae, nulla suscipit unde culpa est! Sapiente,
-              mollitia laboriosam.
-            </p>
+        </div>
+        <div class="card-body pb-3" style="overflow-y: scroll">
+          <h4 class="tituloPasoProceso card-title">Paso 1</h4>
+          <p class="descripcionPasoProceso card-text">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos
+            similique animi ea sit aspernatur magnam enim laboriosam amet ex
+            quam consectetur quae, nulla suscipit unde culpa est! Sapiente,
+            mollitia laboriosam.
+          </p>
+          <div class="d-none" id="descargarArchivoProtocolo">
+            <!--Se activa cuando el paso tiene un archivo subido -->
+            <h4>Descarga archivo protocolo</h4>
+            <button class="btn btn-info">
+              <i class="fa-solid fa-file-arrow-down"></i>
+            </button>
+          </div>
+          <div class="d-none" style="width: 100%; height: 40vh">
+            <% if(tipo==2) {%>
+            <!--Se activa cuando el usuario es el adoptante para subir un archivo-->
+            <h4>Subir archivo</h4>
+            <div
+              class="uploadFileBox mb-3 mx-auto"
+              style="width: 75%; height: 75%"
+              id="subirArchivo"
+            >
+              <div
+                class="upload-file position-relative border border-info mx-auto"
+                style="width: 100%; height: 100%"
+              >
+                <button
+                  class="btn btn-success position-absolute top-50 start-50 translate-middle"
+                >
+                  <i class="fa-solid fa-file-arrow-up"></i>
+                  <input type="file" id="inputFilePasoProceso" class="d-none" />
+                </button>
+              </div>
+
+              <br />
+            </div>
+
+            <%}%>
+            <!-- </div> -->
+          </div>
+          <div class="d-none" id="descargarArchivoSubido">
+            <h4>Descarga archivo subido</h4>
+            <!--Se activa cuando hay un archivo subido en este paso del proceso-->
+            <button class="btn btn-info">
+              <i class="fa-solid fa-file-arrow-down"></i>
+            </button>
           </div>
         </div>
       </div>

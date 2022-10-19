@@ -4,7 +4,6 @@ const socket = io("/");
 const myPeer = new Peer(undefined, {});
 const myVideo = document.getElementById("you");
 const user = document.getElementById("user");
-const ROOM_ID = "10f";
 const messageForm = document.getElementById("messageForm");
 const messageInput = document.getElementById("messageInput");
 const messagesBox = document.getElementById("messages");
@@ -20,6 +19,8 @@ const iconMicrophoneDeactive = "fa-microphone-slash";
 
 const iconCameraActive = "fa-video";
 const iconCameraDeactive = "fa-video-slash";
+
+const colgarLlamadaButton = document.querySelector(".colgarLlamadaButton");
 
 var isVideo = false;
 var isAudio = false;
@@ -193,4 +194,8 @@ socket.on("message-recieved", ({ nombre, message }) => {
   messageBox.appendChild(mensaje);
   messagesBox.appendChild(messageBox);
   messagesBox.scrollTop = messagesBox.scrollHeight;
+});
+
+colgarLlamadaButton.addEventListener("click", () => {
+  window.close();
 });

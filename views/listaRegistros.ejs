@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registros Pendientes</title>
+    <script
+      src="https://kit.fontawesome.com/f0156fc078.js"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="/stylesheets/bootstrap-5.2.0-dist/themes/Lumen/bootstrap.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="/stylesheets/bootstrap-5.2.0-dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/peerjs@1.3.2/dist/peerjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+      :root {
+        --color-border-tipo-comun: #70cee4;
+        --color-hover-tipo-comun: #70cee480;
+        --color-border-tipo-organizacion: #965786;
+        --color-hover-tipo-organizacion: #96578680;
+      }
+
+      .modal-body::-webkit-scrollbar{
+      width: 14px;
+      /* margin-right: 1px; */
+    }
+
+    .modal-body::-webkit-scrollbar-thumb {
+      border: 4px solid rgba(0, 0, 0, 0);
+      background-clip: padding-box;
+      border-radius: 9999px;
+      margin: 1em 0;
+      border-radius: 5em;
+      background-color: #9a9a9a;
+    }
+
+    .modal-body::-webkit-scrollbar-track-piece:end {
+      background: transparent;
+      /* margin-bottom: 1em; */
+    }
+
+    .modal-body::-webkit-scrollbar-track-piece:start {
+      background: transparent;
+      /* margin-top: 1em; */
+    }
+      .TipoRegistro {
+        max-width: fit-content;
+      }
+      li {
+        list-style-type: none;
+      }
+      .bordeCartaOrganizacion {
+        flex-basis: 2%;
+      }
+      .contenidoCartaRegistro {
+        /* flex-basis: 98%; */
+      }
+      .listElementRegistro {
+        overflow: hidden;
+      }
+
+      .cartaTipoComun {
+        border: 1px solid var(--color-border-tipo-comun);
+        border-radius: 0.5em;
+        border-left: 1vw solid var(--color-border-tipo-comun);
+        background-color: white;
+        transition: background-color 1s;
+
+      }
+
+      .cartaTipoOrganizacion {
+        border: 1px solid var(--color-border-tipo-organizacion);
+        border-radius: 0.5em;
+        border-left: 1vw solid var(--color-border-tipo-organizacion);
+        background-color: white;
+        transition: background-color 0.7s;
+      }
+      .cartaTipoComun:hover{
+        background-color: var(--color-hover-tipo-comun);
+      }
+      .cartaTipoOrganizacion:hover{
+        background-color: var(--color-hover-tipo-organizacion);
+      }
+      .TipoRegistro {
+        color: gray;
+      }
+      .headerComun{
+        background-color: var(--color-hover-tipo-comun);
+
+      }
+      .headerOrganizacion{
+        background-color: var(--color-hover-tipo-organizacion);
+
+      }
+      .listElementRegistro:hover,.imgRegistroPendiente:hover{
+        cursor: pointer;
+      }
+      .DocumentosIdentidadImagenes img:nth-child(2){
+        padding-left: 1em;
+      }
+    </style>
+  </head>
+  <body style="height: 100vh;">
+    <div class="mx-auto my-auto h-100 w-100 d-flex align-items-center justify-content-center d-none avisoListaRegistros">
+      <h2 class="">No hay registros para validar</h2>
+    </div>
+    <div class="mainContainerListaRegistros w-100 h-100">
+      <%var countLista = 0 %> 
+      <%if(registros.length!=0){%>
+        <div class="ListaRegistrosPendientes w-75 mx-auto">
+          <ul class="px-0">
+            <!-- cartaTipoComun cartaTipoOrganizacion -->
+            <%for(var i = 0;i<registros.length;i++){%>
+              <%countLista++%>
+              <%let tipoClase = ""%>
+              <%let tipoTexto = ""%>
+              <%if(registros[i].Tipo_Usuario==1){%>
+                  <%tipoClase = "cartaTipoOrganizacion"%>
+                  <%tipoTexto = "Organización"%>
+              <%}%>
+              <%if(registros[i].Tipo_Usuario==2){%>
+                  <%tipoClase = "cartaTipoComun"%>
+                  <%tipoTexto = "Común"%>
+              <%}%>
+              <li class="listElementRegistro <%=tipoClase%> rounded-end position-relative mb-4" data-bs-toggle="modal" data-bs-target="#modalRegistroView" data-bs-whatever="r-<%=registros[i].ID%>" id="r-<%=registros[i].ID%>">
+                  <div class="row ps-1">
+                  <div class="row pt-2">
+                      <p class="NombreRegistro fs-5 mb-1"><%=registros[i].Nombre%></p>
+                  </div>
+                  <div class="row">
+                      <p class="Ubicacion mb-0"><%=registros[i].muni.estado.Abreviatura%>, <%=registros[i].muni.Nombre%></p>
+                  </div>
+                  <div class="row justify-content-end">
+                      <div class="TipoRegistro my-1 pe-0">
+                      <p class="Tipo my-0 fs-6"><%=tipoTexto%></p>
+                      </div>
+                  </div>
+                  </div>
+              </li>
+            <%}%>
+          </ul>
+        </div>
+      <%}else{%>
+        <div class="mx-auto my-auto h-100 w-100 d-flex align-items-center justify-content-center">
+          <h2 class="">No hay registros para validar</h2>
+        </div>
+      <%}%>
+      <div class="modal fade" id="modalRegistroView" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div
+                  class="w-100 h-100 d-flex justify-content-center align-items-center loadingScreenLayer position-absolute top-50 start-50 translate-middle"
+                  style="z-index: 1; background-color: rgb(255, 255, 255)"
+                >
+                  <div
+                    class="spinner-border text-primary loadingSpinnerSolicitudes mx-auto my-auto"
+                    role="status"
+                  >
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                </div>
+            <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Registro</h1>
+                <button type="button" class="btn-close closeModal" data-bs-dismiss="modal" aria-label="Close" style="z-index:2"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                
+                <div class="mb-3">
+                    <h3 class="text-center fw-bold">Nombre</h3>
+                    <p id="NombreRegistroLista" class="text-center fs-4"></p>
+                </div>
+                <div class="mb-3">
+                    <h3 class="text-center fw-bold">Estado</h3>
+                    <p id="EstadoRegistroLista" class="text-center fs-4"></p>
+                </div>
+                <div class="mb-3">
+                    <h3 class="text-center fw-bold">Municipio</h3>
+                    <p id="MunicipioRegistroLista" class="text-center fs-4"></p>
+                </div>
+                <h3 class="text-center fw-bold">Documentos de Identidad</h3>
+                
+                <div class="DocumentosIdentidadImagenes d-flex justify-content-center" >
+                    
+                </div>
+                <!-- <div class="mb-3">
+                    <label for="message-text" class="col-form-label">Message:</label>
+                    <textarea class="form-control" id="message-text"></textarea>
+                </div> -->
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="aceptarRegistroListaPendiente" class="btn btn-success">Aceptar</button>
+                <button type="button" id="devolverRegistroListaPendiente" data-bs-target="#modalRazon" data-bs-toggle="modal" data-bs-dismiss="modal" class="btn btn-warning">Devolver</button>
+            </div>
+            </div>
+        </div>
+        </div>
+        <div class="modal fade" tabindex="-1" id="modalRazon">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Devolver registro</h5>
+                <button type="button" class="btn-close closeModal" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <p>Escribe la razón de devolución</p>
+                <div class="form-floating">
+                  <textarea class="form-control" placeholder="Escribe tu razón aquí" id="textareaRazonListaRegistros" style="height: 100px"></textarea>
+                  <label for="floatingTextarea2">Razón</label>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="enviarRazon">Enviar razon</button>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+    <script> let count = <%=countLista%></script>
+    <script type="module" src="/javascripts/listaRegistros.js"></script>
+    
+  </body>
+</html>
