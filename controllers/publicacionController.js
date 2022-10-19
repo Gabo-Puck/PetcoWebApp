@@ -79,7 +79,6 @@ const getAllTamano = (req, res, next) => {
 };
 
 const getProtocolosFromUsuario = (req, res, next) => {
-  req.session.IdSession = 2;
   if (req.session.IdSession) {
     // console.log("ProtocolosUsuario");
     Usuario.query()

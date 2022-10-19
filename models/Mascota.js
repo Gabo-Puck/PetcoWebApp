@@ -56,6 +56,16 @@ class Mascota extends BaseModel {
           to: "publicacion.ID",
         },
       },
+
+      MP: {
+        modelClass: Publicacion,
+        relation: Model.BelongsToOneRelation,
+        join: {
+          from: "mascota.ID_Publicacion",
+          to: "publicacion.ID",
+        },
+      },
+
       MascotasEspecie: {
         modelClass: Especie,
         relation: Model.BelongsToOneRelation,

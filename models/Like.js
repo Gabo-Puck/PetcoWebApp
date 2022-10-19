@@ -3,7 +3,7 @@ var knex = require("../knex");
 var BaseModel = require("./BaseModel");
 Model.knex(knex);
 
-class Like extends BaseModel {
+class Like extends Model {
     static get tableName() {
         return "like";
     }

@@ -12,6 +12,11 @@ router.get("/feed", feed_start.feed);
 
 router.post("/CrearI", feed_start.CrearIntereses);
 
+router.get("/cerrarsession", feed_start.CerrarSession);
+
+router.get("/PublicacionesGuardadas", feed_start.Pguardadas);
+
+
 //router.post("/CheckLogin", registro_Login.CheckDB);
 
 module.exports = router;

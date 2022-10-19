@@ -11,6 +11,8 @@ const Comentario = require("../models/Comentario");
 const paypal = require("paypal-rest-sdk");
 const Donaciones = require("../models/Donaciones");
 const Like = require("../models/Like");
+const Publicacion_Guardada = require("../models/Publicacion_Guardada");
+const Reporte_Publicacion = require("../models/Reporte_Publicacion");
 
 paypal.configure({
   mode: "sandbox", //sandbox or live
@@ -22,59 +24,183 @@ paypal.configure({
 
 exports.query = (req, res) => {
 
-  Comentario.query()
-  .withGraphJoined('ComentariosPublicacion')
-  .withGraphJoined('ComentariosUsuario.UsuarioRegistro')
-  .where('comentario.ID_Publicacion', '=', req.params.idPublicacion)
-  .orderBy('Fecha_Envio' , "desc")
-  .then((result)=>{ 
+  Like.query()
+    .where('like.ID_Publicacion', '=', req.params.idPublicacion)
 
-    Mascota.query()
-    .withGraphJoined("MascotasPublicacion.PublicacionUsuario")
-    .withGraphJoined("MascotasCastrado")
-    .withGraphJoined("MascotasTamano")
-    .withGraphJoined("MascotasEspecie")
-    .withGraphJoined("MascotasVacunas")
-    .withGraphJoined("MascotasSalud")
-    .withGraphJoined("MascotasEstado")
-    .withGraphJoined("MascotasImagenes")
-    .withGraphJoined("MascotasMetas.MetasDonaciones")
-    .where("mascota.ID_Publicacion", "=", req.params.idPublicacion)
-    //.findByIds({'MascotasPublicacion.ID':req.params.idPublicacion})
-    .then((MascotaP) => {
-      //nombre usuario
-      //console.log("🚀 ~ file: PublicacionGetController.js ~ line 65 ~ .then ~ MascotaP "+ MascotaP[0].MascotasPublicacion.PublicacionUsuario.ID)
-      
+    .then((LikesP) => {
 
-      Registro.query()
-      .withGraphJoined('RegistroUsuario')
-      .where('RegistroUsuario.ID', '=', req.session.IdSession)
-      .then((resultados)=>{
-        // console.log(resultados[0].Nombre);
-        
-        // console.log(MascotaP[0].MascotasImagenes);
-        res.render("publicacion.ejs", {
-          MascotaRender: MascotaP,
-          usuario:resultados,
-          comentarios:result,
-        });
-        
-        
-      })
-    });
 
-  })
+      Comentario.query()
+        .withGraphJoined('ComentariosPublicacion')
+        .withGraphJoined('ComentariosUsuario.UsuarioRegistro')
+        .where('comentario.ID_Publicacion', '=', req.params.idPublicacion)
+        .orderBy('Fecha_Envio', "desc")
+        .then((result) => {
+
+          Mascota.query()
+            .withGraphJoined("MP.PublicacionUsuario.[UsuarioRegistro]")
+            .withGraphJoined("MascotasCastrado")
+            .withGraphJoined("MascotasTamano")
+            .withGraphJoined("MascotasEspecie")
+            .withGraphJoined("MascotasVacunas")
+            .withGraphJoined("MascotasSalud")
+            .withGraphJoined("MascotasEstado")
+            .withGraphJoined("MascotasImagenes")
+            .withGraphJoined("MascotasMetas.MetasDonaciones")
+            .where("mascota.ID_Publicacion", "=", req.params.idPublicacion)
+            .then((MascotaP) => {
+
+              Registro.query()
+                .withGraphJoined('RegistroUsuario')
+                .where('RegistroUsuario.ID', '=', req.session.IdSession)
+                .then((resultados) => {
+                  res.render("publicacion.ejs", {
+                    MascotaRender: MascotaP,
+                    usuario: resultados,
+                    comentarios: result,
+                    likesp: LikesP,
+                  });
+
+                })
+            });
+
+        })
+
+    })
 
 
 };
+
 exports.likes = (req, res) => {
-  Like.query()
-  .then( (res)=>{
 
-    console.log(res);
-    console.log(req.params)
-  })
+  if (req.params.accion == 0) {
 
+    Like.query()
+      .where('like.ID_Publicacion', '=', req.params.idP)
+      .andWhere('like.ID_Usuario', '=', req.params.idU)
+      .then((resp) => {
+        console.log(resp);
+        console.log(req.params)
+        res.json(resp);
+
+      })
+  }
+
+
+  if (req.params.accion == 1) {
+
+    Like.query()
+      .insert({
+        ID_Publicacion: req.params.idP,
+        ID_Usuario: req.params.idU,
+      })
+      .then((resp) => { })
+
+    res.json("Se agrego");
+
+  }
+
+  if (req.params.accion == 2) {
+    Like.query()
+      .delete()
+      .where('like.ID_Publicacion', '=', req.params.idP)
+      .andWhere('like.ID_Usuario', '=', req.params.idU)
+      .then();
+    res.json("Se Borro");
+
+  }
+
+}
+
+exports.psaveds = (req, res) => {
+  //Buscar coincidencias
+  if (req.params.accion == 0) {
+    Publicacion_Guardada.query()
+      .where('publicacion_guardada.ID_Publicacion', '=', req.params.idP)
+      .andWhere('publicacion_guardada.ID_Usuario', '=', req.params.idU)
+      .then((resp) => {
+        console.log(resp);
+        console.log(req.params)
+        res.json(resp);
+      })
+  }
+
+  if (req.params.accion == 1) {
+
+    Publicacion_Guardada.query()
+      .insert({
+        ID_Publicacion: req.params.idP,
+        ID_Usuario: req.params.idU,
+      })
+      .then((resp) => { })
+
+    res.json("Se agrego");
+
+  }
+
+  if (req.params.accion == 2) {
+    Publicacion_Guardada.query()
+      .delete()
+      .where('publicacion_guardada.ID_Publicacion', '=', req.params.idP)
+      .andWhere('publicacion_guardada.ID_Usuario', '=', req.params.idU)
+      .then();
+    res.json("Se Borro");
+  }
+}
+
+exports.reportar = (req, res) => {
+  console.log(req.params);
+  Reporte_Publicacion.query()
+    .insert({
+      razon: req.params.motivo,
+      ID_Usuario_Reporta: req.params.usuarioreporta,
+      ID_Usuario_Reportado: req.params.usuarioreportado,
+      ID_Publicacion: req.params.publicacion
+
+    })
+    .then((resp) => { })
+
+  Publicacion.query()
+    .findOne({ ID: req.params.publicacion })
+    .then((PublicacionFind) => {
+    
+      PublicacionFind.$query()
+        .patch({ Reportes_Peso: parseInt(PublicacionFind.Reportes_Peso) + parseInt(req.params.peso) })
+        .then(() => {
+
+          if (PublicacionFind.Reportes_Peso >= 50)
+          {
+           
+            PublicacionFind.$query()
+            .patch({ Activo: 0 })
+            .then(() => {})
+            
+          }
+
+        });
+
+    });
+
+  // Publicacion.query()
+  //   .where('publicacion.ID', "=", req.params.publicacion)
+  //   .then((PublicacionObtenida) => { 
+
+  //     //Actualizar Peso
+  //     Publicacion.query()
+  //     .where('publicacion.ID', "=", req.params.publicacion)
+  //     .patch({
+  //       Reportes_Peso: parseInt(PublicacionObtenida[0].Reportes_Peso) + parseInt(req.params.peso),
+  //     })
+  //     .then((PublicacionActualizada) => {
+
+  //       if(PublicacionActualizada[0].Reportes_Peso)
+  //       {}
+
+  //     })
+
+  //   })
+
+  res.json("Se realizo el fetch");
 
 }
 
@@ -194,8 +320,8 @@ exports.paysuccess = (req, res) => {
   );
 
   var today = new Date();
-  var date =today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
-  var time =today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+  var date = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+  var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
   var dateTime = date + " " + time;
   console.log(dateTime);
 
