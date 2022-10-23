@@ -12,6 +12,9 @@ exports.isAdoptante = (req, res, next) => {
   } catch (err) {
     next(err);
   }
+  console.log(req.body);
+
+  console.log(MascotaID);
 
   Mascota.query()
     .withGraphJoined(
@@ -28,7 +31,7 @@ exports.isAdoptante = (req, res, next) => {
         //hacer algo cuando el usuario encontrado es el adoptante
         // res.render("procesoAdopcion")
         // console.log(usuarioSolicitud);
-        // console.log("Si es adoptante");
+        console.log("Si es adoptante");
         // console.log(usuarioSolicitud);
         // console.log(usuarioSolicitud[0].MascotasSolicitudes[0]);
         res.SolicitudID = usuarioSolicitud[0].MascotasSolicitudes[0].ID;
@@ -37,6 +40,7 @@ exports.isAdoptante = (req, res, next) => {
         res.PeerProceso = {
           Nombre: UsuarioQuery.UsuarioRegistro.Nombre,
           Foto_Perfil: UsuarioQuery.Foto_Perfil,
+          ID: UsuarioQuery.ID,
         };
         console.log(res.PeerProceso);
         res.isAdoptante = true;
@@ -51,13 +55,22 @@ exports.isAdoptante = (req, res, next) => {
 
 exports.isDuenoMascota = (req, res, next) => {
   console.log("Estamos en dueno");
+  try {
+    if (req.params.MascotaID) {
+      MascotaID = req.params.MascotaID;
+    } else if (req.body.MascotaID) {
+      MascotaID = req.body.MascotaID;
+    }
+  } catch (err) {
+    next(err);
+  }
   if (!res.isAdoptante) {
     Mascota.query()
       .withGraphJoined(
         "[MascotasPublicacion,MascotasSolicitudes.[Usuario.[UsuarioRegistro]]]",
         { minimize: true }
       )
-      .where("mascota.ID", "=", req.params.MascotaID)
+      .where("mascota.ID", "=", MascotaID)
       .andWhere("_t0.ID_Usuario", "=", req.session.IdSession)
       .andWhere("_t1.Estado", "=", 1)
       .then((usuarioDueno) => {
@@ -73,6 +86,7 @@ exports.isDuenoMascota = (req, res, next) => {
           res.PeerProceso = {
             Nombre: UsuarioQuery.UsuarioRegistro.Nombre,
             Foto_Perfil: UsuarioQuery.Foto_Perfil,
+            ID: UsuarioQuery.ID,
           };
           console.log(res.ProcesoPeer);
           res.isDuenoMascota = true;

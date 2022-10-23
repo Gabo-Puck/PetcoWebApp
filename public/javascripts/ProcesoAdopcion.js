@@ -26,6 +26,10 @@ var idPaso; //ID del paso seleccionado actual por el usuario
 
 const pasoCompletadoCheckBox = document.querySelector("#pasoCompletado");
 
+const iconsFeedBack = document.querySelector(".iconsFeedBack");
+
+const iconsFace = document.querySelectorAll(".face-feedback");
+
 pasoCompletadoCheckBox.addEventListener("change", (e) => {
   if (pasoCompletadoCheckBox.checked == "1") {
     Swal.fire({
@@ -124,6 +128,7 @@ window.addEventListener("DOMContentLoaded", () => {
   }
   emitConnectionData();
   addListenerMandarMensajeButton();
+  allPasosCompletado();
 });
 let socket;
 
@@ -140,6 +145,86 @@ const insertPreviousMessages = () => {
   });
 };
 socket = initSocket(insertPreviousMessages);
+
+iconsFace.forEach((iconF) => {
+  addEventListenerIconsFeedback(iconF);
+});
+
+function addEventListenerIconsFeedback(iconF) {
+  var mapValues = new Map();
+  mapValues.set("face-feedback-muymal", -10);
+  mapValues.set("face-feed-back-mal", -5);
+  mapValues.set("face-feed-back-regular", 1);
+  mapValues.set("face-feed-back-bien", 6);
+  mapValues.set("face-feed-back-muybien", 10);
+  var e = document.createElement("a");
+
+  iconF.addEventListener("click", (e) => {
+    let iconClicked = e.target;
+    for (let index = 0; index < iconClicked.classList.length; index++) {
+      const element = iconClicked.classList[index];
+      if (mapValues.has(element)) {
+        let valueSelected = mapValues.get(element);
+        console.log(valueSelected, MascotaID);
+        sendFeedback(valueSelected, MascotaID);
+      }
+    }
+  });
+}
+function allPasosCompletado() {
+  let isCompleted = true;
+  PasosProceso.forEach((paso) => {
+    if (paso.PasoProceso[0].Completado < 3) {
+      isCompleted = false;
+    }
+  });
+  let lastIndex = PasosProceso.length - 1;
+  let lastPaso = PasosProceso[lastIndex].PasoProceso[0];
+  console.log(lastPaso);
+  if (lastPaso.Completado == 5 && tipo == 1) {
+    showFeedBackModal();
+  }
+
+  if (lastPaso.Completado == 4 && tipo == 2) {
+    showFeedBackModal();
+  }
+
+  if (lastPaso.Completado == 3) {
+    showFeedBackModal();
+  }
+}
+
+function showFeedBackModal() {
+  iconsFeedBack.classList.remove("d-none");
+  Swal.fire({
+    title: "¡Adopción finalizada!",
+    icon: "question",
+    html: iconsFeedBack,
+  });
+}
+function sendFeedback(value, MascotaID) {
+  let formData = new FormData();
+  formData.append("reputacionValue", value);
+  formData.append("MascotaID", MascotaID);
+  let request = { reputacionValue: value, MascotaID: MascotaID };
+  fetch(`/proceso/recibirFeedback`, {
+    method: "POST",
+    body: JSON.stringify(request),
+    headers: { "Content-Type": "application/json" },
+  })
+    .then((res) => res.json())
+    .then((res) => {
+      if (res == "ok") {
+        Swal.fire("¡Recibido!", `Muchas gracias :)`, "success");
+      } else {
+        Swal.fire(
+          "¡Atención!",
+          `<p>Algo ha salido mal</p><p>Intenta más tarde</p>`,
+          "error"
+        );
+      }
+    });
+}
 
 function emitConnectionData() {
   socket.emit("join-proceso", MascotaID);
@@ -199,12 +284,12 @@ function addPasosToProgressBarSteps(progressBar, PasosProceso) {
     if (Paso.PasoProceso[0].Completado == 0) {
       newPasoToProgressBar = pasoPendiente.cloneNode(true);
     }
-    if (Paso.PasoProceso[0].Completado == 3) {
+    if (Paso.PasoProceso[0].Completado >= 3) {
       newPasoToProgressBar = pasoCompletado.cloneNode(true);
     }
     if (
-      Paso.PasoProceso[0].Completado != 3 &&
-      Paso.PasoProceso[0].Completado != 0
+      Paso.PasoProceso[0].Completado != 0 &&
+      Paso.PasoProceso[0].Completado <= 2
     ) {
       newPasoToProgressBar = pasoActivo.cloneNode(true);
     }
@@ -401,39 +486,6 @@ function getFormatedDate(dateToFormat) {
   return dateTime;
 }
 
-socket.on("mensaje-chat-proceso", ({ message, userID, fecha }) => {
-  insertNewMensaje(message, userID, fecha, socket);
-});
-
-socket.on("paso-completado", ({ Completado, idPasoAfectado }) => {
-  PasosProceso[idPasoAfectado].PasoProceso[0].Completado = Completado;
-  pasos[idPasoAfectado].click();
-  if (Completado == 3) {
-    pasos[idPasoAfectado].classList = pasoCompletado.classList;
-    if (idPasoAfectado < PasosProceso.length - 1) {
-      pasos[Number(idPasoAfectado) + 1].classList = pasoActivo.classList;
-      infoPasoProceso.header.querySelector("div").textContent =
-        "Paso completado";
-      infoPasoProceso.header
-        .querySelector("#pasoCompletado")
-        .parentElement.classList.add("d-none");
-    }
-  }
-});
-
-socket.on(
-  "error-paso-completado-lista-registro",
-  ({ error, idPasoAfectado }) => {
-    Swal.fire("Atención", `<p>${error}</p>`, "warning");
-    pasos[idPasoAfectado].click();
-  }
-);
-
-socket.on("archivo-subido-paso", ({ path, idPasoAfectado }) => {
-  PasosProceso[idPasoAfectado].PasoProceso[0].Archivo = path;
-  pasos[idPasoAfectado].click();
-});
-
 function insertNewMensaje(message, userID, fecha, socket) {
   let newMessage;
   let newContentParagraph;
@@ -459,4 +511,38 @@ function insertNewMensaje(message, userID, fecha, socket) {
 
 videollamadaButton.addEventListener("click", () => {
   window.open(`/videollamada/${ROOM_ID}`, "_parent");
+});
+
+socket.on("mensaje-chat-proceso", ({ message, userID, fecha }) => {
+  insertNewMensaje(message, userID, fecha, socket);
+});
+
+socket.on("paso-completado", ({ Completado, idPasoAfectado }) => {
+  PasosProceso[idPasoAfectado].PasoProceso[0].Completado = Completado;
+  pasos[idPasoAfectado].click();
+  if (Completado == 3) {
+    pasos[idPasoAfectado].classList = pasoCompletado.classList;
+    if (idPasoAfectado < PasosProceso.length - 1) {
+      pasos[Number(idPasoAfectado) + 1].classList = pasoActivo.classList;
+      infoPasoProceso.header.querySelector("div").textContent =
+        "Paso completado";
+      infoPasoProceso.header
+        .querySelector("#pasoCompletado")
+        .parentElement.classList.add("d-none");
+    }
+    allPasosCompletado();
+  }
+});
+
+socket.on(
+  "error-paso-completado-lista-registro",
+  ({ error, idPasoAfectado }) => {
+    Swal.fire("Atención", `<p>${error}</p>`, "warning");
+    pasos[idPasoAfectado].click();
+  }
+);
+
+socket.on("archivo-subido-paso", ({ path, idPasoAfectado }) => {
+  PasosProceso[idPasoAfectado].PasoProceso[0].Archivo = path;
+  pasos[idPasoAfectado].click();
 });

@@ -8,7 +8,7 @@ class Pasos_Mascota extends Model {
     return "paso_mascota";
   }
   static get idColumn() {
-    return ["ID_Mascota", "ID_Paso"];
+    return "ID";
   }
 
   static get relationMappings() {

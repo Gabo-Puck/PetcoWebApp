@@ -5,5 +5,6 @@ const ProcesoAdopcionesController = require("../controllers/ProcesoAdopcionContr
 
 router.get("/ver/:MascotaID", ProcesoAdopcionesController.getProceso);
 router.post("/subirArchivo", ProcesoAdopcionesController.uploadFile);
+router.post("/recibirFeedback", ProcesoAdopcionesController.patchReputacion);
 
 module.exports = router;

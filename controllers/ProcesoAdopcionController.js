@@ -141,6 +141,71 @@ exports.uploadFile = [
   },
 ];
 
+exports.patchReputacion = [
+  isAdoptante,
+  isDuenoMascota,
+  (req, res, next) => {
+    if (res.isAdoptante || res.isDuenoMascota) {
+      console.log(res.PeerProceso.ID);
+      Usuario.query()
+        .findById(res.PeerProceso.ID)
+        .then((usuarioReputacion) => {
+          let reputacionCambio =
+            usuarioReputacion.Reputacion + req.body.reputacionValue;
+          usuarioReputacion
+            .$query()
+            .patch({ Reputacion: reputacionCambio })
+            .then(() => patchPasoProceso(req.body.MascotaID, res.isAdoptante))
+            .then((resolveValue) => {
+              if (resolveValue == "ok") {
+                res.json(resolveValue);
+              } else {
+                next(resolveValue);
+              }
+            });
+        })
+        .catch((err) => {
+          console.log(err);
+          next(err);
+        });
+    } else {
+      console.log("Te mando al login");
+      res.json("notOk");
+    }
+  },
+];
+
+function patchPasoProceso(mascotaID, isAdoptante) {
+  return new Promise((resolve, reject) => {
+    Mascota.query()
+      .withGraphJoined("MascotasPasos.[PasoProceso]")
+      .where("mascota.ID", "=", mascotaID)
+      .andWhere("MascotasPasos:PasoProceso.ID_Mascota", "=", mascotaID)
+      .then((PasosProceso) => {
+        console.log(PasosProceso[0], "\n");
+        console.log(PasosProceso[0].MascotasPasos, "\n");
+        console.log(PasosProceso[0].MascotasPasos.PasosProceso, "\n");
+        let lastIndex = PasosProceso[0].MascotasPasos.length - 1;
+        let valueAdd = isAdoptante ? 2 : 1;
+        let completadoPatchValue =
+          PasosProceso[0].MascotasPasos[lastIndex].PasoProceso[0].Completado +
+          valueAdd;
+        Pasos_Mascota.query()
+          .findOne({
+            ID: PasosProceso[0].MascotasPasos[lastIndex].PasoProceso[0].ID,
+          })
+          .patch({ Completado: completadoPatchValue })
+          .then(() => {
+            resolve("ok");
+          });
+      })
+      .catch((err) => {
+        console.log(err);
+        resolve(err);
+      });
+  });
+}
+
 // exports.isAdoptante = isAdoptante;
 
 // exports.isDuenoMascota = isAdoptante;
