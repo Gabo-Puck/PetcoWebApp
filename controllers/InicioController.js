@@ -1,26 +1,94 @@
 var Intereses = require("../models/Intereses");
 var Especie = require("../models/Especie");
+var Mascota = require("../models/Mascota");
+const Publicacion = require("../models/Publicacion");
+const Publicacion_Guardada = require("../models/Publicacion_Guardada");
 
 exports.Inicio = (req, res, next) => {
+  console.log(req.session);
+
   if (req.session.Logged) {
+
     //Revisa si el usuario esta logeado en la pagina
+
+
+    let prueba = new Array();
+
+
 
     Intereses.query()
       .where("intereses.ID_Usuario", "=", req.session.IdSession)
       .then((Result) => {
-        console.log(Result);
+        //console.log(Result);
 
         if (Result.length < 3) {
           //Revisa que el usuario tenga 3 intereses
-          console.log(Result);
-          console.log(req.baseUrl.concat("login"));
-          console.log(req.hostname.concat("/login"));
-
           res.redirect(req.baseUrl + "/intereses");
-          // res.redirect("./login");
+
         } else {
-          // res.render("feed.ejs"); //El usuario esta logeado y tiene los intereses correspondientes
-          res.redirect(req.baseUrl + "/feed");
+
+          //El usuario esta logeado y tiene los intereses correspondientes
+          Intereses.query()
+            .where("intereses.ID_Usuario", "=", req.session.IdSession)
+            .then((Result) => {
+              //console.log(Result);
+
+
+
+              Publicacion.query()
+              .where("publicacion.Activo", "=", 1)
+                .withGraphJoined("Mascota.MascotasPublicacion")
+                .withGraphJoined("Mascota.MascotasEstado")
+                .withGraphJoined("Mascota.MascotasImagenes")
+                .select(
+                  'publicacion.*',
+                  Publicacion.relatedQuery('PublicacionLike')
+                    .count()
+                    .as('numberOfLikes')
+                )
+                .select(
+                  'publicacion.*',
+                  Publicacion.relatedQuery('PublicacionReporte')
+                    .count()
+                    .as('numberOfReports')
+                )
+                .orderByRaw('numberOfReports')
+                .orderBy('numberOfLikes', 'desc')
+                .orderByRaw('Reportes_Peso')
+                .then((resultado) => {
+
+                  //console.log('Separador ------------------------');
+                  //console.log(resultado);
+
+                  let contador = 0;
+
+                  for (let i = 0; i < resultado.length; i++) {
+
+                    for (let j = 0; j < resultado[i].Mascota.length; j++) {
+
+                      if (resultado[i].Mascota[j].ID_Especie == Result[0].ID_Especie || resultado[i].Mascota[j].ID_Especie == Result[1].ID_Especie || resultado[i].Mascota[j].ID_Especie == Result[2].ID_Especie)
+                      {
+                      //console.log(resultado[i].Mascota[j].Nombre);
+                      prueba[contador] = resultado[i].Mascota[j];
+                      contador++;
+                    }
+                    }
+                    //console.log('Aqui acaba una publicacion y sus mascotas')
+                  }
+
+                  res.render("feed.ejs", {
+                    MascotaRender: prueba,
+                  });
+                  //console.log(prueba);
+                })
+
+
+              //id organizacion
+              //  console.log(MascotaP);
+              //console.log(req.session.IdSession);
+
+            })
+
         }
       })
       .catch((err) => next(err));
@@ -31,6 +99,7 @@ exports.Inicio = (req, res, next) => {
 
 exports.feed = (req, res, next) => {
   res.render("feed.ejs");
+  console.log(req.session);
 };
 
 exports.SeleccionarIntereses = (req, res, next) => {
@@ -58,10 +127,157 @@ exports.CrearIntereses = (req, res, next) => {
         ID_Usuario: req.session.IdSession,
         ID_Especie: array[i],
       })
-      .then((registroCreado) => {})
+      .then((registroCreado) => { })
       .catch((err) => next(err));
   }
 
   // res.redirect("/inicio");
   res.redirect(req.baseUrl + "/feed");
 };
+<<<<<<< HEAD
+=======
+
+
+exports.CerrarSession = (req, res, next) => {
+
+  console.log('owo');
+
+  req.session.destroy(()=>
+  {
+    res.redirect('/');
+  })
+
+}
+
+exports.Pguardadas = (req, res, next) => {
+
+  let prueba = new Array();
+
+  
+  Publicacion.query()
+  .where("publicacion.Activo", "=", 1)
+    .withGraphJoined("Mascota.MascotasPublicacion")
+    .withGraphJoined("Mascota.MascotasEstado")
+    .withGraphJoined("Mascota.MascotasImagenes")
+    .select(
+      'publicacion.*',
+      Publicacion.relatedQuery('PublicacionLike')
+        .count()
+        .as('numberOfLikes')
+    )
+    .select(
+      'publicacion.*',
+      Publicacion.relatedQuery('PublicacionReporte')
+        .count()
+        .as('numberOfReports')
+    )
+    .withGraphJoined('PublicacionGuardada')
+    .orderByRaw('numberOfReports')
+    .orderBy('numberOfLikes', 'desc')
+    .orderByRaw('Reportes_Peso')
+    .then((resultado) => {
+
+      //console.log('Separador ------------------------');
+      //console.log(resultado);
+
+      let contador = 0;
+
+      for (let i = 0; i < resultado.length; i++) {
+
+        for (let j = 0; j < resultado[i].PublicacionGuardada.length; j++) {
+
+          if (resultado[i].PublicacionGuardada[j].ID_Usuario == req.session.IdSession)
+          {
+          //console.log(resultado[i].Mascota[j].Nombre);
+          prueba[contador] = resultado[i].Mascota[j];
+          contador++;
+        }
+        }
+        //console.log('Aqui acaba una publicacion y sus mascotas')
+      }
+
+      res.render("feed.ejs", {
+        MascotaRender: prueba,
+      });
+      //console.log(prueba);
+    })
+
+// Publicacion.query()
+// .withGraphJoined('PublicacionGuardada')
+// .then((result) => {
+//   res.json(result);
+// })  
+
+
+exports.CerrarSession = (req, res, next) => {
+
+  console.log('owo');
+
+  req.session.destroy(()=>
+  {
+    res.redirect('/');
+  })
+
+}
+
+exports.Pguardadas = (req, res, next) => {
+
+  let prueba = new Array();
+
+  
+  Publicacion.query()
+  .where("publicacion.Activo", "=", 1)
+    .withGraphJoined("Mascota.MascotasPublicacion")
+    .withGraphJoined("Mascota.MascotasEstado")
+    .withGraphJoined("Mascota.MascotasImagenes")
+    .select(
+      'publicacion.*',
+      Publicacion.relatedQuery('PublicacionLike')
+        .count()
+        .as('numberOfLikes')
+    )
+    .select(
+      'publicacion.*',
+      Publicacion.relatedQuery('PublicacionReporte')
+        .count()
+        .as('numberOfReports')
+    )
+    .withGraphJoined('PublicacionGuardada')
+    .orderByRaw('numberOfReports')
+    .orderBy('numberOfLikes', 'desc')
+    .orderByRaw('Reportes_Peso')
+    .then((resultado) => {
+
+      //console.log('Separador ------------------------');
+      //console.log(resultado);
+
+      let contador = 0;
+
+      for (let i = 0; i < resultado.length; i++) {
+
+        for (let j = 0; j < resultado[i].PublicacionGuardada.length; j++) {
+
+          if (resultado[i].PublicacionGuardada[j].ID_Usuario == req.session.IdSession)
+          {
+          //console.log(resultado[i].Mascota[j].Nombre);
+          prueba[contador] = resultado[i].Mascota[j];
+          contador++;
+        }
+        }
+        //console.log('Aqui acaba una publicacion y sus mascotas')
+      }
+
+      res.render("feed.ejs", {
+        MascotaRender: prueba,
+      });
+      //console.log(prueba);
+    })
+
+// Publicacion.query()
+// .withGraphJoined('PublicacionGuardada')
+// .then((result) => {
+//   res.json(result);
+// })  
+
+}
+
