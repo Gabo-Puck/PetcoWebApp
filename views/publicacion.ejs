@@ -79,7 +79,16 @@
             display: block;
             width: 100%;
         }
+        .alertLimite{
+            width: 50vw; 
+            z-index: 100;
+        }
 
+        @media(max-width:768px){
+            .alertLimite{
+                width: 80vw;
+            }
+        }
        
         
     </style>
@@ -291,7 +300,13 @@
             <%= MascotaRender[0].MP.Descripcion %>
         </h3>
     </div>
-
+    <%if(!SolicitudesValNumero){%>
+    <div class="alert alert-dismissible alert-info position-fixed bottom-0 end-0 me-2 alertLimite" >
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <h4 class="alert-heading">¡Aviso!</h4>
+        <p class="mb-0">Haz alcanzado el limite de 3 solicitudes enviadas. Cancela o finaliza solicitudes activas para enviar más</p>
+      </div>
+      <%}%>
     <div class=" container mr-5 ml-5" style=" text-align: center; ">
 
         <div class="swiper SliderMascota">
@@ -453,16 +468,59 @@
 
 
                                                                     <h5 style="text-align: center;" class="mt-5">
-
-                                                                        <a href="/petco/formulario/responder/m=<%=MascotaRender[i].ID%>"
-                                                                            class="btn btn-warning btn-block">
-
-
-                                                                            Enviar solicitud <i
-                                                                                class="fa-solid fa-envelope"></i>
-
-                                                                            </i>
-                                                                        </a>
+                                                                        <%if(isDueno==false){%>
+                                                                            <%let isSolicitudEnviada=false;%>
+                                                                            <% arrayMascotasSolicitud.forEach(function(solicitudID){ %>
+                                                                                
+                                                                                <%if(solicitudID==MascotaRender[i].ID){%>
+                                                                                    <%isSolicitudEnviada=true;%>
+                                                                                <%}%>
+                                                                              <% }); %>
+                                                                              <%if(isSolicitudEnviada){%>
+                                                                                <a
+                                                                                   href="#" class="btn btn-warning btn-block disabled" tabindex="-1" aria-disabled="true">
+        
+        
+                                                                                    Solicitud enviada <i
+                                                                                        class="fa-solid fa-envelope"></i>
+        
+                                                                                    </i>
+                                                                                </a>
+                                                                              <%}else if(SolicitudesValNumero){%>
+                                                                                <a href="/petco/formulario/responder/m=<%=MascotaRender[i].ID%>"
+                                                                                    class="btn btn-warning btn-block">
+        
+        
+                                                                                    Enviar solicitud <i
+                                                                                        class="fa-solid fa-envelope"></i>
+        
+                                                                                    </i>
+                                                                                </a>
+                                                                                <%} else{%>
+                                                                                    <a href="#"
+                                                                                    class="btn btn-warning btn-block disabled" tabindex="-1" aria-disabled="true">
+            
+            
+                                                                                        Enviar solicitud <i
+                                                                                            class="fa-solid fa-envelope"></i>
+            
+                                                                                        </i>
+                                                                                    </a>
+                                                                                <%}%>
+                                                                            
+                                                                        <%}%>
+                                                                        
+                                                                        <%if(isDueno==true){%>
+                                                                            <a href="/solicitudes/ver/<%=publicacionID%>"
+                                                                                class="btn btn-warning btn-block">
+    
+    
+                                                                                Ver Solicitudes <i
+                                                                                    class="fa-solid fa-envelope"></i>
+    
+                                                                                </i>
+                                                                            </a>
+                                                                        <%}%>
                                                                     </h5>
 
                                 </div>

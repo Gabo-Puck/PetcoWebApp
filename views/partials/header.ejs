@@ -1,78 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" , href="/stylesheets/style.css" />
-    <link href="https://fonts.googleapis.com/css?family=Poppins:400,700" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css?family=Poppins:400,700"
+      rel="stylesheet"
+    />
 
-
-    <link href="https://fonts.googleapis.com/css?family=Poppins:400,700" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css?family=Poppins:400,700"
+      rel="stylesheet"
+    />
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js"
-        integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT"
-        crossorigin="anonymous"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js"
+      integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT"
+      crossorigin="anonymous"
+    ></script>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"
-        integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"
+      integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <!--  tipo 1 es organizacion -->
+    <!-- tipo 2 es comun -->
     <title>Document</title>
-</head>
+  </head>
 
-<body>
+  <body>
+    <nav
+      class="navbar navbar-expand-lg navbar-light bg-light sticky-top"
+      style="text-align: center"
+    >
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Navbar</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarColor03"
+          aria-controls="navbarColor03"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarColor03">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a class="nav-link active" href="/petco/inicio"
+                >Inicio
+                <span class="visually-hidden">(current)</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/publicacion/crear">Publicar</a>
+            </li>
 
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                data-bs-toggle="dropdown"
+                href="#"
+                role="button"
+                aria-haspopup="true"
+                aria-expanded="false"
+                ><i class="fa-solid fa-bars fa-lg"></i
+              ></a>
+              <div class="dropdown-menu">
+                <a
+                  class="dropdown-item"
+                  href="/petco/inicio/PublicacionesGuardadas"
+                  >Publicaciones Guardadas</a
+                >
+                <a class="dropdown-item" href="#">Another action</a>
+                <a class="dropdown-item" href="#">Something else here</a>
+                <%if(Tipo==1){%>
+                <a class="dropdown-item" href="/petco/dashboard">Dashboard</a>
 
+                <!-- Cosas de organizacion -->
+                <%}%> <%if(Tipo==2){%>
+                <!-- Cosas de comun -->
+                <a class="dropdown-item" href="#">Ver procesos</a>
 
+                <%}%>
+                <div class="dropdown-divider"></div>
+                <a
+                  class="dropdown-item"
+                  href="/petco/inicio/cerrarsession/"
+                  id="logout"
+                  >Cerrar sesion
+                  <i
+                    class="fa-solid fa-door-open fa-lg"
+                    style="color: #ea2340"
+                  ></i
+                ></a>
+              </div>
+            </li>
+          </ul>
 
-
-    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top" style="text-align: center;">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Navbar</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor03"
-                aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarColor03">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/petco/inicio">Inicio
-                            <span class="visually-hidden">(current)</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/publicacion/crear">Publicar</a>
-                    </li>
-
-                    
-
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
-                            aria-haspopup="true" aria-expanded="false"><i class="fa-solid fa-bars fa-lg"></i></a>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="/petco/inicio/PublicacionesGuardadas">Publicaciones Guardadas</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <a class="dropdown-item" href="#">Something else here</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="/petco/inicio/cerrarsession/" id="logout">Cerrar sesion   <i class="fa-solid fa-door-open fa-lg" style="color: #EA2340;"></i></a>
-                        </div>
-                    </li>
-
-                </ul>
-
-                <a class="mt-2">
-                    <a href=""  style="margin-right: 1%;"> <i class="fa-regular fa-bell fa-lg"></i> </a>
-                </a>
-
-               
-            </div>
+          <a class="mt-2">
+            <a href="" style="margin-right: 1%">
+              <i class="fa-regular fa-bell fa-lg"></i>
+            </a>
+          </a>
         </div>
+      </div>
     </nav>
-
-
-</body>
-
+  </body>
 </html>

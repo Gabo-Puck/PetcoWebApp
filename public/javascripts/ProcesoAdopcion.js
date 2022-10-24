@@ -30,6 +30,8 @@ const iconsFeedBack = document.querySelector(".iconsFeedBack");
 
 const iconsFace = document.querySelectorAll(".face-feedback");
 
+const abortarProceso = document.querySelector("#abortarProceso");
+
 pasoCompletadoCheckBox.addEventListener("change", (e) => {
   if (pasoCompletadoCheckBox.checked == "1") {
     Swal.fire({
@@ -77,6 +79,52 @@ pasoCompletadoCheckBox.addEventListener("change", (e) => {
     });
   }
 });
+
+abortarProceso.addEventListener("click", (e) => {
+  Swal.fire({
+    title: "¿Estás seguro de querer abortar el proceso?",
+    icon: "warning",
+    html: "<p>Una vez realizada esta acción no hay vuelta atrás</p><p>Todos los archivos subidos, así como mensajes se perderán</p>",
+    showConfirmButton: true,
+    showCancelButton: true,
+    confirmButtonText: "Si quiero",
+    cancelButtonText: "No quiero",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      loadingScreen.fire();
+      setTimeout(() => {
+        abortarProcesoFetch();
+      }, defaultTimer);
+    }
+  });
+});
+
+function abortarProcesoFetch() {
+  let request = { MascotaID: MascotaID };
+  fetch("/petco/proceso/abortar", {
+    method: "POST",
+    body: JSON.stringify(request),
+    headers: { "Content-Type": "application/json" },
+  })
+    .then((res) => res.json())
+    .then((res) => {
+      if (res == "ok") {
+        Swal.fire(
+          "¡Correcto!",
+          "<p>Se ha abortado el proceso correctamente</p>"
+        );
+      } else {
+        throw new Error("Algo ha salido mal");
+      }
+    })
+    .catch((err) => {
+      Swal.fire(
+        "¡Atención!",
+        `<p>Algo ha salido mal</p><p>Intenta más tarde</p>`,
+        "error"
+      );
+    });
+}
 
 const chatBox = document.querySelector(".messagesChatProceso"); //Obtenemos el elemento que contiene los mensajes del chat
 
@@ -166,7 +214,10 @@ function addEventListenerIconsFeedback(iconF) {
       if (mapValues.has(element)) {
         let valueSelected = mapValues.get(element);
         console.log(valueSelected, MascotaID);
-        sendFeedback(valueSelected, MascotaID);
+        loadingScreen.fire();
+        setTimeout(() => {
+          sendFeedback(valueSelected, MascotaID);
+        }, defaultTimer);
       }
     }
   });
@@ -200,6 +251,9 @@ function showFeedBackModal() {
     title: "¡Adopción finalizada!",
     icon: "question",
     html: iconsFeedBack,
+    showConfirmButton: false,
+    allowOutsideClick: false,
+    allowEscapeKey: false,
   });
 }
 function sendFeedback(value, MascotaID) {
@@ -207,7 +261,7 @@ function sendFeedback(value, MascotaID) {
   formData.append("reputacionValue", value);
   formData.append("MascotaID", MascotaID);
   let request = { reputacionValue: value, MascotaID: MascotaID };
-  fetch(`/proceso/recibirFeedback`, {
+  fetch(`/petco/proceso/recibirFeedback`, {
     method: "POST",
     body: JSON.stringify(request),
     headers: { "Content-Type": "application/json" },
@@ -216,16 +270,33 @@ function sendFeedback(value, MascotaID) {
     .then((res) => {
       if (res == "ok") {
         Swal.fire("¡Recibido!", `Muchas gracias :)`, "success");
+        Swal.fire({
+          title: "¡Recibido!",
+          icon: "success",
+          html: `<p>Muchas gracias :)</p>`,
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.open("/petco", "_self");
+          }
+        });
       } else {
-        Swal.fire(
-          "¡Atención!",
-          `<p>Algo ha salido mal</p><p>Intenta más tarde</p>`,
-          "error"
-        );
+        throw new Error("Algo ha salido mal");
       }
+    })
+    .catch((err) => {
+      displayError();
     });
 }
 
+function displayError() {
+  Swal.fire(
+    "¡Atención!",
+    `<p>Algo ha salido mal</p><p>Intenta más tarde</p>`,
+    "error"
+  );
+}
 function emitConnectionData() {
   socket.emit("join-proceso", MascotaID);
   console.log("Emitting connection data...");
@@ -246,7 +317,7 @@ function addListenerSubirArchivo(button) {
 
     loadingScreen.fire();
     setTimeout(() => {
-      fetch(`/proceso/subirArchivo`, { method: "POST", body: formData })
+      fetch(`/petco/proceso/subirArchivo`, { method: "POST", body: formData })
         .then((res) => res.json())
         .then((res) => {
           if (res.state == "ok") {
@@ -313,13 +384,18 @@ function addPasosToProgressBarSteps(progressBar, PasosProceso) {
   let completadoArray = progressBar.querySelectorAll(
     ".completed-paso-progressbar"
   );
-  let ultimoCompletado = completadoArray[completadoArray.length - 1];
+  if (completadoArray.length > 0) {
+    let ultimoCompletado = completadoArray[completadoArray.length - 1];
 
-  let idUltimoCompletado = Number(ultimoCompletado.id.split("-")[1]);
-  if (idUltimoCompletado < pasos.length - 1) {
-    pasos[idUltimoCompletado + 1].classList.remove("pending-paso-progressbar");
-    pasos[idUltimoCompletado + 1].classList.add("active-paso-progressbar");
+    let idUltimoCompletado = Number(ultimoCompletado.id.split("-")[1]);
+    if (idUltimoCompletado < pasos.length - 1) {
+      pasos[idUltimoCompletado + 1].classList.remove(
+        "pending-paso-progressbar"
+      );
+      pasos[idUltimoCompletado + 1].classList.add("active-paso-progressbar");
+    }
   }
+
   progressBar.appendChild(liGap.cloneNode());
 }
 

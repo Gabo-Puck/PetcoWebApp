@@ -114,6 +114,9 @@ function renderSolicitudes(solicitudes) {
     solicitud
       .querySelector(".rechazarButton")
       .setAttribute("id", solicitudFetch.ID);
+    solicitud
+      .querySelector(".progresoButton")
+      .setAttribute("id", solicitudFetch.ID);
     addListenerToAceptar(solicitud.querySelector(".aceptarButton"));
     addListenerToRechazar(solicitud.querySelector(".rechazarButton"));
     addListenerToProceso(solicitud.querySelector(".progresoButton"));
@@ -238,7 +241,12 @@ function addListenerToRechazar(buttonTriggered, idMascota) {
   });
 }
 
-function addListenerToProceso(buttonTriggered) {}
+function addListenerToProceso(buttonTriggered) {
+  buttonTriggered.addEventListener("click", (e) => {
+    const mascotaID = document.querySelector(".activeButtonMascota").id;
+    window.open(`/petco/proceso/ver/${mascotaID}`);
+  });
+}
 
 var solicitudRespuestasModal = document.getElementById(
   "solicitudRespuestasModal"

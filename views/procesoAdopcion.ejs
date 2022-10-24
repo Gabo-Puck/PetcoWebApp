@@ -470,7 +470,7 @@
       <ul class="d-flex align-items-center justify-content-start px-0 pb-2"></ul>
     </div>
     <div class="iconsFeedBack d-none">
-      <p>Califica la atención que te ha brindado <%=UsuarioPeer.Nombre%></p>
+      <p>Califica la atención que te ha brindado "<%=UsuarioPeer.Nombre%>"</p>
       <div class="progress-bar mx-auto">
         <ul class="d-flex align-items-center justify-content-start p-0 pt-2 m-0 mt-2">
           <li class="gap-feedback"></li>
@@ -501,7 +501,7 @@
       </div>
     </div>
     <div class="mx-auto pasoInfoContainer">
-      <div class="d-flex justify-content-start controlesPasoProceso mb-3">
+      <div class="d-flex justify-content-start controlesPasoProceso mb-3 position-relative">
         <!--Solo para paso activo-->
         <button
           class="btn btn-info me-3"
@@ -513,6 +513,10 @@
         </button>
         <button class="btn btn-info" id="videollamadaButton">
           <i class="fa-solid fa-phone-flip"></i>
+        </button>
+        <button class="btn btn-danger position-absolute top-0 end-0" id="abortarProceso">
+          <!-- <i class="fa-solid fa-phone-flip"></i> -->
+          <i class="fa-solid fa-xmark"></i>
         </button>
         <!--Solo para paso activo-->
       </div>

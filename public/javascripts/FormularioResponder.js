@@ -115,7 +115,7 @@ const guardarButton = document
   .addEventListener("click", () => {
     loadingScreen.fire();
     var bodyFetch = fetchRespuestas(document);
-    fetch("http://localhost:3000/petco/formulario/responderFormulario", {
+    fetch("/petco/formulario/responderFormulario", {
       method: "POST",
       body: JSON.stringify(bodyFetch),
       headers: { "Content-Type": "application/json" },

@@ -11,12 +11,17 @@ const fetch = require("node-fetch");
 const jsdom = require("jsdom");
 const Respuestas = require("../models/Respuestas");
 const { response } = require("express");
+const Pasos_Mascota = require("../models/Pasos_Mascota");
 const { JSDOM } = jsdom;
 
 exports.formularioList = (req, res) => {
-  Usuario.query()
-    .withGraphJoined("Formularios")
-    .then((Formulario) => res.json(Formulario));
+  if (req.session.Tipo == 1) {
+    Usuario.query()
+      .withGraphJoined("Formularios")
+      .then((Formulario) => res.json(Formulario));
+  } else {
+    res.redirect("/petco/inicio");
+  }
 };
 
 exports.formularioPreguntas = (req, res) => {
@@ -100,7 +105,29 @@ exports.responder_formulario_post = (req, res) => {
       (response) =>
         postRespuestas(req.body, IdSession, req.body.MascotaID, res),
       (messages) => res.json(messages)
-    );
+    )
+    .then(() => {
+      Mascota.query()
+        .withGraphJoined("MascotasPasos.PasoProceso")
+        .findOne({ "MascotasPasos:PasoProceso.ID_Mascota": req.body.MascotaID })
+        .debug()
+        .then((re) => {
+          console.log(re);
+          console.log(re.MascotasPasos[0].PasoProceso);
+          console.log("IDDDD");
+          console.log(req.body.MascotaID);
+
+          return new Promise((resolve, reject) => {
+            // console.log(re);
+            resolve(
+              re.MascotasPasos[0].PasoProceso[0]
+                .$query()
+                .patch({ Completado: 3 })
+                .then(() => {})
+            );
+          });
+        });
+    });
 };
 
 function generatePromisesRespuestas(Solicitud, respuestas) {
@@ -153,6 +180,7 @@ function postRespuestas(respuestas, IdUsuario, IdMascota, res) {
   })
     .then((Solicitud) => generatePromisesRespuestas(Solicitud, respuestas))
     .then((promises) => Promise.all(promises))
+    .then()
     .then(() => res.json("ok"));
 }
 
@@ -650,30 +678,30 @@ function promiseFetchTemplate(Formulario, res) {
 exports.formulario_edit_get = [
   getTemplatePreguntas,
   (req, res) => {
-    var IdSession = req.session.IdSession;
-    res.permiso = true;
-    // console.log("a");
-    Formulario.query()
-      .withGraphJoined("Preguntas.[Opciones_Respuestas_Pregunta,Respuestas]")
-      .where("formulario.ID", "=", req.params.idFormulario)
-      .andWhere("formulario.ID_Usuario", "=", IdSession)
-      // .then((FormWPreguntas) => FormWPreguntas.json())
-      .then((Formulario) => promiseFetchTemplate(Formulario, res))
-      .then((response) => {
-        // console.log(FormWPreguntas);
-        if (response == "") {
-          res.redirect("/petco/dashboard");
-        } else {
-          res.render("Formulario/EditarFormulario", {
-            Response: response,
-          });
-        }
-        // console.log(response);
-      });
-    // res.render("Formulario/EditarFormulario");
-    // res.render("Formulario/PreguntasTemplate", {}, (err, html) => {
-    //   res.send(html);
-    // });
+    if (req.session.Tipo == 1) {
+      var IdSession = req.session.IdSession;
+      res.permiso = true;
+      // console.log("a");
+      Formulario.query()
+        .withGraphJoined("Preguntas.[Opciones_Respuestas_Pregunta,Respuestas]")
+        .where("formulario.ID", "=", req.params.idFormulario)
+        .andWhere("formulario.ID_Usuario", "=", IdSession)
+        // .then((FormWPreguntas) => FormWPreguntas.json())
+        .then((Formulario) => promiseFetchTemplate(Formulario, res))
+        .then((response) => {
+          // console.log(FormWPreguntas);
+          if (response == "") {
+            res.redirect("/petco/dashboard");
+          } else {
+            res.render("Formulario/EditarFormulario", {
+              Response: response,
+            });
+          }
+          // console.log(response);
+        });
+    } else {
+      res.redirect("/petco/inicio");
+    }
   },
 ];
 
@@ -681,6 +709,7 @@ exports.formulario_edit_post = (req, res) => {
   // console.log(req.body);
 
   var IdSession = req.session.IdSession;
+
   if (req.body.ID_Usuario != IdSession) {
     res.redirect(200, "/info");
   } else {
