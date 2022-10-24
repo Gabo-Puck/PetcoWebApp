@@ -15,7 +15,7 @@ import {
 } from "/javascripts/FormulariosFunctions.js";
 
 $(function () {
-  fetch("http://localhost:3000/petco/formulario/preguntaTemplate")
+  fetch("/petco/formulario/preguntaTemplate")
     .then((res) => res.text())
     .then((html) => {
       var parserDOM = new DOMParser();
@@ -45,7 +45,7 @@ const guardarButton = document
       document.querySelectorAll(".preguntaAbierta"),
       document.querySelectorAll(".preguntaCerrada"),
       document.querySelectorAll(".preguntaMultiple"),
-      "/petco/formulario/info",
+      "/petco/dashboard",
       document,
       "/petco/formulario/crear"
     );

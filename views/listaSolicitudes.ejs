@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      src="https://kit.fontawesome.com/f0156fc078.js"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="/stylesheets/bootstrap-5.2.0-dist/themes/Lumen/bootstrap.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="/stylesheets/bootstrap-5.2.0-dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap theme Lumen from bootswatch -->
+    <!-- Bootstrap bundle -->
+    <!-- Jquery -->
+    <!-- Popper -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"
+    />
+    <!-- Sweetalert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>Lista Solicitudes para</title>
+    <style>
+      .openMenuMascotas {
+        transform: rotate(270deg);
+        display: inline-block;
+      }
+      .closeMenuMascotas {
+        transform: rotate(180deg);
+        display: inline-block;
+      }
+
+      .btnMenuMascota {
+        background-color: transparent;
+        border: none;
+      }
+      .btnMenuMascotaOpen {
+        position: absolute;
+      }
+      .mascotaMenuOffCanvas {
+        border: none;
+        background-color: transparent;
+        padding: 1em 0;
+        width: 100%;
+        border-top: 1px solid black;
+        /* border-bottom: -1px solid black; */
+      }
+
+      .fotoMascota {
+        background-size: 100% 100%;
+        width: 8vh;
+        height: 8vh;
+        background-repeat: no-repeat;
+      }
+
+      .offcanvas-body > *:last-child {
+        border-bottom: 1px solid black;
+      }
+      h5,
+      button {
+        word-break: break-all;
+      }
+      button {
+        text-align: center;
+      }
+      .activeButtonMascota {
+        background-color: #89b3f1;
+        color: white;
+      }
+      .offcanvas {
+        background-color: #66a3ff;
+      }
+      .loadingScreenLayer {
+        height: 100vh;
+      }
+      .mainContainerSolicitudes {
+        height: 100vh;
+      }
+      .loadingSpinnerSolicitudes {
+        z-index: 2000;
+      }
+      .fotoPerfilSolicitud {
+        /* background-image: url("https://m.media-amazon.com/images/I/71ZcXHsUk1L.__AC_SX300_SY300_QL70_FMwebp_.jpg"); */
+        /* background-size: 100% 100%; */
+        width: 80%;
+        text-align: center;
+        position: relative;
+        padding-bottom: 80%;
+        border-radius: 50%;
+        overflow: hidden;
+        background-color: #3c8bfb;
+      }
+      .fotoPerfilSolicitud img {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        object-fit: cover;
+      }
+      .controlSolicitud div {
+        width: 50%;
+      }
+      .controlSolicitud div button {
+        width: 100%;
+      }
+
+      @media (max-width: 767px) {
+        .fotoPerfilSolicitud {
+          width: 40%;
+          padding-bottom: 40%;
+        }
+      }
+      @media (min-width: 768px) and (max-width: 1023px) {
+        .fotoPerfilSolicitud {
+          width: 100%;
+          padding-bottom: 100%;
+        }
+      }
+    </style>
+    <script>
+      const mascotas = <%-JSON.stringify(Mascotas)%>;
+    </script>
+  </head>
+  <body>
+    <div class="preguntaTemplateFormularioSolicitud card d-none mb-3">
+      <p class="preguntaFormularioSolicitud fs-4 fw-bold ms-2 mb-1"></p>
+      <ul class="respuestasFormularioSolicitud"></ul>
+    </div>
+
+    <div
+      class="modal fade"
+      id="solicitudRespuestasModal"
+      tabindex="-1"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+          <div class="modal-header bg-info">
+            <h5 class="modal-title" id="exampleModalLabel">
+              Respuestas Formulario
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cerrar
+            </button>
+            <!-- <button type="button" class="btn btn-primary">Send message</button> -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Loading Screen -->
+    <div
+      class="w-100 h-100 d-flex justify-content-center align-items-center loadingScreenLayer position-absolute top-50 start-50 translate-middle d-none"
+      style="z-index: 1; background-color: rgb(255, 255, 255)"
+    >
+      <div
+        class="spinner-border text-primary loadingSpinnerSolicitudes mx-auto my-auto"
+        role="status"
+      >
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    <!-- Loading Screen -->
+    <!-- Main container -->
+    <div class="mainContainer">
+      <!-- Carta solicitud -->
+      <div class="mainContainerSolicitudes w-100 h-10" style="z-index: 2">
+        <div class="cardContainer"></div>
+        <!-- Botón para abrir Offcanvas de mascotas -->
+        <button
+          class="btnMenuMascota btnMenuMascotaOpen position-fixed top-0 start-0"
+          type="button"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#offcanvasScrolling"
+          aria-controls="offcanvasScrolling"
+          style="z-index: 5"
+        >
+          <i class="fa-solid fa-chevron-down openMenuMascotas fs-5"></i>
+        </button>
+        <!-- Botón para abrir Offcanvas de mascotas -->
+
+        <!-- Menu de mascotas (Offcanvas Bootsrap) -->
+        <div>
+          <!--  -->
+          <div
+            class="offcanvas offcanvas-start"
+            data-bs-scroll="true"
+            tabindex="-1"
+            id="offcanvasScrolling"
+            aria-labelledby="offcanvasScrollingLabel"
+          >
+            <!-- Cabecera de menu offcanvas mascotas -->
+            <div class="offcanvas-header">
+              <!-- Titulo de menu (Nombre publicación) -->
+              <div>
+                <h5><%=PublicacionNombre%></h5>
+                <br />
+                <h5 class="offcanvas-title" id="offcanvasScrollingLabel">
+                  Mascotas:
+                </h5>
+              </div>
+              <!-- Titulo de menu (Nombre publicación) -->
+
+              <!-- Boton para cerrar menu offcanvas -->
+              <button
+                type="button"
+                class="closeMenuMascotas btnMenuMascota align-self-start"
+                data-bs-dismiss="offcanvas"
+                aria-label="Close"
+              >
+                <i class="fa-solid fa-chevron-down openMenuMascotas fs-5"></i>
+              </button>
+              <!-- Boton para cerrar menu offcanvas -->
+            </div>
+            <!-- Cabecera de menu offcanvas mascotas -->
+
+            <!-- Cuerpo menu offcanvas -->
+            <div class="offcanvas-body p-0"></div>
+            <!-- Cuerpo menu offcanvas -->
+          </div>
+        </div>
+        <!-- Menu de mascotas (Offcanvas Bootsrap) -->
+      </div>
+    </div>
+    <!-- Carta solicitud -->
+    <div
+      class="w-100 h-10 container card border border-3 border-primary shadow p-3 mb-5 bg-body rounded mt-3 cardTemplateSolicitud d-none"
+    >
+      <!-- Cuerpo carta -->
+      <div class="row row-cols-1 row-cols-md-4 justify-content-center">
+        <!-- Foto de usuario de solicitud -->
+        <div
+          class="col col-md-2 align-self-center d-flex justify-content-center"
+        >
+          <!-- src="https://m.media-amazon.com/images/I/71ZcXHsUk1L.__AC_SX300_SY300_QL70_FMwebp_.jpg" -->
+
+          <div class="row fotoPerfilSolicitud">
+            <img />
+          </div>
+        </div>
+        <!-- Foto de usuario de solicitud -->
+        <!-- Nombre usuario y boton ver solicitud -->
+        <div class="col col-md-4 col-lg-5 align-self-center">
+          <div
+            class="row flex-grow-1 justify-content-center justify-content-md-start"
+          >
+            <div class="row">
+              <div class="col">
+                <div
+                  class="d-flex justify-content-center justify-content-md-start"
+                >
+                  <h4
+                    style="overflow-wrap: break-word"
+                    class="nombreUsuario fw-bold"
+                  ></h4>
+                </div>
+              </div>
+            </div>
+            <div class="row justify-content-center justify-content-md-start">
+              <div
+                class="col d-flex justify-content-center justify-content-md-start"
+              >
+                <button
+                  class="btn btn-link m-0 p-0 verSolicitudButton"
+                  style="outline: none; box-shadow: none"
+                  data-bs-toggle="modal"
+                  data-bs-target="#solicitudRespuestasModal"
+                  data-bs-solicitud=""
+                >
+                  Ver solicitud
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Nombre usuario y boton ver solicitud -->
+        <!-- Controles para solicitud -->
+        <div class="col col-md-5 col-lg-4">
+          <!-- Fila botones de control -->
+          <div
+            class="row h-100 justify-content-center justify-content-md-start"
+          >
+            <!-- Boton ver progreso -->
+            <div class="row d-none">
+              <div class="col controlSolicitud my-auto">
+                <div class="mx-auto">
+                  <button class="btn btn-warning mb-3 mb-md-0 progresoButton">
+                    Proceso
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- Boton ver progreso -->
+            <!-- Boton aceptar -->
+            <div class="row">
+              <div class="col controlSolicitud my-auto">
+                <div class="mx-auto">
+                  <button class="btn btn-success mb-3 mb-md-0 aceptarButton">
+                    Aceptar
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- Boton aceptar -->
+            <!-- Boton rechazar -->
+            <div class="row">
+              <div class="col controlSolicitud my-auto">
+                <div class="mx-auto">
+                  <button class="btn btn-danger rechazarButton">
+                    Rechazar
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- Boton rechazar -->
+          </div>
+          <!-- Fila botones de control -->
+        </div>
+        <!-- Controles para solicitud -->
+      </div>
+      <!-- Cuerpo carta -->
+    </div>
+
+    <script type="module" src="/javascripts/Solicitudes.js"></script>
+  </body>
+</html>

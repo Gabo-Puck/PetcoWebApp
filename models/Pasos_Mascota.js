@@ -8,7 +8,21 @@ class Pasos_Mascota extends Model {
     return "paso_mascota";
   }
   static get idColumn() {
-    return ["ID_Mascota", "ID_Paso"];
+    return "ID";
+  }
+
+  static get relationMappings() {
+    const Paso = require("./Paso");
+    return {
+      Paso: {
+        relation: Model.HasOneRelation,
+        modelClass: Paso,
+        join: {
+          from: "paso_mascota.ID_Paso",
+          to: "paso.ID",
+        },
+      },
+    };
   }
 }
 

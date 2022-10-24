@@ -46,8 +46,8 @@ module.exports.validateFilesExtension = (acceptedTypes) => {
     if (req.body.fileExt) {
       req.body.fileExt = JSON.parse(req.body.fileExt);
       var errors = "";
-      console.log(req.body);
-      console.log(req.body.fileExt);
+      // console.log(req.body);
+      // console.log(req.body.fileExt);
       if (!res.correctFields) res.correctFields = [];
 
       req.body.fileExt.forEach((element) => {
@@ -71,7 +71,7 @@ module.exports.validateFilesExtension = (acceptedTypes) => {
 module.exports.validateRequestFiles = (folder) => {
   return (req, res, next) => {
     console.log("Estoy en uploadFile");
-    console.log(req.body);
+    // console.log(req.body);
     const storage = multer.diskStorage({
       destination: function (req, file, cb) {
         cb(null, `./public/${folder}`);
@@ -93,7 +93,7 @@ module.exports.validateRequestFiles = (folder) => {
         storage: storage,
         fileFilter: function (req, file, callback) {
           console.log("estamos en el fileFilter");
-          console.log(req.body);
+          // console.log(req.body);
           console.log(file);
           var acceptedTypes = [".png", ".jpg", ".bmp", ".jpeg"];
           var ext = path.extname(file.originalname);
@@ -114,7 +114,7 @@ module.exports.validateRequestFiles = (folder) => {
       // validateRequest(req, res, validateRequest);
       upload(req, res, function () {
         console.log("Ya ejecute single");
-        console.log(req.body, req.files);
+        // console.log(req.body, req.files);
         if (req.files.length == 0) {
           console.log("No se subieron archivos");
           addErrors(res, "No se subieron los archivos solicitados", null);
@@ -124,6 +124,14 @@ module.exports.validateRequestFiles = (folder) => {
             req.body.pathFilesSaved =
               req.body.pathFilesSaved + req.files[indexFile].path + ";";
           }
+          req.body.pathFilesSaved = req.body.pathFilesSaved.replaceAll(
+            /public/g,
+            ""
+          );
+          req.body.pathFilesSaved = req.body.pathFilesSaved.replaceAll(
+            "\\",
+            "/"
+          );
           console.log(req.body.pathFilesSaved);
         }
         next();

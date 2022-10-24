@@ -11,18 +11,23 @@ const fetch = require("node-fetch");
 const jsdom = require("jsdom");
 const Respuestas = require("../models/Respuestas");
 const { response } = require("express");
+const Pasos_Mascota = require("../models/Pasos_Mascota");
 const { JSDOM } = jsdom;
 
 exports.formularioList = (req, res) => {
-  Usuario.query()
-    .withGraphJoined("Formularios")
-    .then((Formulario) => res.json(Formulario));
+  if (req.session.Tipo == 1) {
+    Usuario.query()
+      .withGraphJoined("Formularios")
+      .then((Formulario) => res.json(Formulario));
+  } else {
+    res.redirect("/petco/inicio");
+  }
 };
 
 exports.formularioPreguntas = (req, res) => {
   Formulario.query()
     .withGraphJoined("Preguntas.[Opciones_Respuestas_Pregunta,Respuestas]")
-    .where("Formulario.ID", "=", "18")
+    .where("formulario.ID", "=", "18")
     .then((FormWPreguntas) => res.json(FormWPreguntas));
 };
 
@@ -46,6 +51,7 @@ exports.responder_formulario_get = [
       .findById(req.params.idMascota)
       .then((re) => {
         return new Promise((resolve, reject) => {
+          // console.log(re);
           resolve(
             re.MascotasPasos[re.MascotasPasos.length - 1].Proto
               .FormularioProtocolo
@@ -53,7 +59,7 @@ exports.responder_formulario_get = [
         });
       })
       .then((response) => {
-        console.log(response);
+        // console.log(response);
         if (response != null) {
           res.render("Formulario/ResponderFormulario", {
             Response: response,
@@ -99,7 +105,29 @@ exports.responder_formulario_post = (req, res) => {
       (response) =>
         postRespuestas(req.body, IdSession, req.body.MascotaID, res),
       (messages) => res.json(messages)
-    );
+    )
+    .then(() => {
+      Mascota.query()
+        .withGraphJoined("MascotasPasos.PasoProceso")
+        .findOne({ "MascotasPasos:PasoProceso.ID_Mascota": req.body.MascotaID })
+        .debug()
+        .then((re) => {
+          console.log(re);
+          console.log(re.MascotasPasos[0].PasoProceso);
+          console.log("IDDDD");
+          console.log(req.body.MascotaID);
+
+          return new Promise((resolve, reject) => {
+            // console.log(re);
+            resolve(
+              re.MascotasPasos[0].PasoProceso[0]
+                .$query()
+                .patch({ Completado: 3 })
+                .then(() => {})
+            );
+          });
+        });
+    });
 };
 
 function generatePromisesRespuestas(Solicitud, respuestas) {
@@ -120,7 +148,7 @@ function generatePromisesRespuestas(Solicitud, respuestas) {
   for (const prop in respuestas.bodyFetchOpciones) {
     if (Object.hasOwnProperty.call(respuestas.bodyFetchOpciones, prop)) {
       const respuestaUsuario = respuestas.bodyFetchOpciones[prop];
-      console.log(respuestaUsuario);
+      // console.log(respuestaUsuario);
       respuestaUsuario.forEach((resp) => {
         if (resp.check == true) {
           promises.push(
@@ -152,6 +180,7 @@ function postRespuestas(respuestas, IdUsuario, IdMascota, res) {
   })
     .then((Solicitud) => generatePromisesRespuestas(Solicitud, respuestas))
     .then((promises) => Promise.all(promises))
+    .then()
     .then(() => res.json("ok"));
 }
 
@@ -174,7 +203,7 @@ function evaluateResult(res) {
 
 function executePromises(res, nextPromise) {
   return new Promise((resolve, reject) => {
-    console.log(res);
+    //console.log(res);
     if (!res.messages) {
       res.messages = {};
       res.messages["errors"] = [];
@@ -282,7 +311,7 @@ function validateRespuestaOpcion(respuestasOpcion, idFormulario) {
         new Promise((resolve, reject) => {
           resolve(
             Formulario.query().withGraphJoined("Preguntas").findOne({
-              "Formulario.ID": idFormulario,
+              "formulario.ID": idFormulario,
               "Preguntas.ID": propiedad,
             })
           );
@@ -307,7 +336,7 @@ function validateRespuestaAbierta(respuestasAbiertas, idFormulario) {
             .withGraphJoined("Preguntas.[Opciones_Respuestas_Pregunta]")
             // .findOne("Preguntas.ID", "=", respuesta.ID_Pregunta)
             .findOne({
-              "Formulario.ID": idFormulario,
+              "formulario.ID": idFormulario,
               "Preguntas.ID": respuesta.ID_Pregunta,
             })
         );
@@ -370,11 +399,11 @@ exports.verSolicitud = (req, res) => {
 exports.EliminarForm = (req, res) => {
   Formulario.query()
     .deleteById(req.params.idFormulario)
-    .then(res.redirect("/petco/formulario/info"));
+    .then(res.redirect("/petco/dashboard"));
 };
 
 exports.verifyFormulario = (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   var errors = [];
   var correct = [];
   var globalError = [];
@@ -400,7 +429,7 @@ exports.verifyFormulario = (req, res) => {
   }
 
   req.body.abiertas.forEach((pregunta) => {
-    console.log(pregunta.preguntaText.replace(/ /g, ""));
+    // console.log(pregunta.preguntaText.replace(/ /g, ""));
     if (pregunta.preguntaText.replace(/ /g, "").length <= 7) {
       errors.push({
         formID: pregunta.formID,
@@ -424,7 +453,7 @@ exports.verifyFormulario = (req, res) => {
 
 function validateCerradaMultiple(preguntas, errors, correct) {
   preguntas.forEach((pregunta) => {
-    console.log(pregunta.preguntaText.replace(/ /g, ""));
+    // console.log(pregunta.preguntaText.replace(/ /g, ""));
     var error = "";
     if (pregunta.preguntaText.replace(/ /g, "") <= 7) {
       error = "La pregunta debe tener por lo menos 7 caraceteres";
@@ -433,7 +462,7 @@ function validateCerradaMultiple(preguntas, errors, correct) {
       error += "\nLa pregunta debe de tener por lo menos dos respuestas";
     }
     pregunta.respuestas.forEach((respuesta) => {
-      console.log(respuesta.respuestaText.length);
+      // console.log(respuesta.respuestaText.length);
       if (respuesta.respuestaText.replace(/ /g, "").length < 1) {
         errors.push({
           formID: respuesta.formID,
@@ -596,12 +625,12 @@ exports.formDashboard = (req, res) => {
   var IdSession = req.session.IdSession;
 
   Formulario.query()
-    .where("Formulario.ID_Usuario", "=", IdSession)
+    .where("formulario.ID_Usuario", "=", IdSession)
     .then((Formularios) => {
       res.render("Formulario/FormDashboard.ejs", {
         Elemento: Formularios,
       });
-      console.log(Formularios);
+      // console.log(Formularios);
     });
 };
 function promiseFetchDoc(html) {
@@ -649,36 +678,38 @@ function promiseFetchTemplate(Formulario, res) {
 exports.formulario_edit_get = [
   getTemplatePreguntas,
   (req, res) => {
-    var IdSession = req.session.IdSession;
-    res.permiso = true;
-    // console.log("a");
-    Formulario.query()
-      .withGraphJoined("Preguntas.[Opciones_Respuestas_Pregunta,Respuestas]")
-      .where("Formulario.ID", "=", req.params.idFormulario)
-      .andWhere("Formulario.ID_Usuario", "=", IdSession)
-      // .then((FormWPreguntas) => FormWPreguntas.json())
-      .then((Formulario) => promiseFetchTemplate(Formulario, res))
-      .then((response) => {
-        // console.log(FormWPreguntas);
-        if (response == "") {
-          res.redirect(200, "/info");
-        }
-        console.log(response);
-        res.render("Formulario/EditarFormulario", {
-          Response: response,
+    if (req.session.Tipo == 1) {
+      var IdSession = req.session.IdSession;
+      res.permiso = true;
+      // console.log("a");
+      Formulario.query()
+        .withGraphJoined("Preguntas.[Opciones_Respuestas_Pregunta,Respuestas]")
+        .where("formulario.ID", "=", req.params.idFormulario)
+        .andWhere("formulario.ID_Usuario", "=", IdSession)
+        // .then((FormWPreguntas) => FormWPreguntas.json())
+        .then((Formulario) => promiseFetchTemplate(Formulario, res))
+        .then((response) => {
+          // console.log(FormWPreguntas);
+          if (response == "") {
+            res.redirect("/petco/dashboard");
+          } else {
+            res.render("Formulario/EditarFormulario", {
+              Response: response,
+            });
+          }
+          // console.log(response);
         });
-      });
-    // res.render("Formulario/EditarFormulario");
-    // res.render("Formulario/PreguntasTemplate", {}, (err, html) => {
-    //   res.send(html);
-    // });
+    } else {
+      res.redirect("/petco/inicio");
+    }
   },
 ];
 
 exports.formulario_edit_post = (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
 
   var IdSession = req.session.IdSession;
+
   if (req.body.ID_Usuario != IdSession) {
     res.redirect(200, "/info");
   } else {
@@ -710,7 +741,7 @@ exports.formulario_edit_post = (req, res) => {
 function getTemplatePreguntas(req, res, next) {
   res.render("Formulario/PreguntasTemplate", {}, (err, html) => {
     res.templatePreguntas = html;
-    console.log(`Este es html: \n${html}`);
+    // console.log(`Este es html: \n${html}`);
     next();
   });
 }
@@ -726,7 +757,7 @@ function deleteContenidos(contenidos, tabla) {
     if (contenidos.length !== 0) {
       contenidos.forEach((contenido) => {
         resolve(tabla.query().deleteById(contenido.ID));
-        console.log(contenido.ID);
+        // console.log(contenido.ID);
       });
     }
   });

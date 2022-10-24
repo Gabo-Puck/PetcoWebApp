@@ -57,7 +57,7 @@
  
     </style>
     <!-- <div style="height: 100vh;"> -->
-
+      
       <div class="card border-info container-fluid my-5" style="width: 85%; margin: auto">
         <h1 class="d-flex justify-content-center mt-5 mb-6 card-title"><%=title%></h1>
         <div class="card-body">
@@ -70,36 +70,63 @@
             <div id="Formulario">
               <div id="PrimeraParte">
                 <div class="d-flex justify-content-center mt-3">
-                  <h3>Tipo de cuenta:</h3>
+                  <h3 style="text-align: center;">Tipo de cuenta:</h3>
                 </div>
                 <div class="mb-3 mx-auto form-row tipos">
-                  <div class="col">
+                  <%let displayOrg =""%>
+                  <%let displayCom =""%>
+                    <%let checkedOrg =""%>
+                    <%let checkedCom =""%>
+                    <%if(RegistroPrevio==null){%>
+                      <%checkedOrg = "checked"%>
+                    <%}else{%>
+                      <%if(RegistroPrevio.Tipo_Usuario==2){%>
+                        <%checkedCom = "checked"%>
+                        <%displayOrg = "d-none"%>
+                      <%}%>
+                      <%if(RegistroPrevio.Tipo_Usuario==1){%>
+                        <%checkedOrg = "checked"%>
+                        <%displayCom = "d-none"%>
+                      <%}%>
+                    <%}%>
+                  <div class="col <%=displayOrg%>">
                     <div class="d-flex justify-content-center">
                       <label for="Tipo1">Organizacion</label>
                     </div>
-                    <input
-                      id="Tipo1"
-                      class="a-radio__input"
-                      type="radio"
-                      placeholder=""
-                      name="Tipo"
-                      checked
-                      value="1"
-                    />
+                    
+                    <div>
+                      <input
+                        id="Tipo1"
+                        class="form-check-input d-block mx-auto"
+                        style="position: relative;"
+                        type="radio"
+                        placeholder=""
+                        name="Tipo"
+                        <%=checkedOrg%>
+                        value="1"
+                        
+                      />
+
+                    </div>
                   </div>
-                  <div class="col" id="me">
+                  <div class="col <%=displayCom%>" id="me">
                     <div class="d-flex justify-content-center">
                       <label for="Tipo2">Común</label>
                     </div>
-                    <input
-                      class="a-radio__input"
-                      type="radio"
-                      placeholder=""
-                      name="Tipo"
-                      id="Tipo2"
-                      value="2"
-                    />
-                    
+
+                    <div>
+                      <input
+                        class="form-check-input d-block mx-auto"
+                        type="radio"
+                        style="position: relative;"
+                        <%=checkedCom%>
+                        placeholder=""
+                        name="Tipo"
+                        id="Tipo2"
+                        value="2"
+                      />
+                      
+                    </div>
                   </div>
                 </div>
                 <div class="form-row">
@@ -142,6 +169,7 @@
                 </div>
     
                 <div id="correoForm" class="form-row">
+                  
                   <div class="col">
                     <label for="Correo">Correo</label>
                     <input
@@ -150,12 +178,12 @@
                       type="email"
                       placeholder="miura@gmail.com"
                       name="Correo"
-                      value=""
+                      value="<%= RegistroPrevio!=null ? RegistroPrevio.Correo : ''%>"
                     />
                   </div>
                 </div>
                 <div class="form-row">
-                  <div class="col">
+                  <div class="col-md">
                     <label for="Telefono">Telefono:</label>
                     <input
                       id="Telefono"
@@ -163,10 +191,10 @@
                       type="tel"
                       placeholder="3323980011"
                       name="Telefono"
-                      value=""
+                      value="<%= RegistroPrevio!=null ? RegistroPrevio.Telefono : ''%>"
                     />
                   </div>
-                  <div class="col">
+                  <div class="col-md">
                     <label for="Contrasena">Contraseña</label>
                     <input
                       id="Contrasena"
@@ -174,6 +202,17 @@
                       type="password"
                       placeholder="123456789"
                       name="Contrasena"
+                      value=""
+                    />
+                  </div>
+                  <div class="col-md">
+                    <label for="Contrasena">Confirmar Contraseña</label>
+                    <input
+                      id="Contrasena"
+                      class="form-control"
+                      type="password"
+                      placeholder="123456789"
+                      name="ContrasenaVer"
                       value=""
                     />
                   </div>
@@ -186,9 +225,18 @@
                     <div class="input-group has-validation">
                       <span class="input-group-text">Estado</span>
                       <select class="custom-select" id="Estado">
+                        <%let selectedEstado = ""%>
                         <% if(EstadosMunicipios)%> <%
                         EstadosMunicipios.forEach(estado=>{%>
-                        <option value="<%=estado.ID%>"><%=estado.Nombre%></option>
+                          <%if(RegistroPrevio!=null&&selectedEstado==""){%>
+                            <%if(RegistroPrevio.muni.ID_Estado==estado.ID){%>
+                              <%selectedEstado = "selected"%>
+                            <%}%>
+                          <%}%>
+    
+                          <option value="<%=estado.ID%>" <%=selectedEstado%>><%=estado.Nombre%></option>
+                          <%selectedEstado = ""%>
+
                         <%})%>
                       </select>
                     </div>
@@ -200,11 +248,22 @@
                     <div class="input-group">
                       <span class="input-group-text">Municipio</span>
                       <select class="custom-select" name="Municipio" id="Municipio">
+                        <%let selectedMunicipio = ""%>
+                        <%let estadoID = 0%>
+                        <%if(RegistroPrevio){%>
+                          <%estadoID = RegistroPrevio.muni.ID_Estado-1%>
+                        <%}%>
                         <% if(EstadosMunicipios)%> <%
-                        EstadosMunicipios[0].municipios.forEach(municipio=>{ %>
-                        <option value="<%=municipio.ID%>">
+                        EstadosMunicipios[estadoID].municipios.forEach(municipio=>{ %>
+                          <%if(RegistroPrevio!=null&&selectedMunicipio==""){%>
+                            <%if(RegistroPrevio.Municipio==municipio.ID){%>
+                              <%selectedMunicipio = "selected"%>
+                            <%}%>
+                          <%}%>
+                        <option value="<%=municipio.ID%>" <%=selectedMunicipio%>>
                           <%=municipio.Nombre%>
                         </option>
+                        <%selectedMunicipio = ""%>
                         <%})%>
                       </select>
                     </div>
@@ -225,6 +284,34 @@
               <div id="errorsBox"></div>
               <div id="SegundaParte" class="pt-3" style="display: none">
                 <div class="d-flex justify-content-center mb-1"><h4>Sube tus fotografías</h4></div>
+                <%let imgComFrontal = ""%>
+                <%let imgComTrasera = ""%>
+                <%let imgOrg = ""%>
+                <%let nuloOrg = "DocumentoOrg"%>
+                <%let nuloComFront = "Documento_Identidad2"%>
+                <%let nuloComBack = "Documento_Identidad3"%>
+                <%if(RegistroPrevio!=null){%>
+                  
+                  <%if(RegistroPrevio.Tipo_Usuario==1){ %>
+                    <%imgOrg = RegistroPrevio.Documento_Identidad.split(";")[0]%>
+                    <%imgOrg = imgOrg.replace(/public/g, "")%>
+                    <%imgOrg = imgOrg.replaceAll("\\", "/")%>
+                    <%nuloComFront = "NULO"%>
+                    <%nuloComBack = "NULO"%>
+                  <%}%>
+
+                  <%if(RegistroPrevio.Tipo_Usuario==2){ %>
+                    <%imgComFrontal = RegistroPrevio.Documento_Identidad.split(";")[0]%>
+                    <%imgComFrontal = imgComFrontal.replace(/public/g, "")%>
+                    <%imgComFrontal = imgComFrontal.replaceAll("\\", "/")%>
+                    <%imgComTrasera = RegistroPrevio.Documento_Identidad.split(";")[1]%>
+                    <%imgComTrasera = imgComTrasera.replace(/public/g, "")%>
+                    <%imgComTrasera = imgComTrasera.replaceAll("\\", "/")%>
+                    <%nuloOrg = "NULO"%>
+                  <%}%>
+                  
+                
+                <%}%>
                 <div class="form-row" id="TipoComun">
                     <div class="row d-flex flex-column align-items-center align-content-center" style="width: 100%">
                       <div class="form-row d-flex justify-content-center my-2">
@@ -236,7 +323,7 @@
                           id="Preview_Identidad_Front"
                           class="my-3"
                           style="max-width: 95%;"
-                          src=""
+                          src="<%=imgComFrontal%>"
                           alt=""
                         />
                       </div>
@@ -248,7 +335,7 @@
                               type="file"
                               class="custom-file-input"
                               placeholder=""
-                              name="Documento_Identidad2"
+                              name="<%=nuloComFront%>"
                               value=""/>
                             <label class="custom-file-label" for="Documento_Identidad2">Selecciona un archivo...</label>
                           </div>
@@ -260,7 +347,9 @@
                         Fotografía INE parte trasera
                       </div>
                       <div class="form-row d-flex justify-content-center">
-                        <img id="Preview_Identidad_Back" class="my-3" style="max-width: 95%;"src="" alt="" />
+                        <img id="Preview_Identidad_Back" class="my-3" style="max-width: 95%;"
+                        src="<%=imgComTrasera%>"
+                        alt="" />
                       </div>
                       <div class="form-group d-flex justify-content-center">
                           <div class="custom-file" style="width: 100%;">
@@ -269,7 +358,7 @@
                               class="custom-file-input"
                               type="file"
                               placeholder=""
-                              name="Documento_Identidad3"
+                              name="<%=nuloComBack%>"
                               value=""/>
                               <label class="custom-file-label" for="Documento_Identidad_Back">Selecciona un archivo...</label>
                               <!-- <div class="invalid-feedback" >
@@ -285,7 +374,7 @@
                       Fotografía CIF o Factura
                     </div>
                     <div class="form-row d-flex justify-content-center">
-                      <img id="PreviewOrg" class="my-3" style="max-width: 95%;" src="" alt="" />
+                      <img src="<%=imgOrg%>" id="PreviewOrg" class="my-3" style="max-width: 95%;"  alt="" />
                     </div>
                     <div class="form-group d-flex justify-content-center">
                       <div class="custom-file" style="width: 100%;">
@@ -294,7 +383,7 @@
                         class="custom-file-input"
                         type="file"
                         placeholder=""
-                        name="DocumentoOrg"
+                        name="<%=nuloOrg%>"
                         value=""/>
                         <label class="custom-file-label" for="Documento_Identidad_Org">Selecciona un archivo...</label>
                         <!-- <p>
@@ -349,6 +438,12 @@
     const primeraParte = document.getElementById("PrimeraParte");
     const segundaParte = document.getElementById("SegundaParte");
     const errorsBox = document.getElementById("errorsBox");
+
+    <%if(RegistroPrevio!=null){%>
+      let archivoOrg = {file:null};
+      let archivoComunFront = {file:null};
+      let archivoComunBack = {file:null};
+    <%}%>
     // const a = document.createElement();
    
 
@@ -361,17 +456,75 @@
         nextSibling.innerText = nameFile;
         previewImage(PreviewOrg, InputFileOrg);
       } else {//Si al realizar el cambio, el valor quedo como "", volvemos a renderizar el preview
+      <%if(RegistroPrevio==null){%>
         PreviewOrg.src = "";
         nextSibling.innerText = "Selecciona un archivo...";
+      <%}else{%>
+        let event = new Event("change");
+        let dataTransfer = new DataTransfer();
+        dataTransfer.items.add(archivoOrg.file);
+        InputFileOrg.files = dataTransfer.files;
+        InputFileOrg.dispatchEvent(event);
+        console.log(InputFileOrg.files);
+      <%}%>
       }
     });
 
     window.onload = () => {
-      resizeSelector();
-      resizeSelector(EstadoSelector);
-      onClickTipos();
+      <%if(RegistroPrevio==null){%>
+        resizeSelector();
+        resizeSelector(EstadoSelector);
+        onClickTipos();
+      <%}else{%>
+        getImageToBlob()
+      <%}%>
     };
 
+    <%if(RegistroPrevio!=null){%>
+      
+      function getImageToBlob(){        
+        <%if(RegistroPrevio.Tipo_Usuario==1){%>
+          let imgURL = "<%=RegistroPrevio.Documento_Identidad.split(';')[0].replaceAll("\\","/")%>";
+          imgURL = formatURL(imgURL);
+          // archivoOrg = getImage(imgURL);
+          getImage(imgURL,archivoOrg,InputFileOrg)
+        <%}%>
+
+        <%if(RegistroPrevio.Tipo_Usuario==2){%>
+          
+          let imgUrlIneFront =  "<%=RegistroPrevio.Documento_Identidad.split(";")[0]%>";
+          imgUrlIneFront =imgUrlIneFront
+          getImage(imgUrlIneFront,archivoComunFront,InputFileINEFrontal)    
+          let imgUrlIneBack = "<%=RegistroPrevio.Documento_Identidad.split(";")[1]%>";
+          imgUrlIneBack = imgUrlIneBack         
+          getImage(imgUrlIneBack,archivoComunBack,InputFileINETrasera)    
+
+        <%}%>
+        resizeSelector();
+        resizeSelector(EstadoSelector);
+        onClickTipos();
+      }
+
+      function formatURL(url){
+        url = url.replace(/public/g,"");
+        return url;
+      }
+
+
+      function getImage(url,obj,input){
+        fetch(url)
+        .then((imgRes)=>imgRes.blob()).then((ass)=>{
+          let type = ass.type.split("/")[1];
+          let newFile = new File([ass],`ArchivoSubido.${type}`,{type:`image/${type}`})
+          obj.file=newFile
+          let event = new Event("change");
+          input.dispatchEvent(event);
+
+        })
+        .catch((err)=>console.log(err))
+      }
+      
+    <%}%>
     function displayConfirmation() {
       loadingScreen.close();
       Swal.fire(
@@ -408,7 +561,9 @@
       xhrSubmit.onerror = function (){
         // errorScreen.fire();
       }
-      xhrSubmit.open("POST", "/registro/crear");
+
+      let urlGrabar = "<%=urlGrabarReq%>"
+      xhrSubmit.open("POST", urlGrabar);
       xhrSubmit.send(formData);
     }
 
@@ -456,7 +611,9 @@
             }
           }
         };
-      xhr.open("POST", "/registro/verify", true);//Especificamos que tipo de request se va a hacer, el uri y si es sincrono o asincrona.
+      let urlVerificar = "<%=urlVerificarReq%>"
+
+      xhr.open("POST", urlVerificar, true);//Especificamos que tipo de request se va a hacer, el uri y si es sincrono o asincrona.
       xhr.send(formData);//Mandamos la información del form data
     });
 
@@ -467,8 +624,18 @@
         nextSibling.innerText = nameFile;
         previewImage(PreviewComunFrente, InputFileINEFrontal);
       } else {//Si al realizar el cambio, el valor quedo como "", volvemos a renderizar el preview
-        PreviewComunFrente.src = "";
-        nextSibling.innerText = "Selecciona un archivo...";
+        <%if(RegistroPrevio==null){%>
+          PreviewOrg.src = "";
+          nextSibling.innerText = "Selecciona un archivo...";
+        <%}else{%>
+          let event = new Event("change");
+          let dataTransfer = new DataTransfer();
+          dataTransfer.items.add(archivoComunFront.file);
+          InputFileINEFrontal.files = dataTransfer.files;
+          InputFileINEFrontal.dispatchEvent(event);
+          console.log(InputFileINEFrontal.files);
+        <%}%>
+        
       }
     });
     InputFileINETrasera.addEventListener("change", (e) => {
@@ -478,8 +645,17 @@
         nextSibling.innerText = nameFile;
         previewImage(PreviewComunTrasera, InputFileINETrasera);
       } else {
-        PreviewComunTrasera.src = "";
-        nextSibling.innerText = "Selecciona un archivo...";
+        <%if(RegistroPrevio==null){%>
+          PreviewOrg.src = "";
+          nextSibling.innerText = "Selecciona un archivo...";
+        <%}else{%>
+          let event = new Event("change");
+          let dataTransfer = new DataTransfer();
+          dataTransfer.items.add(archivoComunBack.file);
+          InputFileINETrasera.files = dataTransfer.files;
+          InputFileINETrasera.dispatchEvent(event);
+          console.log(InputFileINETrasera.files);
+        <%}%>
       }
     });
 
@@ -662,8 +838,9 @@
         inputSelector.selectedOptions[0].value
       );
       chargeInputToFormData(formData, inputText);
+      let urlVerificar = "<%=urlVerificarReq%>"
 
-      xhr.open("POST", "/registro/verify", true);//Especificamos que tipo de request se va a hacer, el uri y si es sincrono o no
+      xhr.open("POST", urlVerificar, true);//Especificamos que tipo de request se va a hacer, el uri y si es sincrono o no
       xhr.send(formData);
 
     });
@@ -707,7 +884,7 @@
         ApellidoP.name = "";
         ApellidoM.name = "";
         Nombre.placeholder = "Nombre de tu Organización";
-        PreviewOrg.src = "";
+        // PreviewOrg.src = "";
       }
       if (activeType == 2) {
         //- Tipo Comun
@@ -722,8 +899,9 @@
         Nombre.placeholder = "Nombre de tu INE";
         ApellidoP.placeholder = "Apellido paterno de tu INE";
         ApellidoM.placeholder = "Apellido materno de tu INE";
-        PreviewComunFrente.src = "";
-        PreviewComunTrasera.src = "";
+        
+          // PreviewComunFrente.src = "";
+          // PreviewComunTrasera.src = "";
         ApellidoP.name = "ApellidoP";
         ApellidoM.name = "ApellidoM";
       }

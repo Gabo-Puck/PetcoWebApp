@@ -8,7 +8,7 @@ class Municipio extends BaseModel {
     super();
   }
   static get tableName() {
-    return "Municipio";
+    return "municipio";
   }
   static get relationMappings() {
     const Registro = require("./Registro");
@@ -18,16 +18,16 @@ class Municipio extends BaseModel {
         relation: Model.HasManyRelation,
         modelClass: Registro,
         join: {
-          from: "Municipio.ID",
-          to: "Registro.Municipio",
+          from: "municipio.ID",
+          to: "registro.Municipio",
         },
-        estado: {
-          relation: Model.BelongsToOneRelation,
-          modelClass: Estado,
-          join: {
-            from: "Municipio.ID_Estado",
-            to: "Estado.ID",
-          },
+      },
+      estado: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: Estado,
+        join: {
+          from: "municipio.ID_Estado",
+          to: "estado.ID",
         },
       },
     };

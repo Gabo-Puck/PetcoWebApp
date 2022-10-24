@@ -34,15 +34,15 @@ class Especie extends BaseModel {
             from: "Intereses.ID_Especie",
             to: "Intereses.ID_Usuario",
           },
-          to: "Usuario.ID",
+          to: "usuario.ID",
         },
       },
       Mascotas: {
         relation: Model.HasManyRelation,
         modelClass: Mascota,
         join: {
-          from: "Castrado.ID",
-          to: "Mascota.ID_Castrado",
+          from: "castrado.ID",
+          to: "mascota.ID_Castrado",
         },
       },
     };

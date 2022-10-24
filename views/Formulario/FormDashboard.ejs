@@ -1,94 +1,354 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Formularios</title>
-    <link
-      rel="stylesheet"
-      href="/stylesheets/bootstrap-5.2.0-dist/themes/Lumen/bootstrap.css"
-    />
 
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"
-      integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Formularios</title>
+  <link rel="stylesheet" href="/stylesheets/bootstrap-5.2.0-dist/themes/Lumen/bootstrap.css" />
 
-  <body>
-    <div class="container mt-5">
-      <table class="table table-hover">
-        <thead class="table-info">
-          <th colspan="4" style="text-align: center">
-            <h3>Tus formularios.</h3>
-          </th>
-        </thead>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"
+    integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+    <style>
+      .tab-wrap {
+  transition: 0.3s box-shadow ease;
+  border-radius: 6px;
+  max-width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  position: relative;
+  list-style: none;
+  background-color: #fff;
+  margin: 40px 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+.tab-wrap:hover {
+  box-shadow: 0 12px 23px rgba(0, 0, 0, 0.23), 0 10px 10px rgba(0, 0, 0, 0.19);
+}
 
-        <tr class="table table-primary">
-          <th scope="col">Numero.</th>
-          <th scope="col">Titulo</th>
-          <th scope="col"></th>
-          <th scope="col"></th>
-        </tr>
-        <tbody>
-          <% for(var i=0; i < Elemento.length; i++) { %>
-          <tr class="table-default">
-            <td><%= i+1%></td>
-            <td><%= Elemento[i].Titulo %></td>
-            <td>
-              <a
-                href="/petco/formulario/editar/<%= Elemento[i].ID %>"
-                class="btn btn-warning btn-block"
-              >
-                <i class="fas fa-edit"></i>
-              </a>
-            </td>
+.tab {
+  display: none;
+}
+.tab:checked:nth-of-type(1) ~ .tab__content:nth-of-type(1) {
+  opacity: 1;
+  transition: 0.5s opacity ease-in, 0.8s transform ease;
+  position: relative;
+  top: 0;
+  z-index: 100;
+  transform: translateY(0px);
+  text-shadow: 0 0 0;
+}
+.tab:checked:nth-of-type(2) ~ .tab__content:nth-of-type(2) {
+  opacity: 1;
+  transition: 0.5s opacity ease-in, 0.8s transform ease;
+  position: relative;
+  top: 0;
+  z-index: 100;
+  transform: translateY(0px);
+  text-shadow: 0 0 0;
+}
+.tab:checked:nth-of-type(3) ~ .tab__content:nth-of-type(3) {
+  opacity: 1;
+  transition: 0.5s opacity ease-in, 0.8s transform ease;
+  position: relative;
+  top: 0;
+  z-index: 100;
+  transform: translateY(0px);
+  text-shadow: 0 0 0;
+}
+.tab:checked:nth-of-type(4) ~ .tab__content:nth-of-type(4) {
+  opacity: 1;
+  transition: 0.5s opacity ease-in, 0.8s transform ease;
+  position: relative;
+  top: 0;
+  z-index: 100;
+  transform: translateY(0px);
+  text-shadow: 0 0 0;
+}
+.tab:checked:nth-of-type(5) ~ .tab__content:nth-of-type(5) {
+  opacity: 1;
+  transition: 0.5s opacity ease-in, 0.8s transform ease;
+  position: relative;
+  top: 0;
+  z-index: 100;
+  transform: translateY(0px);
+  text-shadow: 0 0 0;
+}
+.tab:first-of-type:not(:last-of-type) + label {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.tab:not(:first-of-type):not(:last-of-type) + label {
+  border-radius: 0;
+}
+.tab:last-of-type:not(:first-of-type) + label {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.tab:checked + label {
+  background-color: #fff;
+  box-shadow: 0 -1px 0 #fff inset;
+  cursor: default;
+}
+.tab:checked + label:hover {
+  box-shadow: 0 -1px 0 #fff inset;
+  background-color: #fff;
+}
+.tab + label {
+  box-shadow: 0 -1px 0 #eee inset;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  display: block;
+  text-decoration: none;
+  color: #333;
+  flex-grow: 3;
+  text-align: center;
+  background-color: #f2f2f2;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  text-align: center;
+  transition: 0.3s background-color ease, 0.3s box-shadow ease;
+  height: 50px;
+  box-sizing: border-box;
+  padding: 15px;
+}
+.tab + label:hover {
+  background-color: #f9f9f9;
+  box-shadow: 0 1px 0 #f4f4f4 inset;
+}
+.tab__content {
+  padding: 10px 25px;
+  background-color: transparent;
+  position: absolute;
+  width: 100%;
+  z-index: -1;
+  opacity: 0;
+  left: 0;
+  transform: translateY(-3px);
+  border-radius: 6px;
+}
 
-            <td>
-              <a
-                onclick="confirmar(<%= Elemento[i].ID %>)"
-                class="btn btn-danger btn-block"
-              >
-                <i class="fa-solid fa-trash"></i>
-              </a>
-            </td>
-          </tr>
-          <% } %>
+/* boring stuff */
+body {
+  font-family: "Helvetica", sans-serif;  
+  padding: 30px 0;
+  font-weight: 300;
+}
 
-          <tr>
-            <th colspan="4" style="text-align: center">
-              <a
-                href="/petco/formulario/crear/"
-                class="btn btn-primary btn-block"
-              >
-                <i class="fas fa-plus"></i>
-              </a>
-            </th>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+.container {
+  margin: 0 auto;
+  display: block;
+  max-width: 1200px;
+}
+.container > *:not(.tab-wrap) {
+  padding: 0 80px;
+}
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-    <script>
-      function confirmar(id) {
-        Swal.fire({
-          title: "¿Seguro que quieres eliminar el formulario?",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonColor: "#d33",
-          cancelButtonColor: "#6c757d",
-          confirmButtonText: "Confirmar",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            window.location = "/petco/formulario/eliminar/" + id;
-          }
-        });
-      }
-    </script>
-  </body>
+h1,
+h2 {
+  margin: 0;
+  color: #444;
+  text-align: center;
+  font-weight: 400;
+}
+
+h2 {
+  font-size: 1em;
+  margin-bottom: 30px;
+}
+
+h3 {
+  font-weight: 400;
+}
+
+p {
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+.ellipsis {
+  overflow: hidden;
+  white-space: nowrap; 
+  text-overflow: ellipsis; 
+}
+.ellipsis:hover {
+  overflow: auto;
+  white-space: normal;
+  text-overflow: unset;
+}
+
+@media only screen and (max-width: 600px) {
+  .ellipsis {
+    -webkit-overflow-scrolling: touch;
+    width: 100px;
+  }
+}
+    </style>
+</head>
+
+<body>
+
+    
+    
+    <div class="container">
+    
+    
+    
+      <div class="tab-wrap">
+    
+        
+        <input type="radio" id="tab1" name="tabGroup1" class="tab" checked>
+        <label for="tab1">Protocolos</label>
+    
+        <input type="radio" id="tab2" name="tabGroup1" class="tab">
+        <label for="tab2">Formularios</label>
+    
+        
+        <div class="tab__content">
+
+          
+          <div class="container mt-5">
+            <table class="table table-hover table-borderless">
+              <thead class="table-info">
+                
+              </thead>
+        
+              <tr class="table table-danger">
+                <th scope="col">Numero.</th>
+                <th scope="col">Titulo</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+              </tr>
+              <tbody>
+                <% for(var i=0; i < Elemento2.length; i++) { %>
+                  
+                  <tr class="table-default">
+                    <td>
+                      <%= i+1%>
+                    </td>
+                    <td >
+                     
+                          <p class='ellipsis' > <%= Elemento2[i].Titulo%></p>
+                      
+                    </td>
+                    <td>
+                      <a href="/petco/protocolo/editar/<%= Elemento2[i].ID %>" class="btn btn-warning btn-block">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                    </td>
+        
+                    <td>
+                      <a onclick="confirmar(<%= Elemento2[i].ID %>)" class="btn btn-danger btn-block">
+                        <i class="fa-solid fa-trash"></i>
+                      </a>
+                    </td>
+                  </tr>
+                  <% } %>
+        
+                    <tr>
+                      <th colspan="4" style="text-align: center">
+                        <a href="/petco/protocolo/" class="btn btn-primary btn-block">
+                          <i class="fas fa-plus"></i>
+                        </a>
+                      </th>
+                    </tr>
+                    
+              </tbody>
+            </table>
+                  
+        
+          
+          
+          </div>
+        
+        
+        </div>
+
+
+    
+        <div class="tab__content">
+
+          <div class="container mt-5">
+            <table class="table table-hover table-borderless">
+              <thead class="table-info">
+                
+              </thead>
+        
+              <tr class="table table-primary">
+                <th scope="col">Numero.</th>
+                <th scope="col">Titulo</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+              </tr>
+              <tbody>
+                <% for(var i=0; i < Elemento.length; i++) { %>
+                  
+                  <tr class="table-default">
+                    <td>
+                      <%= i+1%>
+                    </td>
+                    <td>
+                      <%= Elemento[i].Titulo %>
+                    </td>
+                    <td>
+                      <a href="/petco/formulario/editar/<%= Elemento[i].ID %>" class="btn btn-warning btn-block">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                    </td>
+        
+                    <td>
+                      <a onclick="confirmar(<%= Elemento[i].ID %>)" class="btn btn-danger btn-block">
+                        <i class="fa-solid fa-trash"></i>
+                      </a>
+                    </td>
+                  </tr>
+                  <% } %>
+        
+                    <tr>
+                      <th colspan="4" style="text-align: center">
+                        <a href="/petco/formulario/crear/" class="btn btn-primary btn-block">
+                          <i class="fas fa-plus"></i>
+                        </a>
+                      </th>
+                    </tr>
+                    
+              </tbody>
+            </table>
+                  
+        
+          
+          
+          </div>
+        
+        </div>
+    
+      
+    
+      
+  
+  
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  <script>
+    function confirmar(id) {
+      Swal.fire({
+        title: "¿Seguro que quieres eliminar el formulario?",
+        icon: "warning",
+        showCancelButton: true,
+        cancelButtonText: "Cancelar",
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Confirmar",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location = "/petco/formulario/eliminar/" + id;
+        }
+      });
+    }
+  </script>
+</body>
+
 </html>

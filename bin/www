@@ -4,16 +4,24 @@
  * Module dependencies.
  */
 
-var app = require('../app');
-var debug = require('debug')('petcowebapp-v1:server');
-var http = require('http');
-
+var app = require("../app");
+var { Server } = require("socket.io");
+var debug = require("debug")("petcowebapp-v1:server");
+var http = require("http");
+var { InMemorySessionStore } = require("../utils/socketUtils/SessionStore");
+var { randomId } = require("../utils/cryptoUtils/randomId");
+const Comentario = require("../models/Comentario");
+const Mensajes = require("../models/Mensajes");
+var sessionStore = new InMemorySessionStore();
+const cors = require("cors");
+const Paso = require("../models/Paso");
+const Pasos_Mascota = require("../models/Pasos_Mascota");
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+var port = normalizePort(process.env.PORT || "3000");
+app.set("port", port);
 
 /**
  * Create HTTP server.
@@ -24,10 +32,294 @@ var server = http.createServer(app);
 /**
  * Listen on provided port, on all network interfaces.
  */
-
 server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+server.on("error", onError);
+server.on("listening", onListening);
+//Montamos la instancia de socket io con el servidor http que teníamos creado
+const io = new Server(server, { cors: { origin: "*" } });
+
+const wrap = (middleware) => (socket, next) =>
+  middleware(socket.request, {}, next);
+// const { ExpressPeerServer } = require("peer");
+
+// const peerServer = ExpressPeerServer(server, {
+//   debug: true,
+// });
+// app.use("/peerjs", peerServer);
+io.use(wrap(app.sessionReference)); //Esta función middleware específica para socket.io nos permite "parsear" la función middleware de express-session
+
+io.use((socket, next) => {
+  //Esta es una función middleware, que se ejecutará cada vez que haya un intento de conexión. Esto quiere decir que en este punto aún no se ha establecido una conexión formal
+  const sessionID = socket.handshake.auth.sessionID; //Recibimos la sesion guardada del usuario
+  if (sessionID) {
+    //Si el usuario si tenía su sesion guardada en las cookies
+    const session = sessionStore.findSession(sessionID); //Revisamos si tenemos una sesion actualmente guardada en el sessionStore
+    if (session) {
+      //Si lo tenemos simplemente le asignamos los datos al socket del usuario
+      socket.sessionID = sessionID;
+      socket.userID = session.userID;
+      return next();
+    }
+  }
+  //En el caso de que el usuario no haya tenido guardado en las cookies una sessionID le generamos una
+  if (socket.request.session.IdSession) {
+    socket.sessionID = randomId(); //Generamos una id y única random para la sesion del usuario.
+    socket.userID = socket.request.session.IdSession; //Guardamos la id del usuario al que pertenece el usuario
+    next();
+  } else {
+    return next(new Error("Usuario no logeado"));
+  }
+});
+
+io.on("connection", (socket) => {
+  //Este listener del server socket se acciona cada vez que se conecta un nuevo socket al server
+  sessionStore.saveSession(socket.sessionID, { userID: socket.userID }); //Cada vez que se conecta un socket, guardamos sus datos de sesion en nuestro sessionStore
+  sessionStore.printSessions();
+  //Emitimos al usuario sus datos de acceso, para que se guarden en las cookies del navegador.
+  socket.emit("session", {
+    sessionID: socket.sessionID,
+    userID: socket.userID,
+  });
+  socket.on("join-room", (roomId, userId) => {
+    console.log("An user has joined the call");
+    socket.join(roomId);
+    socket.broadcast.emit("user-connected", userId);
+    socket.on("send-message", ({ nombreUsuario, message, roomID }) => {
+      console.log(nombreUsuario);
+      io.to(roomId).emit("message-recieved", {
+        nombre: nombreUsuario,
+        message: message,
+      });
+    });
+  });
+
+  socket.on("join-proceso", (mascotaID) => {
+    console.log("An user has joined the proceso room");
+    socket.join(mascotaID);
+    socket.on(
+      "mensaje-chat-proceso",
+      ({ message, userID, fecha, SolicitudID }) => {
+        console.log(fecha);
+        console.log(socket.userID);
+
+        Mensajes.query()
+          .insert({
+            Usuario_Remitente: userID,
+            Texto: message,
+            Fecha_Envio: fecha,
+            ID_Solicitud: SolicitudID,
+          })
+          .then(() => {
+            io.to(mascotaID).emit("mensaje-chat-proceso", {
+              message: message,
+              userID: userID,
+              fecha: fecha,
+            });
+          })
+          .catch((err) => {
+            console.log("Error al guardar mensaje: " + err);
+          });
+      }
+    );
+    socket.on(
+      "paso-completado-intento",
+      ({ tipo, idPasoMascota, idPasoArray }) => {
+        console.log(tipo);
+        console.log(idPasoMascota);
+        console.log(idPasoArray);
+        Pasos_Mascota.query()
+          .withGraphJoined("Paso")
+          .findOne({ "paso_mascota.ID": idPasoMascota })
+          .then((PasoActual) => {
+            console.log(PasoActual);
+            if (tipo == 1) {
+              let completado = PasoActual.Completado;
+              completado += 1;
+              PasoActual.$query()
+                .patchAndFetch({ "paso_mascota.Completado": completado })
+                .then((PasoActualPatch) => {
+                  io.to(mascotaID).emit("paso-completado", {
+                    Completado: PasoActualPatch.Completado,
+                    idPasoAfectado: idPasoArray,
+                  });
+                });
+              //Dueno
+            } else {
+              //Adoptante
+              let c1 =
+                PasoActual.Archivo != null && PasoActual.Paso.AceptaArchivo == 1
+                  ? true
+                  : false;
+              let c2 =
+                PasoActual.Archivo == null && PasoActual.Paso.AceptaArchivo == 0
+                  ? true
+                  : false;
+              console.log(c1);
+              console.log(c2);
+              if (c1 || c2) {
+                //hacer query
+                console.log("haciendo query verf archivo");
+                let completado = PasoActual.Completado;
+                completado += 2;
+                PasoActual.$query()
+                  .patchAndFetch({ "paso_mascota.Completado": completado })
+                  .then((PasoActualPatch) => {
+                    io.to(mascotaID).emit("paso-completado", {
+                      Completado: PasoActualPatch.Completado,
+                      idPasoAfectado: idPasoArray,
+                    });
+                  });
+              } else {
+                //enviar socket error
+                console.log("no haciendo query verf archivo");
+                console.log(socket.userID);
+                let mensaje =
+                  c1 == false
+                    ? "Este paso requiere que subas un archivo"
+                    : "Algo ha salido mal";
+                io.to(socket.userID).emit(
+                  "error-paso-completado-lista-registro",
+                  {
+                    error: mensaje,
+                    idPasoAfectado: idPasoArray,
+                  }
+                );
+              }
+            }
+          });
+      }
+    );
+    socket.on(
+      "paso-incompleto-intento",
+      ({ tipo, idPasoMascota, idPasoArray }) => {
+        Pasos_Mascota.query()
+          .withGraphJoined("Paso")
+          .findOne({ "paso_mascota.ID": idPasoMascota })
+          .then((PasoActual) => {
+            console.log(PasoActual);
+            let completado = PasoActual.Completado;
+            if (tipo == 1) {
+              //Dueno
+              completado -= 1;
+            } else {
+              //Adoptante
+              completado -= 2;
+            }
+            PasoActual.$query()
+              .patchAndFetch({ "paso_mascota.Completado": completado })
+              .then((PasoActualPatch) => {
+                io.to(mascotaID).emit("paso-completado", {
+                  Completado: PasoActualPatch.Completado,
+                  idPasoAfectado: idPasoArray,
+                });
+              });
+          });
+      }
+    );
+    socket.on("archivo-subido-paso", ({ path, idPasoAfectado }) => {
+      io.to(mascotaID).emit("archivo-subido-paso", {
+        path: path,
+        idPasoAfectado: idPasoAfectado,
+      });
+    });
+
+    // socket.on();
+  });
+
+  socket.join(socket.userID); //Metemos al socket a la room del usuario
+  //Esto lo hacemos con el fin de considerar la posibilidad de que el usuario abra diferentes pestañas en el mismo navegador
+  //Entonces cada vez que entre un usuario con la misma sessionID, metemos a la misma room todos sus sockets
+  /*Esto nos permite por ejemplo, si se manda un mensaje al usuario con ID 2, y este usuario tiene 3 pestañas activas 
+   *con su cuenta abierta en la app, todas las pestañas recibiran el mensaje. Inclusive nos permite tener en cuenta el
+   hipotetico caso de que el usuario abra su cuenta en el celular y en una computadora*/
+
+  socket.on("disconnect", () => {
+    //Este listener se accionará cuando el socket se desconecte del servidor
+    //Revisamos la cantidad de usuarios que estan dentro de la room "socket.userID"
+    io.in(socket.userID)
+      .allSockets() //Obtenemos todos los sockets de esa room
+      .then((matchingSockets) => {
+        const isDisconnected = matchingSockets.size === 0; //Revisamos si la cantidad de sockets en la room es 0
+        if (isDisconnected) {
+          //Si es 0, quiere decir que el usuario finalmente se ha desconectado
+          sessionStore.deleteSession(socket.sessionID); //Eliminamos su session de las sesiones activas actuales
+          sessionStore.printSessions();
+          console.log(`El usuario ${socket.userID} se ha desconectado`);
+        } else {
+          console.log(
+            `Se ha desconectado un nodo del usuario con ID: ${socket.userID}. Quedan: ${matchingSockets.size}`
+          );
+        }
+      });
+  });
+
+  //Comentarios // Se establece el contexto de los comentarios dentro de la publicacion
+  socket.on("publicacion", (id) => {
+    console.log(id);
+    socket.join("publicacion" + id);
+  });
+
+  //Evento para comentarios
+  socket.on("comentario", ({ msg, id, nombre, imagen, fecha }) => {
+    console.log("Comentario: " + msg);
+    console.log("El usuario del comentario es " + socket.userID);
+    console.log(fecha);
+    //Se procesan los datos correspondientes
+    const idusuario = socket.userID;
+    //Se guardan los comentarios en la base de datos
+    Comentario.query()
+      .insertAndFetch({
+        ID_Publicacion: id,
+        Texto: msg,
+        Fecha_Envio: fecha,
+        ID_Usuario: socket.userID,
+      })
+      .then((resultado) => {
+        console.log(resultado.ID);
+        //Se emite el comentario por parte del cliente dentro del contexto de la publicacion
+        io.to("publicacion" + id).emit("comentario", {
+          msg: msg,
+          nombre: nombre,
+          imagen: imagen,
+          fecha: fecha,
+          idcomentario: resultado.ID,
+        });
+      });
+  });
+
+  socket.on(
+    "respuesta",
+    ({ msg, idP, idcomentario, nombre, imagen, fecha }) => {
+      console.log(msg);
+      console.log(idP);
+      console.log(idcomentario);
+      console.log(nombre);
+      console.log(imagen);
+      console.log(fecha);
+
+      Comentario.query()
+        .insertAndFetch({
+          ID_Publicacion: idP,
+          Comentario_Padre: idcomentario,
+          Texto: msg,
+          Fecha_Envio: fecha,
+          ID_Usuario: socket.userID,
+        })
+        .then((resultado) => {
+          console.log(resultado.ID);
+          //Se emite el comentario por parte del cliente dentro del contexto de la publicacion
+          io.to("publicacion" + idP).emit("respuesta", {
+            msg: msg,
+            idP: idP,
+            idcomentario: idcomentario,
+            nombre: nombre,
+            imagen: imagen,
+            fecha: fecha,
+          });
+        });
+    }
+  );
+});
 
 /**
  * Normalize a port into a number, string, or false.
@@ -54,22 +346,20 @@ function normalizePort(val) {
  */
 
 function onError(error) {
-  if (error.syscall !== 'listen') {
+  if (error.syscall !== "listen") {
     throw error;
   }
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+  var bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
+    case "EACCES":
+      console.error(bind + " requires elevated privileges");
       process.exit(1);
       break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
+    case "EADDRINUSE":
+      console.error(bind + " is already in use");
       process.exit(1);
       break;
     default:
@@ -83,8 +373,6 @@ function onError(error) {
 
 function onListening() {
   var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+  var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
+  debug("Listening on " + bind);
 }

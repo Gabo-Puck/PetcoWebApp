@@ -9,6 +9,7 @@ class Mascota extends BaseModel {
   }
 
   static get relationMappings() {
+    const Metas = require("./Metas");
     const Castrado = require("./Castrado");
     const Salud = require("./Salud");
     const Tamano = require("./Tamano");
@@ -19,6 +20,9 @@ class Mascota extends BaseModel {
     const Imagenes = require("./Imagenes");
     const Solicitud = require("./Solicitudes");
     const Pasos = require("./Paso");
+    const VacunaThrough = require("./Vacunas_Mascota");
+    const Pasos_Mascota = require("./Pasos_Mascota");
+
     return {
       MascotasCastrado: {
         modelClass: Castrado,
@@ -52,6 +56,16 @@ class Mascota extends BaseModel {
           to: "publicacion.ID",
         },
       },
+
+      MP: {
+        modelClass: Publicacion,
+        relation: Model.BelongsToOneRelation,
+        join: {
+          from: "mascota.ID_Publicacion",
+          to: "publicacion.ID",
+        },
+      },
+
       MascotasEspecie: {
         modelClass: Especie,
         relation: Model.BelongsToOneRelation,
@@ -101,15 +115,41 @@ class Mascota extends BaseModel {
             from: "paso_mascota.ID_Mascota",
             to: "paso_mascota.ID_Paso",
           },
-          to: "Paso.ID",
+          to: "paso.ID",
         },
       },
+      MascotasProceso: {
+        modelClass: Pasos_Mascota,
+        realtion: Model.HasManyRelation,
+        join: {
+          from: "mascota.ID",
+          to: "paso_mascota.ID_Mascota",
+        },
+      },
+
       MascotasSolicitudes: {
         modelClass: Solicitud,
         relation: Model.HasManyRelation,
         join: {
           from: "mascota.ID",
           to: "solicitudes.ID_Mascota",
+        },
+      },
+
+      MascotasMetas: {
+        modelClass: Metas,
+        relation: Model.HasOneRelation,
+        join: {
+          from: "mascota.ID",
+          to: "metas.ID_Mascota",
+        },
+      },
+      MascotasVacunasThrough: {
+        modelClass: VacunaThrough,
+        relation: Model.HasManyRelation,
+        join: {
+          from: "mascota.ID",
+          to: "vacunas_mascota.ID_Mascota",
         },
       },
     };

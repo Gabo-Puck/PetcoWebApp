@@ -57,11 +57,16 @@
       .archivoEliminar {
         margin: auto;
       }
+      
     </style>
+
+<div class="container-sm mt-5" style="text-align: center; width: 80%;">
+  <h1>Edita tu protocolo de adopcion</h1>
     <form class="ProtocoloHeader">
-      <div>
+      <div class="mt-5">
         <input
           type="text"
+          class="form-control" 
           placeholder="Titulo Protocolo"
           id="Tprotocolo"
           value="<%-protocolo.Titulo%>"
@@ -70,13 +75,14 @@
       <div>
         <input
           type="text"
+          class="form-control mt-3" 
           placeholder="Descripcion del Protocolo"
           id="Dprotocolo"
           value="<%-protocolo.Descripcion%>"
         />
       </div>
 
-      <select id="formU">
+      <select class="form-select mt-3" id="formU">
         <% for(var i=0; i < formularios.length; i++) { %>
 
         <option value=" <%=formularios[i].ID %>">
@@ -85,14 +91,27 @@
 
         <% } %>
       </select>
-      <div class="Enviar">
+      
+      
+    <div class="container-sm mt-3 pasos" style="text-align: center; max-width: 70%;" > 
+      <h4>Pasos a seguir</h4>
+      <div class="Enviar mt-3 mb-5">
+
         <button type="button" class="AddStep btn btn-primary">
           Añadir Paso
         </button>
         <button type="button" class="agregar btn btn-success">Guardar</button>
+
+
       </div>
     </form>
+    </div>
 
+      
+
+
+  </div>
+  
     <script type="module" src="/javascripts/EditarProtocolo.js"></script>
   </body>
 </html>

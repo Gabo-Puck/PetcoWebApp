@@ -1,0 +1,217 @@
+<div
+  class="swiper-slide d-flex align-items-start justify-items-center swiperCard flex-column mascota"
+>
+  <div class="d-flex w-100 justify-content-between mb-2">
+    <div class="d-flex">
+      <p class="informative align-items-center my-auto">
+        <i class="fa-solid fa-circle-info mx-2 infoImagenes"></i>Muestranos a tu
+        mascota, sube de 3 a 5 fotos suyas!
+      </p>
+    </div>
+    <div class="position-relative align-content-center">
+      <button class="btn btn-danger me-2 deleteMascota">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+  <div class="swiper swiper-v" style="width: 101%; background-color: black">
+    <div class="swiper-wrapper" style="background-color: black">
+      <div
+        class="swiper-slide button"
+        style="background-color: black; width: 101%"
+      >
+        <button class="buttonAddFoto btn btn-info">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="swiper-button-next me-3 d-none d-lg-block"></div>
+    <div class="swiper-button-prev ms-3 d-none d-lg-block"></div>
+    <div class="swiper-pagination"></div>
+  </div>
+  <div class="flex-grow-1 mt-3 w-100 px-5 overflow-hidden">
+    <form method="post" class="">
+      <div class="row border border-1 rounded justify-content-center mb-4">
+        <div class="row mb-2">
+          <div class="col mx-4 d-flex justify-content-around flex-wrap">
+            <div class="d-flex flex-column bd-highlight optionMascotaConMeta">
+              <label class="form-check-label"> Mascota con meta </label>
+              <input
+                class="form-check-input mx-auto"
+                type="radio"
+                name="mascotaMeta"
+                checked
+              />
+            </div>
+            <div class="d-flex flex-column bd-highlight optionMascotaSinMeta">
+              <label class="form-check-label"> Mascota sin meta </label>
+              <input
+                class="form-check-input mx-auto"
+                type="radio"
+                name="mascotaMeta"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-2">
+          <div class="col mx-4">
+            <label for="" class="from-label" hidden>Nombre Mascota</label>
+            <input
+              type="text"
+              class="form-control w-95 mx-auto nombreMascota"
+              style="
+                border-top: none;
+                text-align: center;
+                border-radius: 0;
+                border-left: none;
+                border-bottom-width: 2px;
+                border-right: 0;
+                box-shadow: none;
+              "
+              placeholder="Nombre de la Mascota"
+            />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <label for="" class="form-label"> Especie</label>
+            <select
+              name=""
+              id=""
+              class="form-select w-75 d-block mx-auto mb-3 especieSelect"
+            ></select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col mx-4">
+            <label for="" class="from-label">Edad: </label>
+            <span class="d-inline mx-auto edadTexto">0</span>
+
+            <input
+              type="range"
+              class="form-range edadInput"
+              value="0"
+              max="30"
+              min="-1"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="row border border-1 rounded justify-content-center mb-3">
+        <div class="col border-end">
+          <div class="col mx-4">
+            <label for="" class="from-label d-block">Vacunas</label>
+            <div class="vacunasBox"></div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="row justify-content-center border-1 rounded">
+            <label for="" class="from-label">Salud</label>
+            <div class="row mx-4 saludOptions"></div>
+            <label for="" class="from-label">Tamaño</label>
+            <div class="row mx-4 tamanoOptions"></div>
+            <label for="" class="from-label">Castrado</label>
+            <div class="row mx-4 castradoOptions"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row border border-1 rounded justify-content-center mb-3">
+        <div class="mx-5 pt-2 pb-3">
+          <label for="" class="from-label">Descripción de la mascota</label>
+          <textarea
+            type="text"
+            class="form-control mascotaDescripcion"
+          ></textarea>
+        </div>
+        <label for="">Protocolo para esta mascota</label>
+        <select
+          name=""
+          id=""
+          class="form-select w-50 mx-auto mb-3 protocoloSelector"
+          style="text-align: center"
+        ></select>
+      </div>
+      <div class="row border border-1 rounded justify-content-center mb-3 pb-5">
+        <div class="row justify-content-center metasBox">
+          <h3 class="mx-auto">Meta</h3>
+          <!-- <div class="form-check w-30 pe-5 d-inline-flex">
+            <input
+              class="form-check-input me-3 habilitarDonacionescheck"
+              type="checkbox"
+              id=""
+            />
+            <label for="" class="form-check-label">Habilitar donacion</label>
+          </div> -->
+
+          <!-- <button
+            class="btn btn-warning crearMetaButton mx-auto d-block"
+            type="button"
+            style="width: 30%"
+            disabled
+          >
+            Crear meta
+          </button> -->
+
+          <label for="" class="form-label">Cantidad</label>
+          <input
+            type="number"
+            class="form-control mx-auto metaCantidad"
+            style="width: 45%"
+          />
+          <label for="" class="form-label">Descripción de meta</label>
+          <textarea class="form-control metaDescripcion"></textarea>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div
+  class="swiper-slide swiperCardImage"
+  style="background-color: black; width: 101%"
+>
+  <div class="swiper-zoom-container position-relative">
+    <button
+      class="btn btn-danger position-absolute top-0 start-0 ms-3 btn-delete"
+      style="z-index: 1"
+    >
+      <i class="fa-regular fa-trash-can"></i>
+    </button>
+    <input type="file" style="display: none" class="mascotaImageInput" />
+    <img class="mascotaImagePreview flex-grow-1" src="" alt="" />
+  </div>
+</div>
+
+<div class="form-check form-check radioSelector d-inline-flex">
+  <input class="form-check-input me-4" type="radio" />
+  <label class="form-check-label">1</label>
+</div>
+
+<div class="form-check form-check-inline vacunaTemplate">
+  <input
+    class="form-check-input"
+    type="checkbox"
+    id="inlineCheckbox1"
+    value="option1"
+  />
+  <label class="form-check-label"></label>
+</div>
+
+<option value="" style="text-align: center" class="optionEspecie"></option>
+
+<div
+  class="metaTemplate row border border-1 rounded mb-3 pb-3 px-3"
+  style="width: 100%; padding: 0"
+>
+  <label for="" class="form-label">Cantidad</label>
+  <input
+    type="number"
+    class="form-control mx-auto metaCantidad"
+    style="width: 45%"
+  />
+  <label for="" class="form-label">Descripción de meta</label>
+  <textarea class="form-control metaDescripcion"></textarea>
+</div>
