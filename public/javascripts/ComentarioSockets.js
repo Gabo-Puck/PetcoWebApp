@@ -1,10 +1,15 @@
-var socket = io(); //Se inicializa dentro del scritp socket.io
+import { initSocket } from "/javascripts/socketUtils.js"; //Importamos la función para inicilizar el socket
+import { notificacionNueva } from "/javascripts/globalListeners.js"; //Importamos la función para inicilizar el socket
+
 //Se obtienen algunos de los datos que conforman el comentario
 
 window.onload = function () {
   //Se ejecuta al terminar de cargar la pagina
-  socket.emit("publicacion", idPublicacion); //Metodo que etablece la sala y el contexto de los comentarios dentro de la publicacion
 };
+socket = initSocket(emitPublicacionData);
+function emitPublicacionData() {
+  socket.emit("publicacion", idPublicacion); //Metodo que etablece la sala y el contexto de los comentarios dentro de la publicacion
+}
 
 var tarjeta = document.querySelector(".comentarioTemplate"); //Se obtiene el formato del comentario de un template
 const form = document.querySelector("form");
@@ -143,3 +148,5 @@ socket.on("respuesta", ({ msg, idP, idcomentario, nombre, imagen, fecha }) => {
   //Se inserta el comentario dentro
   document.querySelector("#comentario-" + idcomentario).appendChild(tarjeta2);
 });
+
+notificacionNueva();

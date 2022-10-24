@@ -13,6 +13,7 @@ const Donaciones = require("../models/Donaciones");
 const Like = require("../models/Like");
 const Publicacion_Guardada = require("../models/Publicacion_Guardada");
 const Reporte_Publicacion = require("../models/Reporte_Publicacion");
+const { sendNotificacion } = require("./NotificacionesController");
 
 paypal.configure({
   mode: "sandbox", //sandbox or live
@@ -133,9 +134,18 @@ exports.likes = (req, res) => {
         ID_Publicacion: req.params.idP,
         ID_Usuario: req.params.idU,
       })
-      .then((resp) => {});
-
-    res.json("Se agrego");
+      .then((resp) => {
+        let origen = `/petco/publicacion/adopciones/${req.params.idP}`;
+        sendNotificacion(
+          "¡Tu publicación ha recibido un me gusta!",
+          origen,
+          req.params.idDueno,
+          req
+        );
+      })
+      .then(() => {
+        res.json("Se agrego");
+      });
   }
 
   if (req.params.accion == 2) {
