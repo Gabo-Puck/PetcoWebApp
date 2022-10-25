@@ -3,6 +3,9 @@ const Publicacion = require("../models/Publicacion");
 const Respuestas = require("../models/Respuestas");
 const Solicitudes = require("../models/Solicitudes");
 const { secureRegistro } = require("../utils/formDatabaseClean");
+const { sendNotificacion } = require("../controllers/NotificacionesController");
+const Mascota = require("../models/Mascota");
+
 exports.getListaSolicitudesPublicacion = (req, res, next) => {
   //Importante Borrar esta parte
 
@@ -86,9 +89,14 @@ exports.aceptarSolicitud = (req, res, next) => {
           return new Promise((resolve, reject) => {
             resolve(
               Solicitudes.query()
-                .patch({ Estado: 1 })
-                .findById(req.params.SolicitudID)
+                .patchAndFetchById(req.params.SolicitudID, { Estado: 1 })
                 .then((result) => {
+                  // sendNotificacion;
+                  getUsuarioMascota(
+                    req.params.MascotaID,
+                    result.ID_Usuario,
+                    req
+                  );
                   res.json("ok");
                 })
             );
@@ -103,6 +111,26 @@ exports.aceptarSolicitud = (req, res, next) => {
       });
   }
 };
+
+function getUsuarioMascota(MascotaID, ID_Usuario, req) {
+  return new Promise((resolve, reject) => {
+    Mascota.query()
+      .withGraphJoined(
+        "MascotasPublicacion.[PublicacionUsuario.[UsuarioRegistro]]",
+        { minimize: true }
+      )
+      .findById(MascotaID)
+      .then((MascotaFind) => {
+        let nombreUsuario =
+          MascotaFind.MascotasPublicacion.PublicacionUsuario.UsuarioRegistro
+            .Nombre;
+        let descripcion = `${nombreUsuario} ha aceptado su solicitud para proceso de adopción`;
+        let origen = `/petco/proceso/ver/${MascotaID}`;
+        sendNotificacion(descripcion, origen, ID_Usuario, req.app.io);
+        console.log(MascotaFind);
+      });
+  });
+}
 
 exports.denegarSolicitud = (req, res, next) => {
   if (req.params.SolicitudID && req.params.MascotaID) {

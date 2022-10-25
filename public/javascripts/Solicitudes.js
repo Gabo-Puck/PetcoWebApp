@@ -42,7 +42,7 @@ function addEventListenerToMascotaButton(buttonMascota) {
     loadingSpinnerSolicitudes.parentNode.classList.add("d-block");
     setTimeout(() => {
       buttonMascota.classList.add("activeButtonMascota");
-      fetch(`/solicitudes/obtener/solicitudesMascota/${buttonMascota.id}`)
+      fetch(`/petco/solicitudes/obtener/solicitudesMascota/${buttonMascota.id}`)
         .then((res) => {
           loadingSpinnerSolicitudes.parentNode.classList.remove("d-block");
           loadingSpinnerSolicitudes.parentNode.classList.add("d-none");

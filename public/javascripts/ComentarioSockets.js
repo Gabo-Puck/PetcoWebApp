@@ -35,6 +35,7 @@ form.addEventListener("submit", (e) => {
       nombre: nombreuser,
       imagen: imagenperfil,
       fecha: dateTime,
+      idDueno: idUsuarioPublicacion,
     });
     input.value = "";
   }
@@ -69,7 +70,7 @@ socket.on("comentario", ({ msg, nombre, imagen, fecha, idcomentario }) => {
       var time =
         today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
       var dateTime = date + " " + time;
-
+      console.log(idUsuarioPublicacion);
       socket.emit("respuesta", {
         msg: tarjeta2.querySelector("input").value,
         idP: idPublicacion,
@@ -77,6 +78,7 @@ socket.on("comentario", ({ msg, nombre, imagen, fecha, idcomentario }) => {
         nombre: nombreuser,
         imagen: imagenperfil,
         fecha: dateTime,
+        idDueno: idUsuarioPublicacion,
       });
       tarjeta2.querySelector("input").value = "";
     }
@@ -130,6 +132,7 @@ for (let i = 0; i < ncomentarios; i++) {
         nombre: nombreuser,
         imagen: imagenperfil,
         fecha: dateTime,
+        idDueno: idUsuarioPublicacion,
       });
       GetCommentsInput[i].value = "";
     }

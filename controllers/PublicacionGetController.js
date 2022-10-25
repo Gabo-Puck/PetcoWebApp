@@ -116,7 +116,7 @@ exports.query = [
   },
 ];
 
-exports.likes = (req, res) => {
+exports.likes = (req, res, next) => {
   if (req.params.accion == 0) {
     Like.query()
       .where("like.ID_Publicacion", "=", req.params.idP)
@@ -135,16 +135,42 @@ exports.likes = (req, res) => {
         ID_Usuario: req.params.idU,
       })
       .then((resp) => {
-        let origen = `/petco/publicacion/adopciones/${req.params.idP}`;
-        sendNotificacion(
-          "¡Tu publicación ha recibido un me gusta!",
-          origen,
-          req.params.idDueno,
-          req
-        );
+        return new Promise((resolve, reject) => {
+          Publicacion.query()
+            .where("publicacion.ID", "=", req.params.idP)
+            .select(
+              "publicacion.*",
+              Publicacion.relatedQuery("PublicacionLike")
+                .count()
+                .as("numberOfLikes")
+            )
+            .then((countLikes) => resolve(countLikes));
+        });
       })
-      .then(() => {
-        res.json("Se agrego");
+      .then((countLikes) => {
+        let limite = Math.pow(10, 5); //Establecemos el limite de likes en 100,000 para generar notificaciones
+        let likes = countLikes[0].numberOfLikes;
+        // console.log(likes);
+
+        // console.log(countLikes);
+        if (likes <= limite) {
+          //Si es menor a 100,000 likes geeneramos la notificacion
+          let origen = `/petco/publicacion/adopciones/${req.params.idP}`;
+          sendNotificacion(
+            "¡Tu publicación ha recibido un me gusta!",
+            origen,
+            req.params.idDueno,
+            req.app.io
+          ).then(() => {
+            res.json("ok");
+          });
+        } else {
+          res.json("ok");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        next(err);
       });
   }
 

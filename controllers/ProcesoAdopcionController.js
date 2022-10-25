@@ -50,6 +50,7 @@ exports.getProceso = [
             SolicitudID: res.SolicitudID,
             Mensajes: res.MensajesSolicitud,
             ROOM_ID: ROOM_ID,
+            Tipo: req.session.Tipo,
           });
         });
     } else {
@@ -111,7 +112,6 @@ function getUsuario(req, res, next) {
         "Telefono",
         "Municipio",
         "Tipo_Usuario",
-        "ID",
       ]);
       resUsuario["foto"] = usuario.Foto_Perfil;
       res.usuarioProceso = resUsuario;

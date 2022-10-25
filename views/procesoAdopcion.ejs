@@ -40,6 +40,7 @@
     <script>
       const PasosProceso = <%-JSON.stringify(PasosProceso)%>;
       const Usuario = <%-JSON.stringify(Usuario)%>;
+      console.log(Usuario);
       const UsuarioPeer = <%-JSON.stringify(UsuarioPeer)%>;
     </script>
   </head>
@@ -332,6 +333,8 @@
     const ROOM_ID = "<%=ROOM_ID%>"
   </script>
   <body style="min-height: 100vh; max-height: 100vh">
+    <%- include ("partials/header") %>
+
     <div class="d-none templateElementsMensajes" >
       <div class="someone mb-2 mx-1">
         <div class="row flex-nowrap w-100">

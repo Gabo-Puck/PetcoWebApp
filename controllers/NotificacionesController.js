@@ -1,7 +1,7 @@
 const Notificaciones = require("../models/Notificaciones");
 const Usuario = require("../models/Usuario");
 
-exports.sendNotificacion = (Descripcion, Origen, ID_Usuario, req) => {
+exports.sendNotificacion = (Descripcion, Origen, ID_Usuario, io) => {
   return new Promise((resolve, reject) => {
     console.log(Date.now());
     let dateNow = new Date(Date.now());
@@ -32,6 +32,10 @@ exports.sendNotificacion = (Descripcion, Origen, ID_Usuario, req) => {
     var Fecha_Generacion = dateGeneracion + " " + timeGeneracion;
     console.log(`${date} ${time}`);
     console.log(`${Fecha_Generacion}`);
+    if (Descripcion.length > 175) {
+      Descripcion = Descripcion.slice(0, 170).concat("...");
+      console.log(Descripcion);
+    }
     Notificaciones.query()
       .insertAndFetch({
         Fecha_Generacion: Fecha_Generacion,
@@ -41,9 +45,7 @@ exports.sendNotificacion = (Descripcion, Origen, ID_Usuario, req) => {
       })
       .then((notificacion) => {
         console.log(ID_Usuario);
-        req.app.io
-          .to(Number(ID_Usuario))
-          .emit("notificacion-nueva", notificacion);
+        io.to(Number(ID_Usuario)).emit("notificacion-nueva", notificacion);
         resolve();
       });
   });

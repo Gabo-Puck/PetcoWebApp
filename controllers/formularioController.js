@@ -12,6 +12,8 @@ const jsdom = require("jsdom");
 const Respuestas = require("../models/Respuestas");
 const { response } = require("express");
 const Pasos_Mascota = require("../models/Pasos_Mascota");
+const { sendNotificacion } = require("./NotificacionesController");
+const Registro = require("../models/Registro");
 const { JSDOM } = jsdom;
 
 exports.formularioList = (req, res) => {
@@ -108,8 +110,10 @@ exports.responder_formulario_post = (req, res) => {
     )
     .then(() => {
       Mascota.query()
-        .withGraphJoined("MascotasPasos.PasoProceso")
-        .findOne({ "MascotasPasos:PasoProceso.ID_Mascota": req.body.MascotaID })
+        .withGraphJoined("[MascotasPasos.PasoProceso,MascotasPublicacion]", {
+          minimize: true,
+        })
+        .findOne({ "_t1.ID_Mascota": req.body.MascotaID })
         .debug()
         .then((re) => {
           console.log(re);
@@ -123,7 +127,21 @@ exports.responder_formulario_post = (req, res) => {
               re.MascotasPasos[0].PasoProceso[0]
                 .$query()
                 .patch({ Completado: 3 })
-                .then(() => {})
+                .then(() => {
+                  Usuario.query()
+                    .withGraphJoined("UsuarioRegistro")
+                    .findOne({ "usuario.ID": req.session.IdSession })
+                    .then((usuarioFinded) => {
+                      let descripcion = `¡${usuarioFinded.UsuarioRegistro.Nombre} esta interesado en una de tus mascotas!`;
+                      let origen = `/petco/solicitudes/ver/${re.MascotasPublicacion.ID}`;
+                      sendNotificacion(
+                        descripcion,
+                        origen,
+                        re.MascotasPublicacion.ID_Usuario,
+                        req.app.io
+                      );
+                    });
+                })
             );
           });
         });

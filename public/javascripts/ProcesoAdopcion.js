@@ -1,5 +1,6 @@
 import { loadingScreen } from "/javascripts/FormulariosFunctions.js"; //Importamos la pantalla de carga
 import { initSocket } from "/javascripts/socketUtils.js"; //Importamos la función para inicilizar el socket
+import { notificacionNueva } from "/javascripts/globalListeners.js"; //Importamos la función para inicilizar el socket
 
 const progressBarSteps = document.querySelector(".progress-bar ul"); //Obtenemos la barra de progreso de los pasos
 const pasoPendiente = document.querySelector(
@@ -49,6 +50,10 @@ pasoCompletadoCheckBox.addEventListener("change", (e) => {
           tipo: tipo,
           idPasoMascota: PasosProceso[idPaso].PasoProceso[0].ID,
           idPasoArray: idPaso,
+          NombreUsuario: Usuario.Usuario.Nombre,
+          peerUsuarioID: UsuarioPeer.ID,
+          pasoTitulo: PasosProceso[idPaso].Titulo_Paso,
+          UsuarioID: Usuario.Usuario.ID,
         });
       } else if (result.isDenied) {
         pasoCompletadoCheckBox.checked = 0;
@@ -178,7 +183,7 @@ window.addEventListener("DOMContentLoaded", () => {
   addListenerMandarMensajeButton();
   allPasosCompletado();
 });
-let socket;
+// let socket;
 
 const insertPreviousMessages = () => {
   Mensajes.forEach((mensaje) => {
@@ -539,6 +544,8 @@ function addListenerMandarMensajeButton() {
         userID: socket.userID,
         fecha: dateTime,
         SolicitudID: SolicitudID,
+        peerUsuarioID: UsuarioPeer.ID,
+        NombreMensaje: Usuario.Usuario.Nombre,
       });
     }
     input.value = "";
@@ -622,3 +629,4 @@ socket.on("archivo-subido-paso", ({ path, idPasoAfectado }) => {
   PasosProceso[idPasoAfectado].PasoProceso[0].Archivo = path;
   pasos[idPasoAfectado].click();
 });
+notificacionNueva();
