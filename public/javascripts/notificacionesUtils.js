@@ -19,7 +19,10 @@ export function addNotificacion(notificacion) {
     notificacionesContainer.appendChild(newNotificacion);
   }
   if (notificacion.Leido == 0) {
+    newNotificacion.classList.add("list-group-item-warning");
+    newNotificacion.classList.remove("list-group-item-light");
     idNotificacionesNoLeidas.push(notificacion.ID);
+    notificacionesNoLeidasRef.push(newNotificacion);
     countNotificacionesNoLeidas++;
   }
 }

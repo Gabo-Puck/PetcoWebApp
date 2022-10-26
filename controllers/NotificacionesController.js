@@ -62,3 +62,18 @@ exports.retrieveNotificaciones = (req, res, next) => {
       next(err);
     });
 };
+
+exports.patchLeidoNotificaciones = (req, res, next) => {
+  let promisesNotificaciones = [];
+  req.body.idNotificaciones.forEach((id) => {
+    promisesNotificaciones.push(
+      Notificaciones.query().findById(id).patch({ Leido: 1 })
+    );
+  });
+  Promise.all(promisesNotificaciones)
+    .then(() => res.json("ok"))
+    .catch((err) => {
+      console.log(err);
+      next(err);
+    });
+};

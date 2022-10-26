@@ -2,6 +2,7 @@
   var socket;
   var countNotificacionesNoLeidas = 0;
   var idNotificacionesNoLeidas = [];
+  var notificacionesNoLeidasRef = [];
 </script>
 
 <nav
@@ -78,7 +79,7 @@
           role="button"
           aria-controls="notificacionesOffCanvas"
           class="position-relative"
-          ;
+          id="notificacionesIconNavbar"
         >
           <i class="fa-regular fa-bell fa-lg pe-2"></i>
           <span
@@ -96,7 +97,7 @@
 <a
   href="#"
   target="_blank"
-  class="list-group-item list-group-item-action list-group-item-light m-0 notificacionTemplate d-none"
+  class="list-group-item list-group-item-action m-0 notificacionTemplate d-none"
   style="text-decoration: none"
 >
   <p style="color: black" class="mb-2 ms-0 text-break descripcionNotificacion">
@@ -129,3 +130,4 @@
 </div>
 
 <script type="module" src="/javascripts/getNotificaciones.js"></script>
+<script type="module" src="/javascripts/headerNavbar.js"></script>
