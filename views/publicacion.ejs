@@ -75,7 +75,7 @@
         }
         .alertLimite{
             width: 50vw; 
-            z-index: 100;
+            z-index: 10;
         }
 
         @media(max-width:768px){
@@ -294,13 +294,7 @@
             <%= MascotaRender[0].MP.Descripcion %>
         </h3>
     </div>
-    <%if(!SolicitudesValNumero){%>
-    <div class="alert alert-dismissible alert-info position-fixed bottom-0 end-0 me-4 alertLimite" >
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        <h4 class="alert-heading">¡Aviso!</h4>
-        <p class="mb-0">Haz alcanzado el limite de 3 solicitudes enviadas. Cancela o finaliza solicitudes activas para enviar más</p>
-      </div>
-      <%}%>
+    
     <div class=" container mr-5 ml-5" style=" text-align: center; ">
 
         <div class="swiper SliderMascota">
@@ -745,7 +739,13 @@
 
 <script  type="module" src="/javascripts/PublicacionesGuardadas.js">  </script>
 
-
+<%if(!SolicitudesValNumero){%>
+    <div class="alert alert-dismissible alert-info position-fixed bottom-0 end-0 me-4 alertLimite" >
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <h4 class="alert-heading">¡Aviso!</h4>
+        <p class="mb-0">Haz alcanzado el limite de 3 solicitudes enviadas. Cancela o finaliza solicitudes activas para enviar más</p>
+      </div>
+      <%}%>
 </body>
 
 </html>

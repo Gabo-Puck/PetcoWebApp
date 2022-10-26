@@ -424,9 +424,36 @@ exports.paysuccess = (req, res) => {
           let descripcion = `¡${usuarioFind.UsuarioRegistro.Nombre} ha aportado a una meta!`;
           let origen = "aquí va la url de donde se ven las metas";
           sendNotificacion(descripcion, origen, idOrganizacion, req.app.io);
+          isCompletadoMeta(meta);
         });
     });
 };
+
+function isCompletadoMeta(idMeta) {
+  Metas.query()
+    .withGraphJoined("[MetasDonaciones,Mascota]")
+    .findById(idMeta)
+    .then((Meta) => {
+      // console.log(Meta);
+      let acumulado = 0;
+      let cantidad = Meta.Cantidad;
+      Meta.MetasDonaciones.forEach((donaciones) => {
+        acumulado += donaciones.Cantidad;
+      });
+      // acumulado += 700;
+      // console.log("Acumulado:", acumulado);
+      if (acumulado >= cantidad) {
+        Meta.$query()
+          .patch({ Completado: 1 })
+          .then(() => {
+            let descripcion = `¡Felicidades! la meta de la mascota: "${Meta.Mascota.Nombre} se ha completado"`;
+            let origen = "aqui va la url de las metas";
+            let usuario = Meta.MetasDonaciones[0].ID_Organizacion;
+            sendNotificacion(descripcion, origen, usuario);
+          });
+      }
+    });
+}
 exports.paycancel = (req, res) => {
   res.send("Cancelled");
 };

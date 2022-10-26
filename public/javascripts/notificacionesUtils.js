@@ -1,30 +1,52 @@
-export function addNotificacion(descripcion, fecha, origen) {
+export function addNotificacion(notificacion) {
   const notificacionTemplate = document.querySelector(".notificacionTemplate");
   const notificacionesContainer = document.querySelector(
     "#notificacionesContainer"
   );
+
   let newNotificacion = notificacionTemplate.cloneNode(true);
   newNotificacion.classList.remove("d-none");
-  newNotificacion.href = origen;
+  newNotificacion.href = notificacion.Origen;
   newNotificacion.querySelector(".descripcionNotificacion").textContent =
-    descripcion;
-  let fechaFormat = new Date(fecha);
+    notificacion.Descripcion;
+  let fechaFormat = new Date(notificacion.Fecha_Generacion);
   fechaFormat = getFormatedDate(fechaFormat);
   newNotificacion.querySelector(".fechaNotificacion").textContent = fechaFormat;
-  notificacionesContainer.appendChild(newNotificacion);
+  let first = notificacionesContainer.firstChild;
+  if (first) {
+    notificacionesContainer.insertBefore(newNotificacion, first);
+  } else {
+    notificacionesContainer.appendChild(newNotificacion);
+  }
+  if (notificacion.Leido == 0) {
+    idNotificacionesNoLeidas.push(notificacion.ID);
+    countNotificacionesNoLeidas++;
+  }
 }
 
 export function retrieveNotificaciones() {
   fetch("/petco/notificaciones")
     .then((res) => res.json())
     .then((notificaciones) => {
+      const notificacionesSinLeerCountSpan = document.querySelector(
+        "#notificacionesSinLeerCount"
+      );
+
       notificaciones.forEach((notificacion) => {
-        addNotificacion(
-          notificacion.Descripcion,
-          notificacion.Fecha_Generacion,
-          notificacion.Origen
-        );
+        addNotificacion(notificacion);
       });
+      if (
+        countNotificacionesNoLeidas > 0 &&
+        countNotificacionesNoLeidas <= 99
+      ) {
+        notificacionesSinLeerCountSpan.classList.remove("d-none");
+        notificacionesSinLeerCountSpan.textContent =
+          countNotificacionesNoLeidas;
+      }
+      if (countNotificacionesNoLeidas > 99) {
+        notificacionesSinLeerCountSpan.classList.remove("d-none");
+        notificacionesSinLeerCountSpan.textContent = "+99";
+      }
     })
     .catch((err) => {
       console.log(err);

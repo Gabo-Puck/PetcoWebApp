@@ -1,5 +1,7 @@
 <script>
   var socket;
+  var countNotificacionesNoLeidas = 0;
+  var idNotificacionesNoLeidas = [];
 </script>
 
 <nav
@@ -75,8 +77,17 @@
           href="#notificacionesOffCanvas"
           role="button"
           aria-controls="notificacionesOffCanvas"
+          class="position-relative"
+          ;
         >
-          <i class="fa-regular fa-bell fa-lg"></i>
+          <i class="fa-regular fa-bell fa-lg pe-2"></i>
+          <span
+            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none"
+            id="notificacionesSinLeerCount"
+          >
+            <!-- 99+ -->
+            <span class="visually-hidden">unread messages</span>
+          </span>
         </a>
       </a>
     </div>
@@ -84,6 +95,7 @@
 </nav>
 <a
   href="#"
+  target="_blank"
   class="list-group-item list-group-item-action list-group-item-light m-0 notificacionTemplate d-none"
   style="text-decoration: none"
 >
@@ -100,6 +112,7 @@
   id="notificacionesOffCanvas"
   aria-labelledby="notificacionesOffCanvasLabel"
   data-bs-scroll="true"
+  data-bs-backdrop="false"
 >
   <div class="offcanvas-header">
     <h5 class="offcanvas-title" id="offcanvasExampleLabel">Notificaciones</h5>
