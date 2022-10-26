@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LogIn</title>
+    <title>Recuperar contraseña</title>
     <link rel="stylesheet" , href="/stylesheets/style.css" />
   </head>
 
@@ -36,7 +36,7 @@
             class="card h-100 border-primary justify-content-center loginCard mx-auto position-relative"
             style="text-align: center"
           >
-            <div class="card-header">Iniciar Sesión</div>
+            <div class="card-header">Recuperar contraseña</div>
 
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
@@ -46,6 +46,7 @@
                 class="d-flex flex-column justify-content-between h-100"
                 method="post"
               >
+                <h4>Introduce tu correo</h4>
                 <div>
                   <div class="form-group mb-3">
                     <input
@@ -56,24 +57,9 @@
                       required
                     />
                   </div>
-
-                  <div class="form-group">
-                    <input
-                      type="password"
-                      name="Password"
-                      placeholder="Contraseña"
-                      class="form-control"
-                      required
-                    />
-                  </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Acceder</button>
-                <div class="d-flex flex-column">
-                  <a href="/login/recuperarContrasena">Recuperar contraseña</a>
-
-                  <a href="">Entrar como moderador</a>
-                </div>
+                <button type="submit" class="btn btn-primary">Enviar</button>
               </form>
             </div>
           </div>

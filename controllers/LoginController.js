@@ -11,6 +11,12 @@ exports.session = (req, res, next) => {
   }
 };
 
+exports.sessionModerador = (req, res, next) => {};
+
+exports.recuperarContrasena = (req, res, next) => {
+  res.render("recuperarContrasena.ejs");
+};
+
 exports.CheckDB = (req, res, next) => {
   console.log(req.body);
 
