@@ -6,10 +6,12 @@ var indexRouter = require("./index");
 var ProtocoloRouter = require("./protocolos");
 var dashboard = require("./DashboardRoutes");
 var publicacionget = require("./PublicacionGetRouter");
-var perfilget = require("./PerfilRouter")
+var perfilget = require("./PerfilRouter");
 var videochat = require("./videollamada");
 var busqueda = require("./BusquedaRouter");
-
+var proceso = require("./ProcesoAdopcionesRouter");
+var solicitudes = require("./SolicitudesRouter");
+var notificaciones = require("./notificacionesRoutes");
 router.use("/inicio", indexRouter);
 router.use("/formulario", formulariosRouter);
 router.use("/protocolo", ProtocoloRouter);
@@ -17,5 +19,7 @@ router.use("/dashboard", dashboard);
 router.use("/publicacion", publicacionget);
 router.use("/perfil", perfilget);
 router.use("/busqueda", busqueda);
-
+router.use("/proceso", proceso);
+router.use("/solicitudes", solicitudes);
+router.use("/notificaciones", notificaciones);
 module.exports = router;

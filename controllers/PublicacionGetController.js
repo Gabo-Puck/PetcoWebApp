@@ -13,6 +13,7 @@ const Donaciones = require("../models/Donaciones");
 const Like = require("../models/Like");
 const Publicacion_Guardada = require("../models/Publicacion_Guardada");
 const Reporte_Publicacion = require("../models/Reporte_Publicacion");
+const { sendNotificacion } = require("./NotificacionesController");
 
 paypal.configure({
   mode: "sandbox", //sandbox or live
@@ -21,132 +22,201 @@ paypal.configure({
   client_secret:
     "EP0JlIun8tIoxFQjUjho4CfyPdF-6A042JxLl4EjyjZQIH3g50DuopJcLynP4z4mTDjuxACCye40Hi-p",
 });
+function validateUsuarioResponder(res, mascotas) {
+  res.solicitudesValNumero = false;
+  res.arrayMascotasSolicitud = [];
+  console.log(res.UsuarioSolicitudes[0].Solicitudes);
+  if (Array.isArray(res.UsuarioSolicitudes[0].Solicitudes)) {
+    res.UsuarioSolicitudes[0].Solicitudes.forEach((UsuarioSolicitud) => {
+      console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAA");
+      mascotas.forEach((m) => {
+        console.log(UsuarioSolicitud.ID_Mascota, m.ID);
+        if (UsuarioSolicitud.ID_Mascota == m.ID) {
+          res.arrayMascotasSolicitud.push(m.ID);
+        }
+      });
+    });
+  }
+  if (res.UsuarioSolicitudes[0].Solicitudes.length < 3) {
+    res.solicitudesValNumero = true;
+  }
+}
 
-exports.query = (req, res) => {
-
-  Like.query()
-    .where('like.ID_Publicacion', '=', req.params.idPublicacion)
-
-    .then((LikesP) => {
-
-
-      Comentario.query()
-        .withGraphJoined('ComentariosPublicacion')
-        .withGraphJoined('ComentariosUsuario.UsuarioRegistro')
-        .where('comentario.ID_Publicacion', '=', req.params.idPublicacion)
-        .orderBy('Fecha_Envio', "desc")
-        .then((result) => {
-
-          Mascota.query()
-            .withGraphJoined("MP.PublicacionUsuario.[UsuarioRegistro]")
-            .withGraphJoined("MascotasCastrado")
-            .withGraphJoined("MascotasTamano")
-            .withGraphJoined("MascotasEspecie")
-            .withGraphJoined("MascotasVacunas")
-            .withGraphJoined("MascotasSalud")
-            .withGraphJoined("MascotasEstado")
-            .withGraphJoined("MascotasImagenes")
-            .withGraphJoined("MascotasMetas.MetasDonaciones")
-            .where("mascota.ID_Publicacion", "=", req.params.idPublicacion)
-            .then((MascotaP) => {
-
-              Registro.query()
-                .withGraphJoined('RegistroUsuario')
-                .where('RegistroUsuario.ID', '=', req.session.IdSession)
-                .then((resultados) => {
-                  res.render("publicacion.ejs", {
-                    MascotaRender: MascotaP,
-                    usuario: resultados,
-                    comentarios: result,
-                    likesp: LikesP,
-                  });
-
-                })
-            });
-
-        })
-
+function getSolicitudes(req, res, next) {
+  Usuario.query()
+    .withGraphJoined("Solicitudes")
+    .where("usuario.ID", "=", req.session.IdSession)
+    .then((UsuarioSolicitudes) => {
+      console.log(UsuarioSolicitudes);
+      res.UsuarioSolicitudes = UsuarioSolicitudes;
+      next();
     })
-
-
-};
-
-exports.likes = (req, res) => {
-
-  if (req.params.accion == 0) {
-
+    .catch((err) => {
+      console.log(err);
+      next(err);
+    });
+}
+exports.query = [
+  getSolicitudes,
+  (req, res) => {
     Like.query()
-      .where('like.ID_Publicacion', '=', req.params.idP)
-      .andWhere('like.ID_Usuario', '=', req.params.idU)
+      .where("like.ID_Publicacion", "=", req.params.idPublicacion)
+
+      .then((LikesP) => {
+        Comentario.query()
+          .withGraphJoined("ComentariosPublicacion")
+          .withGraphJoined("ComentariosUsuario.UsuarioRegistro")
+          .where("comentario.ID_Publicacion", "=", req.params.idPublicacion)
+          .orderBy("Fecha_Envio", "desc")
+          .then((result) => {
+            Mascota.query()
+              .withGraphJoined("MP.PublicacionUsuario.[UsuarioRegistro]")
+              .withGraphJoined("MascotasCastrado")
+              .withGraphJoined("MascotasTamano")
+              .withGraphJoined("MascotasEspecie")
+              .withGraphJoined("MascotasVacunas")
+              .withGraphJoined("MascotasSalud")
+              .withGraphJoined("MascotasEstado")
+              .withGraphJoined("MascotasImagenes")
+              .withGraphJoined("MascotasMetas.MetasDonaciones")
+              .where("mascota.ID_Publicacion", "=", req.params.idPublicacion)
+              .then((MascotaP) => {
+                let isDueno = false;
+                if (
+                  req.session.IdSession == MascotaP[0].MP.PublicacionUsuario.ID
+                ) {
+                  isDueno = true;
+                }
+                // console.log(MascotaP);
+                validateUsuarioResponder(res, MascotaP);
+                console.log("BBBBBBBBBBBBBBBBBB");
+                console.log(res.solicitudesValNumero);
+                console.log(res.arrayMascotasSolicitud);
+
+                let publicacionID = MascotaP[0].MP.ID;
+                Registro.query()
+                  .withGraphJoined("RegistroUsuario")
+                  .where("RegistroUsuario.ID", "=", req.session.IdSession)
+                  .then((resultados) => {
+                    res.render("publicacion.ejs", {
+                      MascotaRender: MascotaP,
+                      usuario: resultados,
+                      comentarios: result,
+                      likesp: LikesP,
+                      isDueno: isDueno,
+                      publicacionID: publicacionID,
+                      Tipo: req.session.Tipo,
+                      SolicitudesValNumero: res.solicitudesValNumero,
+                      arrayMascotasSolicitud: res.arrayMascotasSolicitud,
+                    });
+                  });
+              });
+          });
+      });
+  },
+];
+
+exports.likes = (req, res, next) => {
+  if (req.params.accion == 0) {
+    Like.query()
+      .where("like.ID_Publicacion", "=", req.params.idP)
+      .andWhere("like.ID_Usuario", "=", req.params.idU)
       .then((resp) => {
         console.log(resp);
-        console.log(req.params)
+        console.log(req.params);
         res.json(resp);
-
-      })
+      });
   }
 
-
   if (req.params.accion == 1) {
-
     Like.query()
       .insert({
         ID_Publicacion: req.params.idP,
         ID_Usuario: req.params.idU,
       })
-      .then((resp) => { })
+      .then((resp) => {
+        return new Promise((resolve, reject) => {
+          Publicacion.query()
+            .where("publicacion.ID", "=", req.params.idP)
+            .select(
+              "publicacion.*",
+              Publicacion.relatedQuery("PublicacionLike")
+                .count()
+                .as("numberOfLikes")
+            )
+            .then((countLikes) => resolve(countLikes));
+        });
+      })
+      .then((countLikes) => {
+        let limite = Math.pow(10, 5); //Establecemos el limite de likes en 100,000 para generar notificaciones
+        let likes = countLikes[0].numberOfLikes;
+        // console.log(likes);
 
-    res.json("Se agrego");
-
+        // console.log(countLikes);
+        if (likes <= limite) {
+          //Si es menor a 100,000 likes geeneramos la notificacion
+          let origen = `/petco/publicacion/adopciones/${req.params.idP}`;
+          sendNotificacion(
+            "¡Tu publicación ha recibido un me gusta!",
+            origen,
+            req.params.idDueno,
+            req.app.io
+          ).then(() => {
+            res.json("ok");
+          });
+        } else {
+          res.json("ok");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        next(err);
+      });
   }
 
   if (req.params.accion == 2) {
     Like.query()
       .delete()
-      .where('like.ID_Publicacion', '=', req.params.idP)
-      .andWhere('like.ID_Usuario', '=', req.params.idU)
+      .where("like.ID_Publicacion", "=", req.params.idP)
+      .andWhere("like.ID_Usuario", "=", req.params.idU)
       .then();
     res.json("Se Borro");
-
   }
-
-}
+};
 
 exports.psaveds = (req, res) => {
   //Buscar coincidencias
   if (req.params.accion == 0) {
     Publicacion_Guardada.query()
-      .where('publicacion_guardada.ID_Publicacion', '=', req.params.idP)
-      .andWhere('publicacion_guardada.ID_Usuario', '=', req.params.idU)
+      .where("publicacion_guardada.ID_Publicacion", "=", req.params.idP)
+      .andWhere("publicacion_guardada.ID_Usuario", "=", req.params.idU)
       .then((resp) => {
         console.log(resp);
-        console.log(req.params)
+        console.log(req.params);
         res.json(resp);
-      })
+      });
   }
 
   if (req.params.accion == 1) {
-
     Publicacion_Guardada.query()
       .insert({
         ID_Publicacion: req.params.idP,
         ID_Usuario: req.params.idU,
       })
-      .then((resp) => { })
+      .then((resp) => {});
 
     res.json("Se agrego");
-
   }
 
   if (req.params.accion == 2) {
     Publicacion_Guardada.query()
       .delete()
-      .where('publicacion_guardada.ID_Publicacion', '=', req.params.idP)
-      .andWhere('publicacion_guardada.ID_Usuario', '=', req.params.idU)
+      .where("publicacion_guardada.ID_Publicacion", "=", req.params.idP)
+      .andWhere("publicacion_guardada.ID_Usuario", "=", req.params.idU)
       .then();
     res.json("Se Borro");
   }
-}
+};
 
 exports.reportarUsuario = (req, res) => {
   console.log(req.params);
@@ -175,42 +245,31 @@ exports.reportarUsuario = (req, res) => {
 
   }
 
-exports.reportar = (req, res) => {
+exports.reportarUsuario = (req, res) => {
   console.log(req.params);
   Reporte_Publicacion.query()
     .insert({
       razon: req.params.motivo,
-      ID_Usuario_Reporta: req.params.usuarioreporta,
+      ID_Usuario_Reporta: req.session.IdSession,
       ID_Usuario_Reportado: req.params.usuarioreportado,
-      ID_Publicacion: req.params.publicacion
+      ID_Publicacion: null
 
     })
     .then((resp) => { })
 
-  Publicacion.query()
-    .findOne({ ID: req.params.publicacion })
-    .then((PublicacionFind) => {
+    Usuario.query()
+    .findOne({ ID: req.params.usuarioreportado })
+    .then((UsuarioFind) => {
     
-      PublicacionFind.$query()
-        .patch({ Reportes_Peso: parseInt(PublicacionFind.Reportes_Peso) + parseInt(req.params.peso) })
-        .then(() => {
-
-          if (PublicacionFind.Reportes_Peso >= 50)
-          {
-           
-            PublicacionFind.$query()
-            .patch({ Activo: 0 })
-            .then(() => {})
-            
-          }
-
-        });
+      if (UsuarioFind.Reputacion >= -100 || UsuarioFind.Reputacion <=100)
+      UsuarioFind.$query()
+        .patch({ Reputacion: parseInt(UsuarioFind.Reputacion) - parseInt(req.params.peso) })
+        .then(() => {  });
 
     });
 
 
   res.json("Se realizo el fetch");
-
 }
 
 //Controlar publicaciones
@@ -260,8 +319,8 @@ exports.pay = (req, res) => {
         },
 
         redirect_urls: {
-          return_url: "http://localhost:3000/publicacion/success",
-          cancel_url: "http://localhost:3000/publicacion/cancel",
+          return_url: `${process.env.SERVER_DOMAIN}/petco/publicacion/success`,
+          cancel_url: `${process.env.SERVER_DOMAIN}/petco/publicacion/cancel`,
         },
         transactions: [
           {
@@ -330,8 +389,10 @@ exports.paysuccess = (req, res) => {
   );
 
   var today = new Date();
-  var date = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
-  var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+  var date =
+    today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+  var time =
+    today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
   var dateTime = date + " " + time;
   console.log(dateTime);
 
@@ -346,12 +407,43 @@ exports.paysuccess = (req, res) => {
     })
     .then((registroCreado) => {
       console.log(registroCreado);
+      Usuario.query()
+        .withGraphFetched("UsuarioRegistro")
+        .findOne({ "usuario.ID": req.session.IdSession })
+        .then((usuarioFind) => {
+          let descripcion = `¡${usuarioFind.UsuarioRegistro.Nombre} ha aportado a una meta!`;
+          let origen = "aquí va la url de donde se ven las metas";
+          sendNotificacion(descripcion, origen, idOrganizacion, req.app.io);
+          isCompletadoMeta(meta);
+        });
     });
-
 };
 
-
-
+function isCompletadoMeta(idMeta) {
+  Metas.query()
+    .withGraphJoined("[MetasDonaciones,Mascota]")
+    .findById(idMeta)
+    .then((Meta) => {
+      // console.log(Meta);
+      let acumulado = 0;
+      let cantidad = Meta.Cantidad;
+      Meta.MetasDonaciones.forEach((donaciones) => {
+        acumulado += donaciones.Cantidad;
+      });
+      // acumulado += 700;
+      // console.log("Acumulado:", acumulado);
+      if (acumulado >= cantidad) {
+        Meta.$query()
+          .patch({ Completado: 1 })
+          .then(() => {
+            let descripcion = `¡Felicidades! la meta de la mascota: "${Meta.Mascota.Nombre} se ha completado"`;
+            let origen = "aqui va la url de las metas";
+            let usuario = Meta.MetasDonaciones[0].ID_Organizacion;
+            sendNotificacion(descripcion, origen, usuario);
+          });
+      }
+    });
+}
 exports.paycancel = (req, res) => {
   res.send("Cancelled");
-};
+}

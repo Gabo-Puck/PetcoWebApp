@@ -48,7 +48,6 @@ app.use("/login", loginRouter);
 app.use("/publicacion", publicacionget);
 app.use("/videollamada", require("./routes/videollamada"));
 app.use("/solicitudes", require("./routes/SolicitudesRouter"));
-app.use("/proceso", require("./routes/ProcesoAdopcionesRouter"));
 
 var enviroment = process.env.NODE_ENV || "development";
 if (enviroment === "development") {

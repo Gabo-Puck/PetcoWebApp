@@ -1,7 +1,11 @@
 const Mascota = require("../models/Mascota");
 const Pasos_Mascota = require("../models/Pasos_Mascota");
 const Usuario = require("../models/Usuario");
-const { fetchInput, uploadFiles } = require("../utils/multipartRequestHandle");
+const {
+  fetchInput,
+  uploadFiles,
+  deleteFiles,
+} = require("../utils/multipartRequestHandle");
 const { secureRegistro } = require("../utils/formDatabaseClean");
 const Mensajes = require("../models/Mensajes");
 const { encrypt } = require("../utils/cryptoUtils/randomId");
@@ -9,6 +13,7 @@ const {
   isAdoptante,
   isDuenoMascota,
 } = require("../utils/procesoAdopcionUtils");
+const Solicitudes = require("../models/Solicitudes");
 
 var acceptedTypes = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -32,6 +37,8 @@ exports.getProceso = [
           req.params.MascotaID
         )
         .then((PasosProceso) => {
+          isProcesoCompleted(res, PasosProceso);
+          console.log("ESTOA QUI");
           let tipoUsuario = res.isAdoptante ? 2 : 1; //Si existe res.isAdoptante el usuario será adoptante (2), si no existe entonces será dueño (1)
           let ROOM_ID = encrypt(req.params.MascotaID);
           res.render("procesoAdopcion", {
@@ -43,6 +50,7 @@ exports.getProceso = [
             SolicitudID: res.SolicitudID,
             Mensajes: res.MensajesSolicitud,
             ROOM_ID: ROOM_ID,
+            Tipo: req.session.Tipo,
           });
         });
     } else {
@@ -51,6 +59,16 @@ exports.getProceso = [
     }
   },
 ];
+
+function isProcesoCompleted(res, PasosProceso) {
+  let lastIndex = PasosProceso[0].MascotasPasos.length - 1;
+  let lastPaso = PasosProceso[0].MascotasPasos[lastIndex].PasoProceso[0];
+  console.log(lastPaso);
+  if (lastPaso.Completado < 6) {
+    return;
+  }
+  res.redirect("/inicio");
+}
 
 function getMensajes(req, res, next) {
   try {
@@ -94,7 +112,6 @@ function getUsuario(req, res, next) {
         "Telefono",
         "Municipio",
         "Tipo_Usuario",
-        "ID",
       ]);
       resUsuario["foto"] = usuario.Foto_Perfil;
       res.usuarioProceso = resUsuario;
@@ -140,6 +157,143 @@ exports.uploadFile = [
     }
   },
 ];
+
+exports.patchReputacion = [
+  isAdoptante,
+  isDuenoMascota,
+  (req, res, next) => {
+    if (res.isAdoptante || res.isDuenoMascota) {
+      console.log(res.PeerProceso.ID);
+      Usuario.query()
+        .findById(res.PeerProceso.ID)
+        .then((usuarioReputacion) => {
+          let reputacionCambio =
+            usuarioReputacion.Reputacion + req.body.reputacionValue;
+          usuarioReputacion
+            .$query()
+            .patch({ Reputacion: reputacionCambio })
+            .then(() => patchPasoProceso(req.body.MascotaID, res.isAdoptante))
+            .then((resolveValue) => {
+              if (resolveValue == "ok") {
+                res.json(resolveValue);
+              } else {
+                next(resolveValue);
+              }
+            });
+        })
+        .catch((err) => {
+          console.log(err);
+          next(err);
+        });
+    } else {
+      console.log("Te mando al login");
+      res.json("notOk");
+    }
+  },
+];
+
+exports.abortarProceso = [
+  isAdoptante,
+  isDuenoMascota,
+  (req, res, next) => {
+    if (res.isAdoptante || res.isDuenoMascota) {
+      Mascota.query()
+        .withGraphJoined("MascotasPasos.[PasoProceso]")
+        .where("mascota.ID", "=", req.body.MascotaID)
+        .andWhere(
+          "MascotasPasos:PasoProceso.ID_Mascota",
+          "=",
+          req.body.MascotaID
+        )
+        .then((PasosProceso) => {
+          req.deleteFilesPath = [];
+          let arrayProm = [];
+          PasosProceso[0].MascotasPasos.forEach((pasoProceso) => {
+            if (pasoProceso.Archivo != null) {
+              req.deleteFilesPath.push(pasoProceso.Archivo);
+            }
+            // console.log(pasoProceso);
+            arrayProm.push(
+              patchPasosDefaultPromise(pasoProceso.PasoProceso[0])
+            );
+          });
+          console.log(arrayProm);
+          return new Promise((resolve, reject) => {
+            resolve(arrayProm);
+          });
+        })
+        .then((arrayProm) => Promise.all(arrayProm))
+        .then(() => {
+          deleteFiles(req);
+        })
+        .then(() => {
+          return new Promise((resolve, reject) => {
+            // resolve(Solicitudes.query().deleteById(res.SolicitudID));
+            resolve("");
+          });
+        })
+        .then(() => {
+          res.json("ok");
+        })
+        .catch((err) => {
+          console.log(err);
+          next(err);
+        });
+    }
+  },
+];
+
+function patchPasosDefaultPromise(PasoProceso) {
+  return new Promise((resolve, reject) => {
+    resolve(
+      PasoProceso.$query()
+        .patch({
+          Completado: 0,
+          Archivo: null,
+        })
+        .then(() => {})
+    );
+  });
+}
+
+function createArrayPatchPasosDefaultPromises(PasosProceso) {
+  let arrayProm = [];
+  PasosProceso.forEach((paso) => {
+    arrayProm.push(patchPasosDefaultPromise(PasoProceso));
+  });
+  return arrayProm;
+}
+
+function patchPasoProceso(mascotaID, isAdoptante) {
+  return new Promise((resolve, reject) => {
+    Mascota.query()
+      .withGraphJoined("MascotasPasos.[PasoProceso]")
+      .where("mascota.ID", "=", mascotaID)
+      .andWhere("MascotasPasos:PasoProceso.ID_Mascota", "=", mascotaID)
+      .then((PasosProceso) => {
+        console.log(PasosProceso[0], "\n");
+        console.log(PasosProceso[0].MascotasPasos, "\n");
+        console.log(PasosProceso[0].MascotasPasos.PasosProceso, "\n");
+        let lastIndex = PasosProceso[0].MascotasPasos.length - 1;
+        let valueAdd = isAdoptante ? 2 : 1;
+        let completadoPatchValue =
+          PasosProceso[0].MascotasPasos[lastIndex].PasoProceso[0].Completado +
+          valueAdd;
+        Pasos_Mascota.query()
+          .findOne({
+            ID: PasosProceso[0].MascotasPasos[lastIndex].PasoProceso[0].ID,
+          })
+          .patch({ Completado: completadoPatchValue })
+          .then(() => {
+            resolve("ok");
+          });
+      })
+      .catch((err) => {
+        console.log(err);
+        resolve(err);
+      });
+  });
+}
 
 // exports.isAdoptante = isAdoptante;
 

@@ -20,6 +20,7 @@ class Usuario extends BaseModel {
     const Solicitudes = require("./Solicitudes");
     const Protocolo = require("./Protocolo");
     const Registro = require("./Registro");
+    const Notificaciones = require("./Notificaciones");
 
     return {
       Especies: {
@@ -64,6 +65,14 @@ class Usuario extends BaseModel {
         join: {
           from: "usuario.FK_Registro",
           to: "registro.ID",
+        },
+      },
+      Notificaciones: {
+        relation: Model.HasManyRelation,
+        modelClass: Notificaciones,
+        join: {
+          from: "usuario.ID",
+          to: "notificaciones.ID_Usuario",
         },
       },
     };

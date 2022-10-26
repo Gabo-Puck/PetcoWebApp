@@ -42,7 +42,7 @@ function addEventListenerToMascotaButton(buttonMascota) {
     loadingSpinnerSolicitudes.parentNode.classList.add("d-block");
     setTimeout(() => {
       buttonMascota.classList.add("activeButtonMascota");
-      fetch(`/solicitudes/obtener/solicitudesMascota/${buttonMascota.id}`)
+      fetch(`/petco/solicitudes/obtener/solicitudesMascota/${buttonMascota.id}`)
         .then((res) => {
           loadingSpinnerSolicitudes.parentNode.classList.remove("d-block");
           loadingSpinnerSolicitudes.parentNode.classList.add("d-none");
@@ -113,6 +113,9 @@ function renderSolicitudes(solicitudes) {
       .setAttribute("id", solicitudFetch.ID);
     solicitud
       .querySelector(".rechazarButton")
+      .setAttribute("id", solicitudFetch.ID);
+    solicitud
+      .querySelector(".progresoButton")
       .setAttribute("id", solicitudFetch.ID);
     addListenerToAceptar(solicitud.querySelector(".aceptarButton"));
     addListenerToRechazar(solicitud.querySelector(".rechazarButton"));
@@ -238,7 +241,12 @@ function addListenerToRechazar(buttonTriggered, idMascota) {
   });
 }
 
-function addListenerToProceso(buttonTriggered) {}
+function addListenerToProceso(buttonTriggered) {
+  buttonTriggered.addEventListener("click", (e) => {
+    const mascotaID = document.querySelector(".activeButtonMascota").id;
+    window.open(`/petco/proceso/ver/${mascotaID}`);
+  });
+}
 
 var solicitudRespuestasModal = document.getElementById(
   "solicitudRespuestasModal"

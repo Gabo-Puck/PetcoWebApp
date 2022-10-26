@@ -1,111 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <link rel="stylesheet" , href="/stylesheets/style.css" />
 
-<head>
-  <link rel="stylesheet" , href="/stylesheets/style.css" />
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Feed</title>
+    <script
+      src="https://cdn.socket.io/4.5.0/socket.io.min.js"
+      integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://kit.fontawesome.com/f0156fc078.js"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="/stylesheets/bootstrap-5.2.0-dist/themes/Lumen/bootstrap.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="/stylesheets/bootstrap-5.2.0-dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap theme Lumen from bootswatch -->
+    <!-- Bootstrap bundle -->
+    <!-- Jquery -->
+    <!-- Popper -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
 
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"
+    />
+    <!-- Sweetalert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+      .contenedor {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
+        grid-gap: 2rem;
+        margin: 2rem;
+      }
 
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Feed</title>
-  
+      /* demo purposes only */
 
-  <style>
-    .contenedor {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
-      grid-gap: 2rem;
-      margin: 2rem;
-    }
+      * {
+        font-family: "Poppins", sans-serif;
+      }
 
-    /* demo purposes only */
+      .carta {
+        height: 215px;
+        position: relative;
+        overflow: hidden;
+        border-radius: 8px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+        display: grid;
+        grid-template-rows: 1fr 1fr;
+        transition: 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
 
-    * {
-      font-family: "Poppins", sans-serif;
-    }
+      h3 {
+        color: white;
+        font-size: 24px;
+        margin: 20px 0 0 20px;
+      }
 
-    .carta {
-      height: 215px;
-      position: relative;
-      overflow: hidden;
-      border-radius: 8px;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
-      display: grid;
-      grid-template-rows: 1fr 1fr;
-      transition: 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
+      p {
+        color: white;
+        font-weight: 400;
+        font-size: 16px;
+        align-self: end;
+        margin: 0 0 20px 20px;
+        letter-spacing: 0.5px;
+      }
 
-    h3 {
-      color: white;
-      font-size: 24px;
-      margin: 20px 0 0 20px;
+      img {
+        position: absolute;
+        top: 0;
+        height: 110%;
+        width: 100%;
+        z-index: -1;
+        transition: 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
 
-    }
+      .carta:hover {
+        transform: scale(1.035, 1.035);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+      }
 
-    p {
-      color: white;
-      font-weight: 400;
-      font-size: 16px;
-      align-self: end;
-      margin: 0 0 20px 20px;
-      letter-spacing: 0.5px;
-    }
+      .carta:hover img {
+        transform: translateY(-10px);
+      }
+    </style>
 
-    img {
-      position: absolute;
-      top: 0;
-      height: 110%;
-      width: 100%;
-      z-index: -1;
-      transition: 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
+    <script>
+      window.onbeforeunload = function () {
+        window.scrollTo(0, 0);
+      };
+    </script>
+  </head>
 
-    .carta:hover {
-      transform: scale(1.035, 1.035);
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
-    }
+  <body>
+    <%- include ("partials/header") %>
+    <div class="carta templateFeed" style="display: none">
+      <a href="#" style="text-decoration: none">
+        <img
+          src="https://www.freeiconspng.com/img/7952"
+          style="object-fit: cover; height: 300px"
+        />
+        <h3 style="color: white">Card tittle</h3>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <p style="background-color: rgba(0, 0, 0, 0.5); vertical-align: bottom">
+          <b>Estado:</b>
+          Oowo
+        </p>
+      </a>
+    </div>
 
-    .carta:hover img {
-      transform: translateY(-10px);
-    }
-  </style>
-
-  <script>
-    window.onbeforeunload = function () {
-      window.scrollTo(0, 0);
-
-
-    }
-
-
-  </script>
-</head>
-
-<body>
-     <%- include ("partials/header") %>
-
-
-  <div class="carta templateFeed" style="display: none;">
-    <a href="#" style="text-decoration: none;">
-
-      <img src="https://www.freeiconspng.com/img/7952" style="object-fit: cover; height: 300px;" />
-      <h3 style="color: white;">Card tittle</h3>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-      <p style="background-color: rgba(0, 0, 0, 0.5); vertical-align: bottom;"><b>Estado:</b>
-        Oowo
-      </p>
-    </a>
-  </div>
-
-
-
-  <div class="contenedor">
-    <!-- <% for(var i=0; i < 0; i++) { %>
+    <div class="contenedor">
+      <!-- <% for(var i=0; i < 0; i++) { %>
       <div class="carta">
         <img src=" <%= MascotaRender[i].MascotasImagenes[0].Ruta%>" style="object-fit: cover; height: 300px;" />
         <h3>
@@ -137,138 +158,133 @@
                   <% } %>
       </div>
       <% } %> -->
-  </div>
+    </div>
+
+    <script>
+      var template = document.querySelector(".templateFeed"); //Se obtiene el formato del comentario de un template
+      let banLoad = false;
+      const Mlenght = '<%=MascotaRender.length%>';
+      const MascotaJS = <%-JSON.stringify(MascotaRender) %>;
+      console.log("🚀 ~ file: feed.ejs ~ line 146 ~ MascotaJA", MascotaJS[0].MascotasImagenes[0].Ruta)
+
+
+      let contador = 0;
+      let insert = 4;
+      window.onscroll = function (ev) {
+
+
+        console.log(Mlenght - contador);
+        if ((Mlenght - contador) < 0) {
+          console.log('Muy chiquito');
+          banLoad = false;
+        }
+
+        if (Mlenght - contador < 4) {
+
+          insert = Mlenght - contador;
+        }
+
+        if ((window.innerHeight + window.scrollY) >= document.body.scrollHeight && banLoad == true) {
+          // you're at the bottom of the page
+          //alert("Bottom of page");
+          for (let i = 0; i < insert; i++) {
+            let tarjeta2 = template.cloneNode(true); //se clona un elemento con las caracteristicas de un comentario
+            tarjeta2.querySelector('h3').innerText = MascotaJS[contador].Nombre;
+            tarjeta2.querySelector('img').src = MascotaJS[contador].MascotasImagenes[0].Ruta;
+            tarjeta2.querySelector('p').innerText = MascotaJS[contador].MascotasEstado.Estado_Nombre;
+            tarjeta2.querySelector('a').href='/petco/publicacion/adopciones/' + MascotaJS[contador].MascotasPublicacion.ID;
+
+            switch (MascotaJS[contador].MascotasEstado.ID) {
+            case 1:
+            tarjeta2.querySelector('p').classList.add('text-success')
+              break;
+            case 2:
+            tarjeta2.querySelector('p').classList.add('text-warning')
+
+              break;
+            case 3:
+            tarjeta2.querySelector('p').classList.add('text-warning')
+
+              break;
+
+              case 4:
+            tarjeta2.querySelector('p').classList.add('text-danger')
+
+              break;
+            default:
+              break;
+          }
+
+            tarjeta2.style.display = 'block'// se hace visible el comentario
+            document.querySelector('.contenedor').appendChild(tarjeta2);
+            contador++;
+
+          }
+
+          console.log("🚀 ~ file: feed.ejs ~ line 147 ~ contador", contador)
+
+        }
 
 
 
 
-
-  <script>
-    var template = document.querySelector(".templateFeed"); //Se obtiene el formato del comentario de un template
-    let banLoad = false;
-    const Mlenght = '<%=MascotaRender.length%>';
-    const MascotaJS = <%-JSON.stringify(MascotaRender) %>;
-    console.log("🚀 ~ file: feed.ejs ~ line 146 ~ MascotaJA", MascotaJS[0].MascotasImagenes[0].Ruta)
+      };
 
 
-    let contador = 0;
-    let insert = 4;
-    window.onscroll = function (ev) {
 
+      //[Primera carga]
+      window.onload = function () { //Se ejecuta al terminar de cargar la pagina
+        //Determinar longitud principal
+        let InitialLoading = 0;
 
-      console.log(Mlenght - contador);
-      if ((Mlenght - contador) < 0) {
-        console.log('Muy chiquito');
-        banLoad = false;
-      }
+        if (Mlenght < 12) {
+          InitialLoading = Mlenght;
+          banLoad = false;
+        }
+        else {
+          InitialLoading = 12;
+          banLoad = true
+        }
 
-      if (Mlenght - contador < 4) {
+        for (let i = 0; i < InitialLoading; i++) {
 
-        insert = Mlenght - contador;
-      }
-
-      if ((window.innerHeight + window.scrollY) >= document.body.scrollHeight && banLoad == true) {
-        // you're at the bottom of the page
-        //alert("Bottom of page");
-        for (let i = 0; i < insert; i++) {
-          let tarjeta2 = template.cloneNode(true); //se clona un elemento con las caracteristicas de un comentario
+          let tarjeta2 = template.cloneNode(true); //se clona un elemento
           tarjeta2.querySelector('h3').innerText = MascotaJS[contador].Nombre;
           tarjeta2.querySelector('img').src = MascotaJS[contador].MascotasImagenes[0].Ruta;
           tarjeta2.querySelector('p').innerText = MascotaJS[contador].MascotasEstado.Estado_Nombre;
           tarjeta2.querySelector('a').href='/petco/publicacion/adopciones/' + MascotaJS[contador].MascotasPublicacion.ID;
 
+
           switch (MascotaJS[contador].MascotasEstado.ID) {
-          case 1:
-          tarjeta2.querySelector('p').classList.add('text-success')
-            break;
-          case 2:
-          tarjeta2.querySelector('p').classList.add('text-warning')
+            case 1:
+            tarjeta2.querySelector('p').classList.add('text-success')
+              break;
+            case 2:
+            tarjeta2.querySelector('p').classList.add('text-warning')
 
-            break;
-          case 3:
-          tarjeta2.querySelector('p').classList.add('text-warning')
+              break;
+            case 3:
+            tarjeta2.querySelector('p').classList.add('text-warning')
 
-            break;
+              break;
 
-            case 4:
-          tarjeta2.querySelector('p').classList.add('text-danger')
+              case 4:
+            tarjeta2.querySelector('p').classList.add('text-danger')
 
-            break;
-          default:
-            break;
-        }
+              break;
+            default:
+              break;
+          }
 
-          tarjeta2.style.display = 'block'// se hace visible el comentario
+
+          tarjeta2.style.display = 'block'// se hace visible
           document.querySelector('.contenedor').appendChild(tarjeta2);
           contador++;
 
         }
-
-        console.log("🚀 ~ file: feed.ejs ~ line 147 ~ contador", contador)
-
       }
+    </script>
 
-
-
-
-    };
-
-
-
-    //[Primera carga]
-    window.onload = function () { //Se ejecuta al terminar de cargar la pagina
-      //Determinar longitud principal
-      let InitialLoading = 0;
-
-      if (Mlenght < 12) {
-        InitialLoading = Mlenght;
-        banLoad = false;
-      }
-      else {
-        InitialLoading = 12;
-        banLoad = true
-      }
-
-      for (let i = 0; i < InitialLoading; i++) {
-
-        let tarjeta2 = template.cloneNode(true); //se clona un elemento
-        tarjeta2.querySelector('h3').innerText = MascotaJS[contador].Nombre;
-        tarjeta2.querySelector('img').src = MascotaJS[contador].MascotasImagenes[0].Ruta;
-        tarjeta2.querySelector('p').innerText = MascotaJS[contador].MascotasEstado.Estado_Nombre;
-        tarjeta2.querySelector('a').href='/petco/publicacion/adopciones/' + MascotaJS[contador].MascotasPublicacion.ID;
-
-
-        switch (MascotaJS[contador].MascotasEstado.ID) {
-          case 1:
-          tarjeta2.querySelector('p').classList.add('text-success')
-            break;
-          case 2:
-          tarjeta2.querySelector('p').classList.add('text-warning')
-
-            break;
-          case 3:
-          tarjeta2.querySelector('p').classList.add('text-warning')
-
-            break;
-
-            case 4:
-          tarjeta2.querySelector('p').classList.add('text-danger')
-
-            break;
-          default:
-            break;
-        }
-
-        
-        tarjeta2.style.display = 'block'// se hace visible 
-        document.querySelector('.contenedor').appendChild(tarjeta2);
-        contador++;
-
-      }
-    }
-  </script>
-
-  <script src="/javascripts/socketUtils.js"></script>
-</body>
-
+    <script type="module" src="/javascripts/feed.js"></script>
+  </body>
 </html>

@@ -1,5 +1,6 @@
 import { loadingScreen } from "/javascripts/FormulariosFunctions.js"; //Importamos la pantalla de carga
 import { initSocket } from "/javascripts/socketUtils.js"; //Importamos la función para inicilizar el socket
+import { notificacionNueva } from "/javascripts/globalListeners.js"; //Importamos la función para inicilizar el socket
 
 const progressBarSteps = document.querySelector(".progress-bar ul"); //Obtenemos la barra de progreso de los pasos
 const pasoPendiente = document.querySelector(
@@ -26,6 +27,12 @@ var idPaso; //ID del paso seleccionado actual por el usuario
 
 const pasoCompletadoCheckBox = document.querySelector("#pasoCompletado");
 
+const iconsFeedBack = document.querySelector(".iconsFeedBack");
+
+const iconsFace = document.querySelectorAll(".face-feedback");
+
+const abortarProceso = document.querySelector("#abortarProceso");
+
 pasoCompletadoCheckBox.addEventListener("change", (e) => {
   if (pasoCompletadoCheckBox.checked == "1") {
     Swal.fire({
@@ -43,6 +50,10 @@ pasoCompletadoCheckBox.addEventListener("change", (e) => {
           tipo: tipo,
           idPasoMascota: PasosProceso[idPaso].PasoProceso[0].ID,
           idPasoArray: idPaso,
+          NombreUsuario: Usuario.Usuario.Nombre,
+          peerUsuarioID: UsuarioPeer.ID,
+          pasoTitulo: PasosProceso[idPaso].Titulo_Paso,
+          UsuarioID: Usuario.Usuario.ID,
         });
       } else if (result.isDenied) {
         pasoCompletadoCheckBox.checked = 0;
@@ -73,6 +84,52 @@ pasoCompletadoCheckBox.addEventListener("change", (e) => {
     });
   }
 });
+
+abortarProceso.addEventListener("click", (e) => {
+  Swal.fire({
+    title: "¿Estás seguro de querer abortar el proceso?",
+    icon: "warning",
+    html: "<p>Una vez realizada esta acción no hay vuelta atrás</p><p>Todos los archivos subidos, así como mensajes se perderán</p>",
+    showConfirmButton: true,
+    showCancelButton: true,
+    confirmButtonText: "Si quiero",
+    cancelButtonText: "No quiero",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      loadingScreen.fire();
+      setTimeout(() => {
+        abortarProcesoFetch();
+      }, defaultTimer);
+    }
+  });
+});
+
+function abortarProcesoFetch() {
+  let request = { MascotaID: MascotaID };
+  fetch("/petco/proceso/abortar", {
+    method: "POST",
+    body: JSON.stringify(request),
+    headers: { "Content-Type": "application/json" },
+  })
+    .then((res) => res.json())
+    .then((res) => {
+      if (res == "ok") {
+        Swal.fire(
+          "¡Correcto!",
+          "<p>Se ha abortado el proceso correctamente</p>"
+        );
+      } else {
+        throw new Error("Algo ha salido mal");
+      }
+    })
+    .catch((err) => {
+      Swal.fire(
+        "¡Atención!",
+        `<p>Algo ha salido mal</p><p>Intenta más tarde</p>`,
+        "error"
+      );
+    });
+}
 
 const chatBox = document.querySelector(".messagesChatProceso"); //Obtenemos el elemento que contiene los mensajes del chat
 
@@ -124,8 +181,9 @@ window.addEventListener("DOMContentLoaded", () => {
   }
   emitConnectionData();
   addListenerMandarMensajeButton();
+  allPasosCompletado();
 });
-let socket;
+// let socket;
 
 const insertPreviousMessages = () => {
   Mensajes.forEach((mensaje) => {
@@ -141,6 +199,109 @@ const insertPreviousMessages = () => {
 };
 socket = initSocket(insertPreviousMessages);
 
+iconsFace.forEach((iconF) => {
+  addEventListenerIconsFeedback(iconF);
+});
+
+function addEventListenerIconsFeedback(iconF) {
+  var mapValues = new Map();
+  mapValues.set("face-feedback-muymal", -10);
+  mapValues.set("face-feed-back-mal", -5);
+  mapValues.set("face-feed-back-regular", 1);
+  mapValues.set("face-feed-back-bien", 6);
+  mapValues.set("face-feed-back-muybien", 10);
+  var e = document.createElement("a");
+
+  iconF.addEventListener("click", (e) => {
+    let iconClicked = e.target;
+    for (let index = 0; index < iconClicked.classList.length; index++) {
+      const element = iconClicked.classList[index];
+      if (mapValues.has(element)) {
+        let valueSelected = mapValues.get(element);
+        console.log(valueSelected, MascotaID);
+        loadingScreen.fire();
+        setTimeout(() => {
+          sendFeedback(valueSelected, MascotaID);
+        }, defaultTimer);
+      }
+    }
+  });
+}
+function allPasosCompletado() {
+  let isCompleted = true;
+  PasosProceso.forEach((paso) => {
+    if (paso.PasoProceso[0].Completado < 3) {
+      isCompleted = false;
+    }
+  });
+  let lastIndex = PasosProceso.length - 1;
+  let lastPaso = PasosProceso[lastIndex].PasoProceso[0];
+  console.log(lastPaso);
+  if (lastPaso.Completado == 5 && tipo == 1) {
+    showFeedBackModal();
+  }
+
+  if (lastPaso.Completado == 4 && tipo == 2) {
+    showFeedBackModal();
+  }
+
+  if (lastPaso.Completado == 3) {
+    showFeedBackModal();
+  }
+}
+
+function showFeedBackModal() {
+  iconsFeedBack.classList.remove("d-none");
+  Swal.fire({
+    title: "¡Adopción finalizada!",
+    icon: "question",
+    html: iconsFeedBack,
+    showConfirmButton: false,
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+  });
+}
+function sendFeedback(value, MascotaID) {
+  let formData = new FormData();
+  formData.append("reputacionValue", value);
+  formData.append("MascotaID", MascotaID);
+  let request = { reputacionValue: value, MascotaID: MascotaID };
+  fetch(`/petco/proceso/recibirFeedback`, {
+    method: "POST",
+    body: JSON.stringify(request),
+    headers: { "Content-Type": "application/json" },
+  })
+    .then((res) => res.json())
+    .then((res) => {
+      if (res == "ok") {
+        Swal.fire("¡Recibido!", `Muchas gracias :)`, "success");
+        Swal.fire({
+          title: "¡Recibido!",
+          icon: "success",
+          html: `<p>Muchas gracias :)</p>`,
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.open("/petco", "_self");
+          }
+        });
+      } else {
+        throw new Error("Algo ha salido mal");
+      }
+    })
+    .catch((err) => {
+      displayError();
+    });
+}
+
+function displayError() {
+  Swal.fire(
+    "¡Atención!",
+    `<p>Algo ha salido mal</p><p>Intenta más tarde</p>`,
+    "error"
+  );
+}
 function emitConnectionData() {
   socket.emit("join-proceso", MascotaID);
   console.log("Emitting connection data...");
@@ -161,7 +322,7 @@ function addListenerSubirArchivo(button) {
 
     loadingScreen.fire();
     setTimeout(() => {
-      fetch(`/proceso/subirArchivo`, { method: "POST", body: formData })
+      fetch(`/petco/proceso/subirArchivo`, { method: "POST", body: formData })
         .then((res) => res.json())
         .then((res) => {
           if (res.state == "ok") {
@@ -199,12 +360,12 @@ function addPasosToProgressBarSteps(progressBar, PasosProceso) {
     if (Paso.PasoProceso[0].Completado == 0) {
       newPasoToProgressBar = pasoPendiente.cloneNode(true);
     }
-    if (Paso.PasoProceso[0].Completado == 3) {
+    if (Paso.PasoProceso[0].Completado >= 3) {
       newPasoToProgressBar = pasoCompletado.cloneNode(true);
     }
     if (
-      Paso.PasoProceso[0].Completado != 3 &&
-      Paso.PasoProceso[0].Completado != 0
+      Paso.PasoProceso[0].Completado != 0 &&
+      Paso.PasoProceso[0].Completado <= 2
     ) {
       newPasoToProgressBar = pasoActivo.cloneNode(true);
     }
@@ -228,13 +389,18 @@ function addPasosToProgressBarSteps(progressBar, PasosProceso) {
   let completadoArray = progressBar.querySelectorAll(
     ".completed-paso-progressbar"
   );
-  let ultimoCompletado = completadoArray[completadoArray.length - 1];
+  if (completadoArray.length > 0) {
+    let ultimoCompletado = completadoArray[completadoArray.length - 1];
 
-  let idUltimoCompletado = Number(ultimoCompletado.id.split("-")[1]);
-  if (idUltimoCompletado < pasos.length - 1) {
-    pasos[idUltimoCompletado + 1].classList.remove("pending-paso-progressbar");
-    pasos[idUltimoCompletado + 1].classList.add("active-paso-progressbar");
+    let idUltimoCompletado = Number(ultimoCompletado.id.split("-")[1]);
+    if (idUltimoCompletado < pasos.length - 1) {
+      pasos[idUltimoCompletado + 1].classList.remove(
+        "pending-paso-progressbar"
+      );
+      pasos[idUltimoCompletado + 1].classList.add("active-paso-progressbar");
+    }
   }
+
   progressBar.appendChild(liGap.cloneNode());
 }
 
@@ -378,6 +544,8 @@ function addListenerMandarMensajeButton() {
         userID: socket.userID,
         fecha: dateTime,
         SolicitudID: SolicitudID,
+        peerUsuarioID: UsuarioPeer.ID,
+        NombreMensaje: Usuario.Usuario.Nombre,
       });
     }
     input.value = "";
@@ -400,39 +568,6 @@ function getFormatedDate(dateToFormat) {
   let dateTime = date + " " + time;
   return dateTime;
 }
-
-socket.on("mensaje-chat-proceso", ({ message, userID, fecha }) => {
-  insertNewMensaje(message, userID, fecha, socket);
-});
-
-socket.on("paso-completado", ({ Completado, idPasoAfectado }) => {
-  PasosProceso[idPasoAfectado].PasoProceso[0].Completado = Completado;
-  pasos[idPasoAfectado].click();
-  if (Completado == 3) {
-    pasos[idPasoAfectado].classList = pasoCompletado.classList;
-    if (idPasoAfectado < PasosProceso.length - 1) {
-      pasos[Number(idPasoAfectado) + 1].classList = pasoActivo.classList;
-      infoPasoProceso.header.querySelector("div").textContent =
-        "Paso completado";
-      infoPasoProceso.header
-        .querySelector("#pasoCompletado")
-        .parentElement.classList.add("d-none");
-    }
-  }
-});
-
-socket.on(
-  "error-paso-completado-lista-registro",
-  ({ error, idPasoAfectado }) => {
-    Swal.fire("Atención", `<p>${error}</p>`, "warning");
-    pasos[idPasoAfectado].click();
-  }
-);
-
-socket.on("archivo-subido-paso", ({ path, idPasoAfectado }) => {
-  PasosProceso[idPasoAfectado].PasoProceso[0].Archivo = path;
-  pasos[idPasoAfectado].click();
-});
 
 function insertNewMensaje(message, userID, fecha, socket) {
   let newMessage;
@@ -460,3 +595,38 @@ function insertNewMensaje(message, userID, fecha, socket) {
 videollamadaButton.addEventListener("click", () => {
   window.open(`/videollamada/${ROOM_ID}`, "_parent");
 });
+
+socket.on("mensaje-chat-proceso", ({ message, userID, fecha }) => {
+  insertNewMensaje(message, userID, fecha, socket);
+});
+
+socket.on("paso-completado", ({ Completado, idPasoAfectado }) => {
+  PasosProceso[idPasoAfectado].PasoProceso[0].Completado = Completado;
+  pasos[idPasoAfectado].click();
+  if (Completado == 3) {
+    pasos[idPasoAfectado].classList = pasoCompletado.classList;
+    if (idPasoAfectado < PasosProceso.length - 1) {
+      pasos[Number(idPasoAfectado) + 1].classList = pasoActivo.classList;
+      infoPasoProceso.header.querySelector("div").textContent =
+        "Paso completado";
+      infoPasoProceso.header
+        .querySelector("#pasoCompletado")
+        .parentElement.classList.add("d-none");
+    }
+    allPasosCompletado();
+  }
+});
+
+socket.on(
+  "error-paso-completado-lista-registro",
+  ({ error, idPasoAfectado }) => {
+    Swal.fire("Atención", `<p>${error}</p>`, "warning");
+    pasos[idPasoAfectado].click();
+  }
+);
+
+socket.on("archivo-subido-paso", ({ path, idPasoAfectado }) => {
+  PasosProceso[idPasoAfectado].PasoProceso[0].Archivo = path;
+  pasos[idPasoAfectado].click();
+});
+notificacionNueva();

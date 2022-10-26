@@ -16,6 +16,9 @@ var sessionStore = new InMemorySessionStore();
 const cors = require("cors");
 const Paso = require("../models/Paso");
 const Pasos_Mascota = require("../models/Pasos_Mascota");
+const { sendNotificacion } = require("../controllers/NotificacionesController");
+const Publicacion = require("../models/Publicacion");
+
 /**
  * Get port from environment and store in Express.
  */
@@ -98,7 +101,14 @@ io.on("connection", (socket) => {
     socket.join(mascotaID);
     socket.on(
       "mensaje-chat-proceso",
-      ({ message, userID, fecha, SolicitudID }) => {
+      ({
+        message,
+        userID,
+        fecha,
+        SolicitudID,
+        peerUsuarioID,
+        NombreMensaje,
+      }) => {
         console.log(fecha);
         console.log(socket.userID);
 
@@ -115,6 +125,9 @@ io.on("connection", (socket) => {
               userID: userID,
               fecha: fecha,
             });
+            let descripcion = `¡Mensaje nuevo! ${NombreMensaje} dice: ${message}`;
+            let origen = `/petco/proceso/ver/${mascotaID}`;
+            sendNotificacion(descripcion, origen, peerUsuarioID, io);
           })
           .catch((err) => {
             console.log("Error al guardar mensaje: " + err);
@@ -123,7 +136,15 @@ io.on("connection", (socket) => {
     );
     socket.on(
       "paso-completado-intento",
-      ({ tipo, idPasoMascota, idPasoArray }) => {
+      ({
+        tipo,
+        idPasoMascota,
+        idPasoArray,
+        NombreUsuario,
+        peerUsuarioID,
+        pasoTitulo,
+        UsuarioID,
+      }) => {
         console.log(tipo);
         console.log(idPasoMascota);
         console.log(idPasoArray);
@@ -138,6 +159,22 @@ io.on("connection", (socket) => {
               PasoActual.$query()
                 .patchAndFetch({ "paso_mascota.Completado": completado })
                 .then((PasoActualPatch) => {
+                  if (PasoActualPatch.Completado < 3) {
+                    let descripcion = `${NombreUsuario} ha marcado como completado un paso`;
+                    let origen = `/petco/proceso/ver/${mascotaID}`;
+                    sendNotificacion(descripcion, origen, peerUsuarioID, io);
+                  }
+                  if (PasoActualPatch.Completado == 3) {
+                    let descripcion = `¡Felicidades! Se ha completado el paso: "${pasoTitulo}"`;
+                    let origen = `/petco/proceso/ver/${mascotaID}`;
+                    sendNotificacion(descripcion, origen, peerUsuarioID, io);
+                    sendNotificacion(descripcion, origen, UsuarioID, io);
+                  }
+                  if (PasoActualPatch.Completado == 4) {
+                    let descripcion = `${NombreUsuario} te ha calificado tras finalizar el proceso de adoción`;
+                    let origen = `/petco/proceso/ver/${mascotaID}`;
+                    sendNotificacion(descripcion, origen, peerUsuarioID, io);
+                  }
                   io.to(mascotaID).emit("paso-completado", {
                     Completado: PasoActualPatch.Completado,
                     idPasoAfectado: idPasoArray,
@@ -164,6 +201,24 @@ io.on("connection", (socket) => {
                 PasoActual.$query()
                   .patchAndFetch({ "paso_mascota.Completado": completado })
                   .then((PasoActualPatch) => {
+                    if (PasoActualPatch.Completado == 3) {
+                      let descripcion = `¡Felicidades! Se ha completado el paso: "${pasoTitulo}"`;
+                      let origen = `/petco/proceso/ver/${mascotaID}`;
+                      sendNotificacion(descripcion, origen, peerUsuarioID, io);
+                      sendNotificacion(descripcion, origen, UsuarioID, io);
+                    }
+                    if (PasoActualPatch.Completado < 3) {
+                      let descripcion = `${NombreUsuario} ha marcado como completado un paso`;
+                      let origen = `/petco/proceso/ver/${mascotaID}`;
+                      console.log(peerUsuarioID, UsuarioID);
+                      sendNotificacion(descripcion, origen, peerUsuarioID, io);
+                    }
+                    if (PasoActualPatch.Completado == 5) {
+                      let descripcion = `${NombreUsuario} te ha calificado tras finalizar el proceso de adoción`;
+                      let origen = `/petco/proceso/ver/${mascotaID}`;
+                      sendNotificacion(descripcion, origen, peerUsuarioID, io);
+                    }
+
                     io.to(mascotaID).emit("paso-completado", {
                       Completado: PasoActualPatch.Completado,
                       idPasoAfectado: idPasoArray,
@@ -260,7 +315,7 @@ io.on("connection", (socket) => {
   });
 
   //Evento para comentarios
-  socket.on("comentario", ({ msg, id, nombre, imagen, fecha }) => {
+  socket.on("comentario", ({ msg, id, nombre, imagen, fecha, idDueno }) => {
     console.log("Comentario: " + msg);
     console.log("El usuario del comentario es " + socket.userID);
     console.log(fecha);
@@ -277,6 +332,7 @@ io.on("connection", (socket) => {
       .then((resultado) => {
         console.log(resultado.ID);
         //Se emite el comentario por parte del cliente dentro del contexto de la publicacion
+
         io.to("publicacion" + id).emit("comentario", {
           msg: msg,
           nombre: nombre,
@@ -284,12 +340,18 @@ io.on("connection", (socket) => {
           fecha: fecha,
           idcomentario: resultado.ID,
         });
+        if (idDueno != socket.userID) {
+          let descripcion = `${nombre} ha comentado en tu publicacion: "${msg}"`;
+          console.log(descripcion);
+          let origen = `/petco/publicacion/adopciones/${id}`;
+          sendNotificacion(descripcion, origen, idDueno, io);
+        }
       });
   });
 
   socket.on(
     "respuesta",
-    ({ msg, idP, idcomentario, nombre, imagen, fecha }) => {
+    ({ msg, idP, idcomentario, nombre, imagen, fecha, idDueno }) => {
       console.log(msg);
       console.log(idP);
       console.log(idcomentario);
@@ -316,11 +378,34 @@ io.on("connection", (socket) => {
             imagen: imagen,
             fecha: fecha,
           });
+          if (idDueno != socket.userID) {
+            let descripcion = `${nombre} ha comentado en tu publicacion: "${msg}"`;
+            let origen = `/petco/publicacion/adopciones/${idP}`;
+            console.log(idDueno);
+            sendNotificacion(descripcion, origen, idDueno, io);
+          }
+          Comentario.query()
+            .findById(idcomentario)
+            .then((comentarioFinded) => {
+              if (comentarioFinded.ID_Usuario != socket.userID) {
+                console.log("AQUI ESTA EL PENDEJO ID");
+                console.log(comentarioFinded.ID_Usuario);
+                let descripcion = `${nombre} ha respondido a tu comentario: "${msg}"`;
+                let origen = `/petco/publicacion/adopciones/${idP}`;
+                sendNotificacion(
+                  descripcion,
+                  origen,
+                  comentarioFinded.ID_Usuario,
+                  io
+                );
+              }
+            });
         });
     }
   );
 });
 
+app.io = io;
 /**
  * Normalize a port into a number, string, or false.
  */

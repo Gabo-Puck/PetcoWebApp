@@ -29,6 +29,7 @@
       integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
       crossorigin="anonymous"
     ></script>
+    
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"
@@ -39,6 +40,7 @@
     <script>
       const PasosProceso = <%-JSON.stringify(PasosProceso)%>;
       const Usuario = <%-JSON.stringify(Usuario)%>;
+      console.log(Usuario);
       const UsuarioPeer = <%-JSON.stringify(UsuarioPeer)%>;
     </script>
   </head>
@@ -114,6 +116,13 @@
     .progress-bar-line {
       max-width: 15vh;
       min-width: 15vh;
+      height: 2%;
+      background-color: gray;
+    }
+
+    .gap-feedback{
+      max-width: 4vh;
+      min-width: 4vh;
       height: 2%;
       background-color: gray;
     }
@@ -232,8 +241,30 @@
       color:#9a9a9a;
 
     }
-
     
+    .face-feedback{
+      font-size:calc(2.5rem + 1.5vw);
+      transition: 0.3s;
+      cursor: pointer;
+    } 
+    .face-feedback:hover{
+      font-size:calc(2.7rem + 1.5vw);
+    }
+    .face-feedback-muymal{
+      color: #FF3C38;
+    }
+    .face-feed-back-mal{
+      color: #FF8C42;
+    }
+    .face-feed-back-regular{
+      color:#F5DC00;
+    }
+    .face-feed-back-bien{
+      color:#CED123;
+    }
+    .face-feed-back-muybien{
+      color: #8ABE61;
+    }
 .messagesChatProceso {
   padding-left: 0 !important;
   padding-right: 0 !important;
@@ -302,6 +333,8 @@
     const ROOM_ID = "<%=ROOM_ID%>"
   </script>
   <body style="min-height: 100vh; max-height: 100vh">
+    <%- include ("partials/header") %>
+
     <div class="d-none templateElementsMensajes" >
       <div class="someone mb-2 mx-1">
         <div class="row flex-nowrap w-100">
@@ -376,6 +409,7 @@
         >
       </li>
     </div>
+    
     <div
       class="mainContainer"
       style="
@@ -438,8 +472,39 @@
     <div class="progress-bar mx-auto">
       <ul class="d-flex align-items-center justify-content-start px-0 pb-2"></ul>
     </div>
+    <div class="iconsFeedBack d-none">
+      <p>Califica la atención que te ha brindado "<%=UsuarioPeer.Nombre%>"</p>
+      <div class="progress-bar mx-auto">
+        <ul class="d-flex align-items-center justify-content-start p-0 pt-2 m-0 mt-2">
+          <li class="gap-feedback"></li>
+          <li>
+            <i class="face-feedback face-feedback-muymal fa-regular fa-face-sad-cry"></i>
+          </li>
+          <li class="gap-feedback"></li>
+          <li>
+            <i class="face-feedback  face-feed-back-mal fa-regular fa-face-frown"></i>
+          </li>
+          <li class="gap-feedback"></li>
+          <li>
+            <i class="face-feedback face-feed-back-regular fa-regular fa-face-meh"></i>
+          </li>
+          <li class="gap-feedback"></li>
+
+          <li>
+            <i class="face-feedback  face-feed-back-bien fa-regular fa-face-grin"></i>
+          </li>
+          <li class="gap-feedback"></li>
+
+          <li>
+            <i class="face-feedback  face-feed-back-muybien fa-regular fa-face-smile-beam"></i>
+          </li>
+          <li class="gap-feedback"></li>
+
+        </ul>
+      </div>
+    </div>
     <div class="mx-auto pasoInfoContainer">
-      <div class="d-flex justify-content-start controlesPasoProceso mb-3">
+      <div class="d-flex justify-content-start controlesPasoProceso mb-3 position-relative">
         <!--Solo para paso activo-->
         <button
           class="btn btn-info me-3"
@@ -451,6 +516,10 @@
         </button>
         <button class="btn btn-info" id="videollamadaButton">
           <i class="fa-solid fa-phone-flip"></i>
+        </button>
+        <button class="btn btn-danger position-absolute top-0 end-0" id="abortarProceso">
+          <!-- <i class="fa-solid fa-phone-flip"></i> -->
+          <i class="fa-solid fa-xmark"></i>
         </button>
         <!--Solo para paso activo-->
       </div>
