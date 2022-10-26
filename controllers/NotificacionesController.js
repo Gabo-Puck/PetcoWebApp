@@ -50,3 +50,15 @@ exports.sendNotificacion = (Descripcion, Origen, ID_Usuario, io) => {
       });
   });
 };
+
+exports.retrieveNotificaciones = (req, res, next) => {
+  Notificaciones.query()
+    .where("notificaciones.ID_Usuario", "=", req.session.IdSession)
+    .then((notificacionesUsuario) => {
+      res.json(notificacionesUsuario);
+    })
+    .catch((err) => {
+      console.log(err);
+      next(err);
+    });
+};

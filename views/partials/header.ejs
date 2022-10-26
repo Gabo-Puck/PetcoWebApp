@@ -69,10 +69,50 @@
       </ul>
 
       <a class="mt-2">
-        <a href="" style="margin-right: 1%">
+        <a
+          style="margin-right: 1%"
+          data-bs-toggle="offcanvas"
+          href="#notificacionesOffCanvas"
+          role="button"
+          aria-controls="notificacionesOffCanvas"
+        >
           <i class="fa-regular fa-bell fa-lg"></i>
         </a>
       </a>
     </div>
   </div>
 </nav>
+<a
+  href="#"
+  class="list-group-item list-group-item-action list-group-item-light m-0 notificacionTemplate d-none"
+  style="text-decoration: none"
+>
+  <p style="color: black" class="mb-2 ms-0 text-break descripcionNotificacion">
+    DescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDescripcion
+  </p>
+  <p style="color: #9a9a9a; font-size: 0.9em" class="mb-0 fechaNotificacion">
+    Fechaaaaaaaaaaaaaaaaaaaaaaaaaa
+  </p>
+</a>
+<div
+  class="offcanvas offcanvas-end"
+  tabindex="-1"
+  id="notificacionesOffCanvas"
+  aria-labelledby="notificacionesOffCanvasLabel"
+  data-bs-scroll="true"
+>
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasExampleLabel">Notificaciones</h5>
+    <button
+      type="button"
+      class="btn-close"
+      data-bs-dismiss="offcanvas"
+      aria-label="Close"
+    ></button>
+  </div>
+  <div class="offcanvas-body px-0">
+    <div class="list-group list-group-flush" id="notificacionesContainer"></div>
+  </div>
+</div>
+
+<script type="module" src="/javascripts/getNotificaciones.js"></script>

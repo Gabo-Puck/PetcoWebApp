@@ -48,14 +48,8 @@
         integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
-        crossorigin="anonymous"></script>
-
-
     <script src="https://code.jquery.com/jquery-3.6.0.slim.js">
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js">
     </script>
 
     <!-- Demo styles -->
@@ -122,11 +116,11 @@
 
                         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa-regular fa-flag" style="color: #2FA1DA"></i></a>
                         <div class="dropdown-menu" style="">
-                            <a  class="dropdown-item" id="Spam" aria-valuenow="5" href="#">Reportar esta publicacion por Spam</a>
-                            <a class="dropdown-item" id="Odio" href="#">Esta publicacion incita al odio</a>
-                            <a class="dropdown-item" id="Maltrato" href="#">La publicacion muestra maltrato animal</a>
-                            <a class="dropdown-item" id="InformacionErronea" href="#">La informacion en la publicacion es erronea</a>
-                            <a class="dropdown-item" id="Ventas" href="#">Reportar por promocionar ventas</a>
+                            <a  class="dropdown-item" id="Spam" aria-valuenow="5" href="#" valor="Spam">Reportar esta publicacion por Spam</a>
+                            <a class="dropdown-item" id="Odio" href="#" valor="Odio">Esta publicacion incita al odio</a>
+                            <a class="dropdown-item" id="Maltrato" href="#" valor="Maltrato animal">La publicacion muestra maltrato animal</a>
+                            <a class="dropdown-item" id="InformacionErronea" href="#" valor="Información errónea">La informacion en la publicacion es erronea</a>
+                            <a class="dropdown-item" id="Ventas" href="#" valor="Promocionar ventas">Reportar por promocionar ventas</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" id="Otro" href="#">Otro</a>
                         </div>
@@ -156,7 +150,7 @@
                                 showCancelButton: true,
                                 inputValidator: (value) => {
                                     if (!value) {
-                                        return 'You need to write something!'
+                                        return 'Rellena el campo, porfavor'
                                     }
                                 }
                                 
@@ -180,7 +174,7 @@
                                 confirmButtonText: 'Si, estoy seguro.'
                             }).then((result) => {
                                 if (result.isConfirmed) {
-                                    Reportar(R1.id, 1);
+                                    Reportar(R1.getAttribute("valor"), 1);
 
                                 }
                             })
@@ -198,7 +192,7 @@
                                 confirmButtonText: 'Si, estoy seguro.'
                             }).then((result) => {
                                 if (result.isConfirmed) {
-                                    Reportar(R2.id, 3);
+                                    Reportar(R2.getAttribute("valor"), 3);
 
                                 }
                             })
@@ -216,7 +210,7 @@
                                 confirmButtonText: 'Si, estoy seguro.'
                             }).then((result) => {
                                 if (result.isConfirmed) {
-                                    Reportar(R3.id, 5);
+                                    Reportar(R3.getAttribute("valor"), 5);
 
                                 }
                             })
@@ -234,7 +228,7 @@
                                 confirmButtonText: 'Si, estoy seguro.'
                             }).then((result) => {
                                 if (result.isConfirmed) {
-                                    Reportar(R4.id, 2);
+                                    Reportar(R4.getAttribute("valor"), 2);
 
                                 }
                             })
@@ -252,7 +246,7 @@
                                 confirmButtonText: 'Si, estoy seguro.'
                             }).then((result) => {
                                 if (result.isConfirmed) {
-                                    Reportar(R5.id, 3);
+                                    Reportar(R5.getAttribute("valor"), 3);
 
                                 }
                             })

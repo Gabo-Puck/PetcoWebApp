@@ -1,0 +1,8 @@
+const express = require("express");
+const router = express.Router();
+
+const notificacionesController = require("../controllers/NotificacionesController");
+
+router.get("/", notificacionesController.retrieveNotificaciones);
+
+module.exports = router;

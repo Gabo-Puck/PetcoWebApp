@@ -10,6 +10,7 @@ var perfilget = require("./PerfilRouter");
 var videochat = require("./videollamada");
 var proceso = require("./ProcesoAdopcionesRouter");
 var solicitudes = require("./SolicitudesRouter");
+var notificaciones = require("./notificacionesRoutes");
 router.use("/inicio", indexRouter);
 router.use("/formulario", formulariosRouter);
 router.use("/protocolo", ProtocoloRouter);
@@ -18,5 +19,5 @@ router.use("/publicacion", publicacionget);
 router.use("/perfil", perfilget);
 router.use("/proceso", proceso);
 router.use("/solicitudes", solicitudes);
-
+router.use("/notificaciones", notificaciones);
 module.exports = router;

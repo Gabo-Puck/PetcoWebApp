@@ -113,13 +113,14 @@ exports.responder_formulario_post = (req, res) => {
         .withGraphJoined("[MascotasPasos.PasoProceso,MascotasPublicacion]", {
           minimize: true,
         })
-        .findOne({ "_t1.ID_Mascota": req.body.MascotaID })
+        .findOne({ "mascota.ID": req.body.MascotaID })
         .debug()
         .then((re) => {
-          console.log(re);
-          console.log(re.MascotasPasos[0].PasoProceso);
+          // console.log(re);
+          // console.log(re.MascotasPasos[0].PasoProceso);
           console.log("IDDDD");
-          console.log(req.body.MascotaID);
+          // console.log(req.body.MascotaID);
+          console.log(re);
 
           return new Promise((resolve, reject) => {
             // console.log(re);

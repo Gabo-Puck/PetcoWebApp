@@ -227,7 +227,12 @@ exports.reportar = (req, res) => {
       ID_Usuario_Reportado: req.params.usuarioreportado,
       ID_Publicacion: req.params.publicacion,
     })
-    .then((resp) => {});
+    .then((resp) => {
+      let descripcion = `Haz recibido un reporte por: ${req.params.motivo}`;
+      let origen = `/petco/publicacion/adopciones/${req.params.publicacion}`;
+      let usuarioReportado = req.params.usuarioreportado;
+      sendNotificacion(descripcion, origen, usuarioReportado, req.app.io);
+    });
 
   Publicacion.query()
     .findOne({ ID: req.params.publicacion })
@@ -241,7 +246,17 @@ exports.reportar = (req, res) => {
           if (PublicacionFind.Reportes_Peso >= 50) {
             PublicacionFind.$query()
               .patch({ Activo: 0 })
-              .then(() => {});
+              .then(() => {
+                let descripcion = `Tu publicación se ha ocultado por la cantidad de reportes recibidos`;
+                let origen = `/petco/publicacion/adopciones/${req.params.publicacion}`;
+                let usuarioReportado = req.params.usuarioreportado;
+                sendNotificacion(
+                  descripcion,
+                  origen,
+                  usuarioReportado,
+                  req.app.io
+                );
+              });
           }
         });
     });
@@ -314,8 +329,8 @@ exports.pay = (req, res) => {
         },
 
         redirect_urls: {
-          return_url: "http://localhost:3000/publicacion/success",
-          cancel_url: "http://localhost:3000/publicacion/cancel",
+          return_url: `${process.env.SERVER_DOMAIN}/petco/publicacion/success`,
+          cancel_url: `${process.env.SERVER_DOMAIN}/petco/publicacion/cancel`,
         },
         transactions: [
           {
@@ -402,6 +417,14 @@ exports.paysuccess = (req, res) => {
     })
     .then((registroCreado) => {
       console.log(registroCreado);
+      Usuario.query()
+        .withGraphFetched("UsuarioRegistro")
+        .findOne({ "usuario.ID": req.session.IdSession })
+        .then((usuarioFind) => {
+          let descripcion = `¡${usuarioFind.UsuarioRegistro.Nombre} ha aportado a una meta!`;
+          let origen = "aquí va la url de donde se ven las metas";
+          sendNotificacion(descripcion, origen, idOrganizacion, req.app.io);
+        });
     });
 };
 exports.paycancel = (req, res) => {
