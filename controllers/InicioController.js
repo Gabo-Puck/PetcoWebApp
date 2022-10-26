@@ -36,7 +36,7 @@ exports.Inicio = (req, res, next) => {
 
 
               Publicacion.query()
-              .where("publicacion.Activo", "=", 1)
+                .where("publicacion.Activo", "=", 1)
                 .withGraphJoined("Mascota.MascotasPublicacion")
                 .withGraphJoined("Mascota.MascotasEstado")
                 .withGraphJoined("Mascota.MascotasImagenes")
@@ -66,12 +66,11 @@ exports.Inicio = (req, res, next) => {
 
                     for (let j = 0; j < resultado[i].Mascota.length; j++) {
 
-                      if (resultado[i].Mascota[j].ID_Especie == Result[0].ID_Especie || resultado[i].Mascota[j].ID_Especie == Result[1].ID_Especie || resultado[i].Mascota[j].ID_Especie == Result[2].ID_Especie)
-                      {
-                      //console.log(resultado[i].Mascota[j].Nombre);
-                      prueba[contador] = resultado[i].Mascota[j];
-                      contador++;
-                    }
+                      if (resultado[i].Mascota[j].ID_Especie == Result[0].ID_Especie || resultado[i].Mascota[j].ID_Especie == Result[1].ID_Especie || resultado[i].Mascota[j].ID_Especie == Result[2].ID_Especie) {
+                        //console.log(resultado[i].Mascota[j].Nombre);
+                        prueba[contador] = resultado[i].Mascota[j];
+                        contador++;
+                      }
                     }
                     //console.log('Aqui acaba una publicacion y sus mascotas')
                   }
@@ -140,8 +139,7 @@ exports.CerrarSession = (req, res, next) => {
 
   console.log('owo');
 
-  req.session.destroy(()=>
-  {
+  req.session.destroy(() => {
     res.redirect('/');
   })
 
@@ -151,9 +149,9 @@ exports.Pguardadas = (req, res, next) => {
 
   let prueba = new Array();
 
-  
+
   Publicacion.query()
-  .where("publicacion.Activo", "=", 1)
+    .where("publicacion.Activo", "=", 1)
     .withGraphJoined("Mascota.MascotasPublicacion")
     .withGraphJoined("Mascota.MascotasEstado")
     .withGraphJoined("Mascota.MascotasImagenes")
@@ -169,7 +167,7 @@ exports.Pguardadas = (req, res, next) => {
         .count()
         .as('numberOfReports')
     )
-    .withGraphJoined('PublicacionGuardada')
+    .withGraphFetched('PublicacionGuardada')
     .orderByRaw('numberOfReports')
     .orderBy('numberOfLikes', 'desc')
     .orderByRaw('Reportes_Peso')
@@ -184,12 +182,16 @@ exports.Pguardadas = (req, res, next) => {
 
         for (let j = 0; j < resultado[i].PublicacionGuardada.length; j++) {
 
-          if (resultado[i].PublicacionGuardada[j].ID_Usuario == req.session.IdSession)
-          {
-          //console.log(resultado[i].Mascota[j].Nombre);
-          prueba[contador] = resultado[i].Mascota[j];
-          contador++;
-        }
+          for (let k = 0; k < resultado[i].Mascota.length; k++) {
+
+            if (resultado[i].PublicacionGuardada[j].ID_Usuario == req.session.IdSession) {
+              console.log(resultado[i].Mascota[j].Nombre);
+              prueba[contador] = resultado[i].Mascota[k];
+              contador++;
+            }
+
+          }
+
         }
         //console.log('Aqui acaba una publicacion y sus mascotas')
       }
@@ -200,11 +202,11 @@ exports.Pguardadas = (req, res, next) => {
       //console.log(prueba);
     })
 
-// Publicacion.query()
-// .withGraphJoined('PublicacionGuardada')
-// .then((result) => {
-//   res.json(result);
-// })  
+  // Publicacion.query()
+  // .withGraphJoined('PublicacionGuardada')
+  // .then((result) => {
+  //   res.json(result);
+  // })  
 
 }
 

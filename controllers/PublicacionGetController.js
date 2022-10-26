@@ -148,6 +148,33 @@ exports.psaveds = (req, res) => {
   }
 }
 
+exports.reportarUsuario = (req, res) => {
+  console.log(req.params);
+  Reporte_Publicacion.query()
+    .insert({
+      razon: req.params.motivo,
+      ID_Usuario_Reporta: req.session.IdSession,
+      ID_Usuario_Reportado: req.params.usuarioreportado,
+      ID_Publicacion: null
+
+    })
+    .then((resp) => { })
+
+    Usuario.query()
+    .findOne({ ID: req.params.usuarioreportado })
+    .then((UsuarioFind) => {
+    
+      if (UsuarioFind.Reputacion >= -100 || UsuarioFind.Reputacion <=100)
+      UsuarioFind.$query()
+        .patch({ Reputacion: parseInt(UsuarioFind.Reputacion) - parseInt(req.params.peso) })
+        .then(() => {  });
+
+    });
+
+    res.json("Se realizo el fetch");
+
+  }
+
 exports.reportar = (req, res) => {
   console.log(req.params);
   Reporte_Publicacion.query()
@@ -181,24 +208,6 @@ exports.reportar = (req, res) => {
 
     });
 
-  // Publicacion.query()
-  //   .where('publicacion.ID', "=", req.params.publicacion)
-  //   .then((PublicacionObtenida) => { 
-
-  //     //Actualizar Peso
-  //     Publicacion.query()
-  //     .where('publicacion.ID', "=", req.params.publicacion)
-  //     .patch({
-  //       Reportes_Peso: parseInt(PublicacionObtenida[0].Reportes_Peso) + parseInt(req.params.peso),
-  //     })
-  //     .then((PublicacionActualizada) => {
-
-  //       if(PublicacionActualizada[0].Reportes_Peso)
-  //       {}
-
-  //     })
-
-  //   })
 
   res.json("Se realizo el fetch");
 
@@ -227,6 +236,7 @@ exports.donacionMetas = (req, res) => {
         MascotaRender: MascotaP,
       });
     });
+    
 };
 
 exports.pay = (req, res) => {
@@ -337,7 +347,11 @@ exports.paysuccess = (req, res) => {
     .then((registroCreado) => {
       console.log(registroCreado);
     });
+
 };
+
+
+
 exports.paycancel = (req, res) => {
   res.send("Cancelled");
 };
