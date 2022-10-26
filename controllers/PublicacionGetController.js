@@ -218,32 +218,6 @@ exports.psaveds = (req, res) => {
   }
 };
 
-exports.reportarUsuario = (req, res) => {
-  console.log(req.params);
-  Reporte_Publicacion.query()
-    .insert({
-      razon: req.params.motivo,
-      ID_Usuario_Reporta: req.session.IdSession,
-      ID_Usuario_Reportado: req.params.usuarioreportado,
-      ID_Publicacion: null
-
-    })
-    .then((resp) => { })
-
-    Usuario.query()
-    .findOne({ ID: req.params.usuarioreportado })
-    .then((UsuarioFind) => {
-    
-      if (UsuarioFind.Reputacion >= -100 || UsuarioFind.Reputacion <=100)
-      UsuarioFind.$query()
-        .patch({ Reputacion: parseInt(UsuarioFind.Reputacion) - parseInt(req.params.peso) })
-        .then(() => {  });
-
-    });
-
-    res.json("Se realizo el fetch");
-
-  }
 
 exports.reportarUsuario = (req, res) => {
   console.log(req.params);
@@ -272,6 +246,49 @@ exports.reportarUsuario = (req, res) => {
   res.json("Se realizo el fetch");
 }
 
+exports.reportar = (req, res) => {
+  console.log(req.params);
+  Reporte_Publicacion.query()
+    .insert({
+      razon: req.params.motivo,
+      ID_Usuario_Reporta: req.params.usuarioreporta,
+      ID_Usuario_Reportado: req.params.usuarioreportado,
+      ID_Publicacion: req.params.publicacion,
+    })
+    .then((resp) => {
+      let descripcion = `Haz recibido un reporte por: ${req.params.motivo}`;
+      let origen = `/petco/publicacion/adopciones/${req.params.publicacion}`;
+      let usuarioReportado = req.params.usuarioreportado;
+      sendNotificacion(descripcion, origen, usuarioReportado, req.app.io);
+    });
+
+  Publicacion.query()
+    .findOne({ ID: req.params.publicacion })
+    .then((PublicacionFind) => {
+      PublicacionFind.$query()
+        .patch({
+          Reportes_Peso:
+            parseInt(PublicacionFind.Reportes_Peso) + parseInt(req.params.peso),
+        })
+        .then(() => {
+          if (PublicacionFind.Reportes_Peso >= 50) {
+            PublicacionFind.$query()
+              .patch({ Activo: 0 })
+              .then(() => {
+                let descripcion = `Tu publicación se ha ocultado por la cantidad de reportes recibidos`;
+                let origen = `/petco/publicacion/adopciones/${req.params.publicacion}`;
+                let usuarioReportado = req.params.usuarioreportado;
+                sendNotificacion(
+                  descripcion,
+                  origen,
+                  usuarioReportado,
+                  req.app.io
+                );
+              });
+          }
+        });
+    });
+  }
 //Controlar publicaciones
 var aporte;
 var meta;
