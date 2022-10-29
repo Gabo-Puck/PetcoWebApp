@@ -25,7 +25,7 @@ exports.Inicio = (req, res, next) => {
           Intereses.query()
             .where("intereses.ID_Usuario", "=", req.session.IdSession)
             .then((Result) => {
-              //console.log(Result);
+              console.log(Result);
 
               Publicacion.query()
                 .where("publicacion.Activo", "=", 1)
@@ -113,19 +113,22 @@ exports.CrearIntereses = (req, res, next) => {
   console.log(array[1]);
   console.log(array);
   console.log(req.session.IdSession);
-
+  let arrayPromise = [];
   for (var i = 0; i < 3; i++) {
-    Intereses.query()
-      .insert({
-        ID_Usuario: req.session.IdSession,
-        ID_Especie: array[i],
-      })
-      .then((registroCreado) => {})
-      .catch((err) => next(err));
+    arrayPromise.push(
+      Intereses.query()
+        .insert({
+          ID_Usuario: req.session.IdSession,
+          ID_Especie: array[i],
+        })
+        .catch((err) => next(err))
+    );
   }
+  Promise.all(arrayPromise).then((prom) => {
+    res.redirect("/petco/inicio");
+  });
 
   // res.redirect("/inicio");
-  res.redirect(req.baseUrl + "/feed");
 };
 
 exports.CerrarSession = (req, res, next) => {

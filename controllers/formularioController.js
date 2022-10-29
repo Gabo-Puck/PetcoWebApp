@@ -125,23 +125,21 @@ exports.responder_formulario_post = (req, res) => {
           return new Promise((resolve, reject) => {
             // console.log(re);
             resolve(
-              re.MascotasPasos[0].PasoProceso[0]
-                .$query()
-                .patch({ Completado: 3 })
-                .then(() => {
-                  Usuario.query()
-                    .withGraphJoined("UsuarioRegistro")
-                    .findOne({ "usuario.ID": req.session.IdSession })
-                    .then((usuarioFinded) => {
-                      let descripcion = `¡${usuarioFinded.UsuarioRegistro.Nombre} esta interesado en una de tus mascotas!`;
-                      let origen = `/petco/solicitudes/ver/${re.MascotasPublicacion.ID}`;
-                      sendNotificacion(
-                        descripcion,
-                        origen,
-                        re.MascotasPublicacion.ID_Usuario,
-                        req.app.io
-                      );
-                    });
+              Usuario.query()
+                .withGraphJoined("UsuarioRegistro")
+                .findOne({ "usuario.ID": req.session.IdSession })
+                .then((usuarioFinded) => {
+                  let descripcion = `¡${usuarioFinded.UsuarioRegistro.Nombre} esta interesado en una de tus mascotas!`;
+                  let origen = `/petco/solicitudes/ver/${re.MascotasPublicacion.ID}`;
+                  sendNotificacion(
+                    descripcion,
+                    origen,
+                    re.MascotasPublicacion.ID_Usuario,
+                    req.app.io
+                  );
+                  re.$query()
+                    .patch({ ID_Estado: 2 })
+                    .then(() => {});
                 })
             );
           });

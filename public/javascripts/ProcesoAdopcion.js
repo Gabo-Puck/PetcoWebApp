@@ -46,6 +46,10 @@ pasoCompletadoCheckBox.addEventListener("change", (e) => {
       if (result.isConfirmed) {
         // Swal.fire('Saved!', '', 'success')
         //hacer algo para guardar el paso
+        let isUltimo = false;
+        if (PasosProceso.length - 1 == idPaso) {
+          isUltimo = true;
+        }
         socket.emit("paso-completado-intento", {
           tipo: tipo,
           idPasoMascota: PasosProceso[idPaso].PasoProceso[0].ID,
@@ -53,7 +57,8 @@ pasoCompletadoCheckBox.addEventListener("change", (e) => {
           NombreUsuario: Usuario.Usuario.Nombre,
           peerUsuarioID: UsuarioPeer.ID,
           pasoTitulo: PasosProceso[idPaso].Titulo_Paso,
-          UsuarioID: Usuario.Usuario.ID,
+          UsuarioID: Usuario.UsuarioID,
+          isUltimo: isUltimo,
         });
       } else if (result.isDenied) {
         pasoCompletadoCheckBox.checked = 0;
@@ -114,10 +119,17 @@ function abortarProcesoFetch() {
     .then((res) => res.json())
     .then((res) => {
       if (res == "ok") {
-        Swal.fire(
-          "¡Correcto!",
-          "<p>Se ha abortado el proceso correctamente</p>"
-        );
+        Swal.fire({
+          title: "¡Correcto!",
+          html: "<p>Se ha abortado el proceso correctamente</p>",
+          icon: "success",
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+        }).then((sweetResult) => {
+          if (sweetResult.isConfirmed) {
+            window.location = "/petco/inicio";
+          }
+        });
       } else {
         throw new Error("Algo ha salido mal");
       }

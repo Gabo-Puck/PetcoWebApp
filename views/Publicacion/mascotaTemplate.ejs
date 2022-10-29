@@ -35,7 +35,12 @@
       <div class="row border border-1 rounded justify-content-center mb-4">
         <div class="row mb-2">
           <div class="col mx-4 d-flex justify-content-around flex-wrap">
-            <div class="d-flex flex-column bd-highlight optionMascotaConMeta">
+            <%let aceptaDonaciones=""%> <%let isChecked=""%>
+            <%if(AceptaDonaciones==0){%> <%aceptaDonaciones="d-none"%>
+            <%isChecked = "checked"%> <%}%>
+            <div
+              class="d-flex flex-column bd-highlight optionMascotaConMeta <%=aceptaDonaciones%>"
+            >
               <label class="form-check-label"> Mascota con meta </label>
               <input
                 class="form-check-input mx-auto"
@@ -50,6 +55,8 @@
                 class="form-check-input mx-auto"
                 type="radio"
                 name="mascotaMeta"
+                <%=isChecked%>
+              
               />
             </div>
           </div>
@@ -134,26 +141,26 @@
           style="text-align: center"
         ></select>
       </div>
-      <div class="row border border-1 rounded justify-content-center mb-3 pb-5">
+      <div class="row border border-1 rounded justify-content-center mb-3 pb-5 <%=aceptaDonaciones%>">
         <div class="row justify-content-center metasBox">
           <h3 class="mx-auto">Meta</h3>
           <!-- <div class="form-check w-30 pe-5 d-inline-flex">
-            <input
-              class="form-check-input me-3 habilitarDonacionescheck"
-              type="checkbox"
-              id=""
-            />
-            <label for="" class="form-check-label">Habilitar donacion</label>
-          </div> -->
+              <input
+                class="form-check-input me-3 habilitarDonacionescheck"
+                type="checkbox"
+                id=""
+              />
+              <label for="" class="form-check-label">Habilitar donacion</label>
+            </div> -->
 
           <!-- <button
-            class="btn btn-warning crearMetaButton mx-auto d-block"
-            type="button"
-            style="width: 30%"
-            disabled
-          >
-            Crear meta
-          </button> -->
+              class="btn btn-warning crearMetaButton mx-auto d-block"
+              type="button"
+              style="width: 30%"
+              disabled
+            >
+              Crear meta
+            </button> -->
 
           <label for="" class="form-label">Cantidad</label>
           <input

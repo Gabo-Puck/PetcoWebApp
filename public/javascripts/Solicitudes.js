@@ -173,6 +173,8 @@ function updateSolicitudes(buttonTriggered) {
   parentCardTemplate.classList.add("border-warning");
   const aceptarButton = parentCardTemplate.querySelector(".aceptarButton");
   retrieveParent(aceptarButton, "row").remove();
+  const rechazarButton = parentCardTemplate.querySelector(".rechazarButton");
+  retrieveParent(rechazarButton, "row").remove();
   const progresoButton = parentCardTemplate.querySelector(".progresoButton");
   const parentRowProgresoButton = retrieveParent(progresoButton, "row");
   parentRowProgresoButton.classList.remove("d-none");

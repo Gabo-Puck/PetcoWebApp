@@ -55,7 +55,7 @@ const contrasenaSchema = checkSchema({
 
 exports.session = (req, res, next) => {
   if (req.session.IdSession) {
-    res.redirect("petco/inicio");
+    res.redirect("/petco/inicio");
   } else {
     res.render("login.ejs");
   }

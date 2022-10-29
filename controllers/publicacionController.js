@@ -42,10 +42,26 @@ exports.prueba = (req, res) => {
 var acceptedTypes = ["image/jpeg", "image/png"];
 
 const getMascotaTemplate = (req, res, next) => {
-  res.render("Publicacion/mascotaTemplate", {}, (error, html) => {
-    res.htmlTemplate = html.replace(/\r?\n|\r/g, " ");
-    next();
-  });
+  Usuario.query()
+    .findById(req.session.IdSession)
+    .then((UsuarioFind) => {
+      res.render(
+        "Publicacion/mascotaTemplate",
+        { AceptaDonaciones: UsuarioFind.AceptaDonaciones },
+        (error, html) => {
+          if (error) {
+            next(error);
+          } else {
+            res.htmlTemplate = html.replace(/\r?\n|\r/g, " ");
+            next();
+          }
+        }
+      );
+    })
+    .catch((err) => {
+      console.log(err);
+      next(err);
+    });
 };
 
 const getAllEspecieWithVacuna = (req, res, next) => {
@@ -267,7 +283,7 @@ function createPromisesPasosMascota(ID_Mascota, ID_Protocolo) {
         PasosMascotaInsert.push({
           ID_Mascota: ID_Mascota,
           ID_Paso: element.ID,
-          Completado: 1,
+          Completado: 3,
         });
       } else {
         PasosMascotaInsert.push({

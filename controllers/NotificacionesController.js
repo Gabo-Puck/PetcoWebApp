@@ -47,6 +47,9 @@ exports.sendNotificacion = (Descripcion, Origen, ID_Usuario, io) => {
         console.log(ID_Usuario);
         io.to(Number(ID_Usuario)).emit("notificacion-nueva", notificacion);
         resolve();
+      })
+      .catch((err) => {
+        console.log(err);
       });
   });
 };

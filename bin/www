@@ -131,6 +131,10 @@ io.on("connection", (socket) => {
           })
           .catch((err) => {
             console.log("Error al guardar mensaje: " + err);
+            io.to(socket.userID).emit("error-paso-completado-lista-registro", {
+              error: "Este proceso ya no se encuentra disponible",
+              idPasoAfectado: 0,
+            });
           });
       }
     );
@@ -144,15 +148,25 @@ io.on("connection", (socket) => {
         peerUsuarioID,
         pasoTitulo,
         UsuarioID,
+        isUltimo,
       }) => {
         console.log(tipo);
         console.log(idPasoMascota);
         console.log(idPasoArray);
         Pasos_Mascota.query()
-          .withGraphJoined("Paso")
+          .withGraphJoined("[Paso,Mascota]")
           .findOne({ "paso_mascota.ID": idPasoMascota })
           .then((PasoActual) => {
             console.log(PasoActual);
+            if (PasoActual.Mascota.Estado != 3) {
+              io.to(socket.userID).emit(
+                "error-paso-completado-lista-registro",
+                {
+                  error: "Este proceso ya no se encuentra disponible",
+                  idPasoAfectado: idPasoArray,
+                }
+              );
+            }
             if (tipo == 1) {
               let completado = PasoActual.Completado;
               completado += 1;
@@ -165,8 +179,14 @@ io.on("connection", (socket) => {
                     sendNotificacion(descripcion, origen, peerUsuarioID, io);
                   }
                   if (PasoActualPatch.Completado == 3) {
-                    let descripcion = `¡Felicidades! Se ha completado el paso: "${pasoTitulo}"`;
+                    let descripcion = ``;
                     let origen = `/petco/proceso/ver/${mascotaID}`;
+                    if (isUltimo) {
+                      descripcion = `¡Felicidades! Se ha completado el paso: "${pasoTitulo}" y se ha finalizado la adopción de: "${PasoActual.Mascota.Nombre}"`;
+                    } else {
+                      descripcion = `¡Felicidades! Se ha completado el paso: "${pasoTitulo}"`;
+                    }
+
                     sendNotificacion(descripcion, origen, peerUsuarioID, io);
                     sendNotificacion(descripcion, origen, UsuarioID, io);
                   }
@@ -202,8 +222,14 @@ io.on("connection", (socket) => {
                   .patchAndFetch({ "paso_mascota.Completado": completado })
                   .then((PasoActualPatch) => {
                     if (PasoActualPatch.Completado == 3) {
-                      let descripcion = `¡Felicidades! Se ha completado el paso: "${pasoTitulo}"`;
+                      let descripcion = ``;
                       let origen = `/petco/proceso/ver/${mascotaID}`;
+                      if (isUltimo) {
+                        descripcion = `¡Felicidades! Se ha completado el paso: "${pasoTitulo} y se ha completado la adopción de: "${PasoActual.Mascota.Nombre}"`;
+                      } else {
+                        descripcion = `¡Felicidades! Se ha completado el paso: "${pasoTitulo}"`;
+                      }
+
                       sendNotificacion(descripcion, origen, peerUsuarioID, io);
                       sendNotificacion(descripcion, origen, UsuarioID, io);
                     }

@@ -14,6 +14,7 @@ const {
   isDuenoMascota,
 } = require("../utils/procesoAdopcionUtils");
 const Solicitudes = require("../models/Solicitudes");
+const { sendNotificacion } = require("./NotificacionesController");
 
 var acceptedTypes = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -114,6 +115,7 @@ function getUsuario(req, res, next) {
         "Tipo_Usuario",
       ]);
       resUsuario["foto"] = usuario.Foto_Perfil;
+      resUsuario["UsuarioID"] = usuario.ID;
       res.usuarioProceso = resUsuario;
       next();
     })
@@ -172,7 +174,15 @@ exports.patchReputacion = [
           usuarioReputacion
             .$query()
             .patch({ Reputacion: reputacionCambio })
-            .then(() => patchPasoProceso(req.body.MascotaID, res.isAdoptante))
+            .then(() =>
+              patchPasoProceso(
+                req.body.MascotaID,
+                res.isAdoptante,
+                res.PeerProceso,
+                next,
+                req.app.io
+              )
+            )
             .then((resolveValue) => {
               if (resolveValue == "ok") {
                 res.json(resolveValue);
@@ -195,6 +205,7 @@ exports.patchReputacion = [
 exports.abortarProceso = [
   isAdoptante,
   isDuenoMascota,
+  getUsuario,
   (req, res, next) => {
     if (res.isAdoptante || res.isDuenoMascota) {
       Mascota.query()
@@ -206,13 +217,14 @@ exports.abortarProceso = [
           req.body.MascotaID
         )
         .then((PasosProceso) => {
+          res.PasosProceso = PasosProceso;
           req.deleteFilesPath = [];
           let arrayProm = [];
           PasosProceso[0].MascotasPasos.forEach((pasoProceso) => {
             if (pasoProceso.Archivo != null) {
               req.deleteFilesPath.push(pasoProceso.Archivo);
             }
-            // console.log(pasoProceso);
+            console.log(pasoProceso);
             arrayProm.push(
               patchPasosDefaultPromise(pasoProceso.PasoProceso[0])
             );
@@ -228,8 +240,31 @@ exports.abortarProceso = [
         })
         .then(() => {
           return new Promise((resolve, reject) => {
-            // resolve(Solicitudes.query().deleteById(res.SolicitudID));
-            resolve("");
+            resolve(
+              Solicitudes.query()
+                .deleteById(res.SolicitudID)
+                .then(() => {
+                  let idUsuario = res.PeerProceso.ID;
+                  let descripcion = `${res.usuarioProceso.Usuario.Nombre} ha abortado el proceso de adopción `;
+                  let origen = `/petco/publicacion/adopciones/${res.PasosProceso[0].ID_Publicacion}`;
+                  res.PasosProceso[0]
+                    .$query()
+                    .patch({ ID_Estado: 2 })
+                    .then(() => {
+                      sendNotificacion(
+                        descripcion,
+                        origen,
+                        idUsuario,
+                        req.app.io
+                      );
+                    })
+                    .catch((err) => {
+                      console.log(err);
+                      next(err);
+                    });
+                })
+            );
+            // resolve("");
           });
         })
         .then(() => {
@@ -244,11 +279,15 @@ exports.abortarProceso = [
 ];
 
 function patchPasosDefaultPromise(PasoProceso) {
+  let valueCompletado = 0;
+  if (PasoProceso.ID_Paso == 1) {
+    valueCompletado = 3;
+  }
   return new Promise((resolve, reject) => {
     resolve(
       PasoProceso.$query()
         .patch({
-          Completado: 0,
+          Completado: valueCompletado,
           Archivo: null,
         })
         .then(() => {})
@@ -264,7 +303,7 @@ function createArrayPatchPasosDefaultPromises(PasosProceso) {
   return arrayProm;
 }
 
-function patchPasoProceso(mascotaID, isAdoptante) {
+function patchPasoProceso(mascotaID, isAdoptante, peer, next, io, usuario) {
   return new Promise((resolve, reject) => {
     Mascota.query()
       .withGraphJoined("MascotasPasos.[PasoProceso]")
@@ -285,7 +324,17 @@ function patchPasoProceso(mascotaID, isAdoptante) {
           })
           .patch({ Completado: completadoPatchValue })
           .then(() => {
+            if (completadoPatchValue >= 4) {
+              let descripcion = `${peer.Nombre} te ha calificado tras finalizar el proceso de adoción`;
+              let origen = `/petco/proceso/ver/${mascotaID}`;
+              sendNotificacion(descripcion, origen, peer.ID, io);
+            }
+
             resolve("ok");
+          })
+          .catch((err) => {
+            console.log(err);
+            next(err);
           });
       })
       .catch((err) => {

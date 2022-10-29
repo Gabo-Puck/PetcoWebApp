@@ -166,7 +166,7 @@ document.querySelector(".savePublicacion").addEventListener("click", () => {
       .then((res) =>
         handleResponse(
           res,
-          "/petco/inicio/feed",
+          "/petco/inicio/",
           "¡Publicación creada correctamente!"
         )
       )

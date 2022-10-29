@@ -95,7 +95,8 @@ exports.aceptarSolicitud = (req, res, next) => {
                   getUsuarioMascota(
                     req.params.MascotaID,
                     result.ID_Usuario,
-                    req
+                    req,
+                    "ha aceptado su solicitud para proceso de adopción"
                   );
                   res.json("ok");
                 })
@@ -112,7 +113,7 @@ exports.aceptarSolicitud = (req, res, next) => {
   }
 };
 
-function getUsuarioMascota(MascotaID, ID_Usuario, req) {
+function getUsuarioMascota(MascotaID, ID_Usuario, req, msg) {
   return new Promise((resolve, reject) => {
     Mascota.query()
       .withGraphJoined(
@@ -121,13 +122,17 @@ function getUsuarioMascota(MascotaID, ID_Usuario, req) {
       )
       .findById(MascotaID)
       .then((MascotaFind) => {
-        let nombreUsuario =
-          MascotaFind.MascotasPublicacion.PublicacionUsuario.UsuarioRegistro
-            .Nombre;
-        let descripcion = `${nombreUsuario} ha aceptado su solicitud para proceso de adopción`;
-        let origen = `/petco/proceso/ver/${MascotaID}`;
-        sendNotificacion(descripcion, origen, ID_Usuario, req.app.io);
-        console.log(MascotaFind);
+        MascotaFind.$query()
+          .patch({ ID_Estado: 3 })
+          .then(() => {
+            let nombreUsuario =
+              MascotaFind.MascotasPublicacion.PublicacionUsuario.UsuarioRegistro
+                .Nombre;
+            let descripcion = `${nombreUsuario} ${msg}`;
+            let origen = `/petco/proceso/ver/${MascotaID}`;
+            sendNotificacion(descripcion, origen, ID_Usuario, req.app.io);
+            console.log(MascotaFind);
+          });
       });
   });
 }
@@ -143,15 +148,36 @@ exports.denegarSolicitud = (req, res, next) => {
       )
       .andWhere("Mascota.ID", "=", req.params.MascotaID)
       .andWhere("solicitudes.ID", "=", req.params.SolicitudID)
-      .delete()
-      .then(() => {
-        res.json("ok");
-      })
-      .catch((err) => {
-        console.log(err);
-        return res.json({
-          error: "<p>Algo ha salido mal</p><p>Intentelo más tarde</p>",
-        });
+      .then((solicitudFind) => {
+        let idUsuario = solicitudFind[0].ID_Usuario;
+        let descripcion = `Se ha rechazado tu solicitud de adopción para ${solicitudFind[0].Mascota.Nombre}`;
+        let origen = `/petco/publicacion/adopciones/${solicitudFind[0].Mascota.MascotasPublicacion.ID}`;
+        solicitudFind[0]
+          .$query()
+          .delete()
+          .then(() => {
+            sendNotificacion(descripcion, origen, idUsuario, req.app.io);
+            res.json("ok");
+          })
+          .catch((err) => {
+            console.log(err);
+            return res.json({
+              error: "<p>Algo ha salido mal</p><p>Intentelo más tarde</p>",
+            });
+          });
       });
+    // Solicitudes.query()
+    //   .withGraphJoined("Mascota.[MascotasPublicacion]")
+    //   .where(
+    //     "Mascota:MascotasPublicacion.ID_Usuario",
+    //     "=",
+    //     req.session.IdSession
+    //   )
+    //   .andWhere("Mascota.ID", "=", req.params.MascotaID)
+    //   .andWhere("solicitudes.ID", "=", req.params.SolicitudID)
+    //   .delete()
+    //   .then(() => {
+    //     res.json("ok");
+    //   })
   }
 };
