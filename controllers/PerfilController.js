@@ -37,7 +37,11 @@ exports.pagina = (req, res, next) => {
     .withGraphJoined("UsuarioRegistro")
     .where("usuario.ID", "=", req.params.idUsuario)
     .then((result) => {
-      if (result === undefined) {
+      console.log(
+        "🚀 ~ file: PerfilController.js ~ line 40 ~ .then ~ result",
+        result
+      );
+      if (result.length == 0) {
         res.redirect("/login");
       } else {
         idu = result[0].UsuarioRegistro.ID;
