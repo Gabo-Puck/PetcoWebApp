@@ -1,7 +1,7 @@
 const knex = require("../knex");
 const BaseModel = require("./BaseModel");
 const { Model } = require("objection");
-// Model.knex(knex);
+Model.knex(knex);
 
 class Registro extends BaseModel {
   constructor() {

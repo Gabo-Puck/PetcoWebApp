@@ -26,7 +26,7 @@ function encrypt(text) {
 
 // Decrypting text
 function decrypt(text) {
-  encrypt("3");
+  // encrypt("3");
   try {
     let encryptedText = Buffer.from(text, "hex");
     let decipher = crypto.createDecipheriv("aes-256-cbc", Buffer.from(key), iv);
