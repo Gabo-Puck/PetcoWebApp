@@ -55,14 +55,8 @@ exports.Inicio = (req, res, next) => {
 
                   for (let i = 0; i < resultado.length; i++) {
                     for (let j = 0; j < resultado[i].Mascota.length; j++) {
-                      if (
-                        resultado[i].Mascota[j].ID_Especie ==
-                          Result[0].ID_Especie ||
-                        resultado[i].Mascota[j].ID_Especie ==
-                          Result[1].ID_Especie ||
-                        resultado[i].Mascota[j].ID_Especie ==
-                          Result[2].ID_Especie
-                      ) {
+
+                      if (resultado[i].Mascota[j].ID_Especie == Result[0].ID_Especie || resultado[i].Mascota[j].ID_Especie == Result[1].ID_Especie || resultado[i].Mascota[j].ID_Especie == Result[2].ID_Especie) {
                         //console.log(resultado[i].Mascota[j].Nombre);
                         prueba[contador] = resultado[i].Mascota[j];
                         contador++;
@@ -142,6 +136,8 @@ exports.CerrarSession = (req, res, next) => {
 exports.Pguardadas = (req, res, next) => {
   let prueba = new Array();
 
+
+  
   Publicacion.query()
     .where("publicacion.Activo", "=", 1)
     .withGraphJoined("Mascota.MascotasPublicacion")
@@ -157,10 +153,10 @@ exports.Pguardadas = (req, res, next) => {
         .count()
         .as("numberOfReports")
     )
-    .withGraphJoined("PublicacionGuardada")
-    .orderByRaw("numberOfReports")
-    .orderBy("numberOfLikes", "desc")
-    .orderByRaw("Reportes_Peso")
+    .withGraphFetched('PublicacionGuardada')
+    .orderByRaw('numberOfReports')
+    .orderBy('numberOfLikes', 'desc')
+    .orderByRaw('Reportes_Peso')
     .then((resultado) => {
       //console.log('Separador ------------------------');
       //console.log(resultado);
@@ -169,78 +165,17 @@ exports.Pguardadas = (req, res, next) => {
 
       for (let i = 0; i < resultado.length; i++) {
         for (let j = 0; j < resultado[i].PublicacionGuardada.length; j++) {
-          if (
-            resultado[i].PublicacionGuardada[j].ID_Usuario ==
-            req.session.IdSession
-          ) {
-            //console.log(resultado[i].Mascota[j].Nombre);
-            prueba[contador] = resultado[i].Mascota[j];
-            contador++;
+
+          for (let k = 0; k < resultado[i].Mascota.length; k++) {
+
+            if (resultado[i].PublicacionGuardada[j].ID_Usuario == req.session.IdSession) {
+              console.log(resultado[i].Mascota[j].Nombre);
+              prueba[contador] = resultado[i].Mascota[k];
+              contador++;
+            }
+
           }
-        }
-        //console.log('Aqui acaba una publicacion y sus mascotas')
-      }
 
-      res.render("feed.ejs", {
-        MascotaRender: prueba,
-        Tipo: req.session.Tipo,
-      });
-      //console.log(prueba);
-    });
-};
-
-// Publicacion.query()
-// .withGraphJoined('PublicacionGuardada')
-// .then((result) => {
-//   res.json(result);
-// })
-
-exports.CerrarSession = (req, res, next) => {
-  console.log("owo");
-
-  req.session.destroy(() => {
-    res.redirect("/");
-  });
-};
-
-exports.Pguardadas = (req, res, next) => {
-  let prueba = new Array();
-
-  Publicacion.query()
-    .where("publicacion.Activo", "=", 1)
-    .withGraphJoined("Mascota.MascotasPublicacion")
-    .withGraphJoined("Mascota.MascotasEstado")
-    .withGraphJoined("Mascota.MascotasImagenes")
-    .select(
-      "publicacion.*",
-      Publicacion.relatedQuery("PublicacionLike").count().as("numberOfLikes")
-    )
-    .select(
-      "publicacion.*",
-      Publicacion.relatedQuery("PublicacionReporte")
-        .count()
-        .as("numberOfReports")
-    )
-    .withGraphJoined("PublicacionGuardada")
-    .orderByRaw("numberOfReports")
-    .orderBy("numberOfLikes", "desc")
-    .orderByRaw("Reportes_Peso")
-    .then((resultado) => {
-      //console.log('Separador ------------------------');
-      //console.log(resultado);
-
-      let contador = 0;
-
-      for (let i = 0; i < resultado.length; i++) {
-        for (let j = 0; j < resultado[i].PublicacionGuardada.length; j++) {
-          if (
-            resultado[i].PublicacionGuardada[j].ID_Usuario ==
-            req.session.IdSession
-          ) {
-            //console.log(resultado[i].Mascota[j].Nombre);
-            prueba[contador] = resultado[i].Mascota[j];
-            contador++;
-          }
         }
         //console.log('Aqui acaba una publicacion y sus mascotas')
       }
@@ -256,5 +191,8 @@ exports.Pguardadas = (req, res, next) => {
   // .withGraphJoined('PublicacionGuardada')
   // .then((result) => {
   //   res.json(result);
-  // })
-};
+  // })  
+
+}
+
+

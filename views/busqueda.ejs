@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" , href="/stylesheets/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"
+    integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    <title>Buscar</title>
+    <style>
+             .contenedor {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
+            grid-gap: 2rem;
+            margin: 2rem;
+        }
+
+        /* demo purposes only */
+
+        * {
+            font-family: "Poppins", sans-serif;
+        }
+
+        .carta {
+            height: 215px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+            transition: 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        h3 {
+            color: white;
+            font-size: 24px;
+            margin: 20px 0 0 20px;
+
+        }
+
+        p {
+            color: white;
+            font-weight: 400;
+            font-size: 16px;
+            align-self: end;
+            margin: 0 0 20px 20px;
+            letter-spacing: 0.5px;
+        }
+
+
+        .carta:hover {
+            transform: scale(1.035, 1.035);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .carta:hover img {
+            transform: translateY(-10px);
+        }
+
+        img {
+            position: absolute;
+            top: 0;
+            height: 110%;
+            width: 100%;
+            z-index: -1;
+            transition: 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+    </style>
+</head>
+
+<body>
+
+   
+
+
+   
+    <div class="container mt-4" style="text-align: center;">
+
+        <form action="/petco/busqueda/ingreso" method="post">
+            <div class="row">
+                <div class="form-group col">
+                    <label for="exampleSelect1" class="form-label mt-4">Especie</label>
+                    <select class="form-select" name="BEspecie" id="animales" style="display: table-cell;">
+                        <option value="1" >Asno</option>
+                        <option value="2">Pato</option>
+                        <option value="3">Buey</option>
+                        <option value="4">Caballo</option>
+                        <option value="5" >Cabra</option>
+                        <option value="6">Cerdo</option>
+                        <option value="7">Chinchilla</option>
+                        <option value="8">Codorniz</option>
+                        <option value="9" >Conejillo de indias</option>
+                        <option value="10">Gallina</option>
+                        <option value="11">Ganzo</option>
+                        <option value="12">Gato</option>
+                        <option value="13" >Huron</option>
+                        <option value="14">Hamster</option>
+                        <option value="15">Iguana</option>
+                        <option value="16">Mulo</option>
+                        <option value="17">Ovejas</option>
+                        <option value="18">Paloma</option>
+                        <option value="19">Perro</option>
+                        <option value="20">Raton</option>
+                        <option value="21">Serpiente</option>
+                        <option value="22">Tortuga</option>
+                        <option value="23">Vaca</option>
+                        <option value="24">Toro</option>
+                    
+                    </select>
+                </div>
+
+                <div class="form-group col">
+                    <label for="exampleSelect1" class="form-label mt-4">Tamaño</label>
+                    <select class="form-select" name="BTamano" id="tamanos" style="display: table-cell;">
+                        <option value="0">Cualquiera</option>
+                        <option value="1">Muy pequeño</option>
+                        <option value="2">Pequeño</option>
+                        <option value="3">Mediano</option>
+                        <option value="4">Grande</option>
+                        <option value="5">Muy grande</option>
+                    </select>
+                </div>
+
+                <div class="form-group col">
+                    <label for="exampleSelect1" class="form-label mt-4">Castrado</label>
+                    <select class="form-select" name="BCastrado" id="castrados" style="display: table-cell;">
+                        <option value="0">Cualquiera</option>
+                        <option value="1">Castrado</option>
+                        <option value="2">No castrado</option>
+                        <option value="3">Sin informacion</option>
+                    </select>
+                </div>
+
+                <div class="form-group col">
+                    <label for="exampleSelect1" class="form-label mt-4">Salud</label>
+                    <select class="form-select" name="BSalud" id="saludes"  style="display: table-cell;">
+                      <option value="0">Cualquiera</option>
+                        <option value="1">Enfermo</option>
+                        <option value="2">Discapacitado</option>
+                        <option value="3">Sano</option>
+                        
+                    </select>
+                </div>
+
+                <div class="form-group col">
+                    <label for="exampleSelect1" class="form-label mt-4">Estado</label>
+                    <select class="form-select" name="BEstado" id="estados" style="display: table-cell;">
+                        <option value="0">Cualquiera</option>
+                        <option value="1">Libre</option>
+                        <option value="2">En consideracion</option>
+                        <option value="3">En proceso</option>
+                        <option value="4">Adoptado</option>
+                    </select>
+                </div>
+
+                <div class="form-group col">
+                  <label for="exampleSelect1" class="form-label mt-4">Edad</label>
+                  <select class="form-select" name="Bedad"  id="edades" style="display: table-cell;">
+                  
+                      <option value="1">Menor de un año</option>
+                      <option value="6">Hasta 5 años</option>
+                      <option value="11">Hasta 10 años</option>
+                      <option value="21">Hasta 20 años</option>
+                      <option value="31">Hasta 30 años</option>
+
+                  </select>
+              </div>
+
+            </div>
+
+            <div class="row mt-2">
+
+              <div class="col">
+                <div class="form-group col">
+                  <select class="form-select" name="Borden"  id="ordenes" style="display: table-cell;">
+                      <option value="0">Ordenar Cronologicamente</option>
+                      <option value="1">Ordenar por relevancia</option>
+                  </select>
+              </div>               
+              </div>
+
+              <div class="col">
+                
+                  <button type="submit" class="btn btn-outline-primary btn-block"><i class="fa-solid fa-magnifying-glass"></i></button>
+              
+              </div>
+
+            </div>
+        
+
+            
+
+        
+
+        </form>
+    </div>
+
+
+
+
+    <div class="contenedor">
+        <div class="carta templateFeed" style="display: none;">
+            <a href="#" style="text-decoration: none;">
+            
+                
+            <img src="https://thumbs.gfycat.com/MadeupWillingKronosaurus-max-1mb.gif"
+                style="object-fit: cover; height: 300px;" />
+            <h3 style="color: black;">Card tittle</h3>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <p style="background-color: rgba(0, 0, 0, 0.5); vertical-align: bottom;"><b>Estado:</b>
+                Oowo
+            </p>
+        </a>
+    </div>
+    
+</div>
+
+
+<% if(MascotaRender.length == 0 ){ %>
+    <script>
+  Swal.fire(
+  'Parece que no hay resultados',
+  'Prueba buscando con otros parametros',
+  'warning'
+  )
+    </script>
+  <% } %>  
+
+
+
+
+
+
+    <script>    
+      
+
+        
+
+
+        //Cargar elementos
+        var template = document.querySelector(".templateFeed"); //Se obtiene el formato del comentario de un template
+        let banLoad = false;
+        const Mlenght = '<%=MascotaRender.length%>';
+        const MascotaJS = <%-JSON.stringify(MascotaRender) %>;
+    
+    
+        let contador = 0;
+        let insert = 4;
+
+        
+        //[Primera carga]
+       
+
+        window.onload = function () { //Se ejecuta al terminar de cargar la pagina
+          //Determinar longitud principal
+            select1= document.getElementById("animales").selectedIndex = '<%=Iespecie%>' -1;
+            select2= document.getElementById("tamanos").selectedIndex = '<%=Itamano%>';
+            select3= document.getElementById("castrados").selectedIndex = '<%=Icastrado%>';
+            select4= document.getElementById("saludes").selectedIndex = '<%=Isalud%>';
+            select5= document.getElementById("estados").selectedIndex = '<%=Iestado%>';
+            select5= document.getElementById("ordenes").selectedIndex = '<%=Iorden%>';
+
+            rangoedad= document.getElementById("edades");
+            console.log("🚀 ~ file: busqueda.ejs ~ line 255 ~ rangoedad", rangoedad)
+
+            
+            edadelegida ='<%=Iedad%>';
+            console.log("🚀 ~ file: busqueda.ejs ~ line 257 ~ edadelegida", edadelegida)
+
+          if (edadelegida == 6) {
+            rangoedad.selectedIndex=1;
+          }
+
+          if (edadelegida == 11) {
+            rangoedad.selectedIndex=2;
+          }
+
+          if (edadelegida == 21) {
+            rangoedad.selectedIndex=3;
+          }
+
+          if (edadelegida == 31) {
+            rangoedad.selectedIndex=4;
+          }
+
+            
+            
+
+            
+
+          if (MascotaJS != undefined)
+        {
+
+          let InitialLoading = 0;
+    
+          if (Mlenght < 6) {
+            InitialLoading = Mlenght;
+            banLoad = false;
+          }
+          else {
+            InitialLoading = 6;
+            banLoad = true
+          }
+    
+          for (let i = 0; i < InitialLoading; i++) {
+    
+            let tarjeta2 = template.cloneNode(true); //se clona un elemento
+            tarjeta2.querySelector('h3').innerText = MascotaJS[contador].Nombre;
+            tarjeta2.querySelector('img').src = MascotaJS[contador].MascotasImagenes[0].Ruta;
+            tarjeta2.querySelector('p').innerText = MascotaJS[contador].MascotasEstado.Estado_Nombre;
+            tarjeta2.querySelector('a').href='/petco/publicacion/adopciones/' + MascotaJS[contador].MascotasPublicacion.ID;
+    
+    
+            switch (MascotaJS[contador].MascotasEstado.ID) {
+              case 1:
+              tarjeta2.querySelector('p').classList.add('text-success')
+                break;
+              case 2:
+              tarjeta2.querySelector('p').classList.add('text-warning')
+    
+                break;
+              case 3:
+              tarjeta2.querySelector('p').classList.add('text-warning')
+    
+                break;
+    
+                case 4:
+              tarjeta2.querySelector('p').classList.add('text-danger')
+    
+                break;
+              default:
+                break;
+            }
+    
+            
+            tarjeta2.style.display = 'block'// se hace visible 
+            document.querySelector('.contenedor').appendChild(tarjeta2);
+            contador++;
+    
+          }
+        }        
+    }
+
+
+
+        window.onscroll = function (ev) {
+
+          console.log(Mlenght - contador);
+          if ((Mlenght - contador) < 0) {
+            console.log('Muy chiquito');
+            banLoad = false;
+          }
+    
+          if (Mlenght - contador < 4) {
+    
+            insert = Mlenght - contador;
+          }
+    
+          if ((window.innerHeight + window.scrollY) >= document.body.scrollHeight && banLoad == true) {
+            // you're at the bottom of the page
+            //alert("Bottom of page");
+            for (let i = 0; i < insert; i++) {
+              let tarjeta2 = template.cloneNode(true); //se clona un elemento con las caracteristicas de un comentario
+
+              tarjeta2.querySelector('h3').innerText = MascotaJS[contador].Nombre;
+              console.log(MascotaJS[contador].MascotasImagenes[0].Ruta);
+
+              tarjeta2.querySelector('img').src = MascotaJS[contador].MascotasImagenes[0].Ruta;
+              tarjeta2.querySelector('p').innerText = MascotaJS[contador].MascotasEstado.Estado_Nombre;
+              tarjeta2.querySelector('a').href='/petco/publicacion/adopciones/' + MascotaJS[contador].MascotasPublicacion.ID;
+    
+              switch (MascotaJS[contador].MascotasEstado.ID) {
+              case 1:
+              tarjeta2.querySelector('p').classList.add('text-success')
+                break;
+              case 2:
+              tarjeta2.querySelector('p').classList.add('text-warning')
+    
+                break;
+              case 3:
+              tarjeta2.querySelector('p').classList.add('text-warning')
+    
+                break;
+    
+                case 4:
+              tarjeta2.querySelector('p').classList.add('text-danger')
+    
+                break;
+              default:
+                break;
+            }
+    
+              tarjeta2.style.display = 'block'// se hace visible el comentario
+              document.querySelector('.contenedor').appendChild(tarjeta2);
+              contador++;
+    
+            }
+    
+            console.log("🚀 ~ file: feed.ejs ~ line 147 ~ contador", contador)
+    
+          }
+    
+    
+    
+    
+        };
+    
+
+    </script>
+    
+</body>
+
+</html>

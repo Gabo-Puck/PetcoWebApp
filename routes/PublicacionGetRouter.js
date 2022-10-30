@@ -15,10 +15,11 @@ router.post("/donarmeta", registro_Login.pay);
 router.get("/success", registro_Login.paysuccess);
 router.get("/cancel", registro_Login.paycancel);
 router.get("/Psaved/:idP/:idU/:accion", registro_Login.psaveds);
-router.get(
-  "/Reporte/:motivo/:peso/:usuarioreporta/:usuarioreportado/:publicacion",
+router.get("/Reporte/:motivo/:peso/:usuarioreporta/:usuarioreportado/:publicacion",
   registro_Login.reportar
 );
+router.get("/ReporteUsuario/:motivo/:peso/:usuarioreportado", registro_Login.reportarUsuario);
+
 
 //outer.post("/CheckLogin", registro_Login.CheckDB);
 
