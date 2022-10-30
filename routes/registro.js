@@ -2,11 +2,13 @@ var express = require("express");
 var router = express.Router();
 
 var registro_controller = require("../controllers/registroController");
+var moderador_controller = require("../controllers/ModeradorController");
 
 /// Registro Routes ///
 router.get("/Esme", registro_controller.registro_esme);
 router.get("/pormunicipio", registro_controller.registro_municipio);
 router.get("/crear", registro_controller.registro_crear_get);
+router.get("/aplicarModerador", moderador_controller.crearModeradorGet);
 router.get("/lista_pendientes", registro_controller.registros_pendientes_list);
 router.get("/editar/:registroID", registro_controller.registro_edit_get);
 router.get("/getEstado/:registroID", registro_controller.registro_estado);

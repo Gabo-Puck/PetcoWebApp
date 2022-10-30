@@ -5,7 +5,7 @@ const renderRegistroMiddleware = (req, res, next) => {
     console.log("si hay estados");
   } else console.log("no hay estados");
   res.render("HacerRegistro", {
-    title: "Crear moderador",
+    title: "Registro moderador",
     EstadosMunicipios: res.stuff,
     errors: res.errors,
     RegistroPrevio: null,

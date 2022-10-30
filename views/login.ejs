@@ -16,14 +16,14 @@
       width: 30%;
     }
     .containerLogin {
-      height: 45%;
+      height: 60%;
     }
     @media (min-width: 320px) and (max-width: 800px) {
       .loginCard {
-        width: 85%;
+        width: 95%;
       }
       .containerLogin {
-        height: 50%;
+        height: 70%;
       }
     }
   </style>
@@ -68,11 +68,17 @@
                   </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Acceder</button>
                 <div class="d-flex flex-column">
+                  <button type="submit" class="btn btn-primary mb-2">
+                    Acceder
+                  </button>
+                  <a href="/registro/crear"
+                    >¿No tienes una cuenta? Registrate</a
+                  >
                   <a href="/login/recuperarContrasena">Recuperar contraseña</a>
-
-                  <a href="">Entrar como moderador</a>
+                  <a href="/registro/aplicarModerador"
+                    >Aplicar para moderador</a
+                  >
                 </div>
               </form>
             </div>
