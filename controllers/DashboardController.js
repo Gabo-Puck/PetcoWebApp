@@ -14,6 +14,7 @@ exports.formDashboard = (req, res) => {
           res.render("Formulario/FormDashboard.ejs", {
             Elemento: Formularios,
             Elemento2: Protocolos,
+            Tipo: req.session.Tipo,
           });
           console.log(Protocolos);
         });

@@ -36,7 +36,7 @@
             class="card h-100 border-primary justify-content-center loginCard mx-auto position-relative"
             style="text-align: center"
           >
-            <div class="card-header">Iniciar Sesión</div>
+            <div class="card-header">Iniciar Sesión Moderador</div>
 
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
@@ -71,8 +71,6 @@
                 <button type="submit" class="btn btn-primary">Acceder</button>
                 <div class="d-flex flex-column">
                   <a href="/login/recuperarContrasena">Recuperar contraseña</a>
-
-                  <a href="">Entrar como moderador</a>
                 </div>
               </form>
             </div>
@@ -90,7 +88,7 @@
                  showConfirmButton: <%= showCofirmButton %>,
                  timer: <%= timer %>
       }).then(() => {
-                     window.location = '<%=ruta %>'
+                     window.location = '/<%=ruta %>'
                  })
     </script>
     <% } %>

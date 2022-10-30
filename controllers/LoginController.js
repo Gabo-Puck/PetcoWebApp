@@ -5,6 +5,7 @@ var objection = require("objection");
 var { decrypt, encrypt } = require("../utils/cryptoUtils/randomId");
 const { sendMail } = require("./email");
 const { validationResult, checkSchema } = require("express-validator");
+const { getTodayDateFormated } = require("./NotificacionesController");
 
 const correoSchema = checkSchema({
   correo: {
@@ -78,27 +79,51 @@ exports.CheckDB = (req, res, next) => {
       console.log(Results[0]);
       //El usuario se Logeo
       if (Results[0] != null && Results[0].RegistroUsuario != null) {
-        console.log("ojo");
-        req.session.Logged = true;
-        req.session.IdSession = Results[0].RegistroUsuario.ID;
-        req.session.Tipo = Results[0].Tipo_Usuario;
-        console.log(Results[0]);
-        console.log(req.session.Tipo);
-
+        let Fecha_Generacion = getTodayDateFormated();
         console.log(
-          "🚀 ~ file: LoginController.js ~ line 29 ~ .then ~ session",
-          req.session.IdSession
+          "🚀 ~ file: LoginController.js ~ line 83 ~ .then ~ Fecha_Generacion",
+          Fecha_Generacion
         );
+        Results[0].RegistroUsuario.$query()
+          .patchAndFetch({ UltimaConexion: Fecha_Generacion })
+          .then((usuarioPatched) => {
+            console.log("ojo");
+            req.session.Logged = true;
+            req.session.IdSession = Results[0].RegistroUsuario.ID;
+            req.session.Tipo = Results[0].Tipo_Usuario;
+            console.log(Results[0]);
+            console.log(req.session.Tipo);
 
-        res.render("login.ejs", {
-          alert: true,
-          alertTitle: "Conexion Exitosa",
-          alertMessage: "Se ha iniciado Sesion",
-          alertIcon: "success",
-          showCofirmButton: false,
-          timer: 2500,
-          ruta: "./inicio",
-        });
+            console.log(
+              "🚀 ~ file: LoginController.js ~ line 29 ~ .then ~ session",
+              req.session.IdSession
+            );
+            if (Results[0].Tipo_Usuario == 1 || Results[0].Tipo_Usuario == 2) {
+              res.render("login.ejs", {
+                alert: true,
+                alertTitle: "Conexion Exitosa",
+                alertMessage: "Se ha iniciado Sesion",
+                alertIcon: "success",
+                showCofirmButton: false,
+                timer: 2500,
+                ruta: "./inicio",
+              });
+            }
+            if (Results[0].Tipo_Usuario == 3) {
+              res.render("login.ejs", {
+                alert: true,
+                alertTitle: "Conexion Exitosa",
+                alertMessage: "Se ha iniciado Sesion",
+                alertIcon: "success",
+                showCofirmButton: false,
+                timer: 2500,
+                ruta: "/moderador",
+              });
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       }
 
       //Datos Sin coincidencias

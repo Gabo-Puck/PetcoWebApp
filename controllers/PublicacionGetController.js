@@ -14,6 +14,7 @@ const Like = require("../models/Like");
 const Publicacion_Guardada = require("../models/Publicacion_Guardada");
 const Reporte_Publicacion = require("../models/Reporte_Publicacion");
 const { sendNotificacion } = require("./NotificacionesController");
+const { forEach } = require("lodash");
 
 paypal.configure({
   mode: "sandbox", //sandbox or live
@@ -428,7 +429,15 @@ exports.paysuccess = (req, res) => {
         });
     });
 };
+// Publicacion.query().orderBy("peso").then((pub) => {
+//   let res = new Array();
+//   pub.forEach((p) => {
+//     p.$query().withGraphJoined("Mascotas").where("ID_Salud", "=", 1).then((results) => {
+//       res.push(results);
 
+//     });
+//   })
+// })
 function isCompletadoMeta(idMeta, io) {
   Metas.query()
     .withGraphJoined("[MetasDonaciones,Mascota]")

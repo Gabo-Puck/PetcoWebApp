@@ -18,6 +18,7 @@ const { sendMail } = require("./email");
 
 const { deleteFiles } = require("../utils/multipartRequestHandle");
 const Usuario = require("../models/Usuario");
+const { getTodayDateFormated } = require("./NotificacionesController");
 
 const RegistroSchema = checkSchema({
   Correo: {
@@ -35,7 +36,7 @@ const RegistroSchema = checkSchema({
         return Registro.query()
           .findOne({ Correo: value })
           .then((CorreoFind) => {
-            console.log(req);
+            // console.log(req);
             if (CorreoFind) {
               throw new Error("Ese correo ya ha sido registrado");
             }
@@ -155,7 +156,7 @@ const RegistroSchemaEditar = checkSchema({
           .where("Correo", "=", value)
           .andWhere("ID", "!=", req.registroIdDecrypted)
           .then((CorreoFind) => {
-            console.log(req);
+            // console.log(req);
             if (CorreoFind.length != 0) {
               throw new Error("Ese correo ya ha sido registrado");
             }
@@ -289,6 +290,7 @@ const renderRegistroMiddleware = (req, res, next) => {
     RegistroPrevio: null,
     urlVerificarReq: "/registro/verify",
     urlGrabarReq: "/registro/crear",
+    isModerador: false,
   });
 };
 const getAllEstados = (req, res, next) => {
@@ -336,6 +338,8 @@ exports.registro_aprobar = [
       .then((registro) => {
         if (registro) {
           next();
+        } else {
+          res.json("Algo ha salido mal");
         }
       })
       .catch((err) => {
@@ -389,11 +393,13 @@ const patchRegistroPendiente = (registro, pendiente) => {
 const crearUsuarioPromise = (registro, res) => {
   res.registroPatch = registro;
   return new Promise((resolve, reject) => {
+    let Fecha_Generacion = getTodayDateFormated();
     resolve(
       Usuario.query().insertAndFetch({
         Foto_Perfil: "/images/ImagenesPerfilUsuario/default.png",
         FK_Registro: registro.ID,
         Reputacion: 0,
+        UltimaConexion: Fecha_Generacion,
       })
     );
   });
@@ -468,6 +474,10 @@ exports.registro_edit_get = [
       res.RegistroPrevio.RegistroUsuario == null &&
       res.RegistroPrevio.Pendiente == 0
     ) {
+      let isModerador = false;
+      if (res.RegistroPrevio.Tipo_Usuario == 3) {
+        isModerador = true;
+      }
       console.log(res.RegistroPrevio);
       res.render("HacerRegistro", {
         title: "Editar Registro",
@@ -476,6 +486,7 @@ exports.registro_edit_get = [
         RegistroPrevio: res.RegistroPrevio,
         urlVerificarReq: `/registro/verifyEditar/${req.params.registroID}`,
         urlGrabarReq: `/registro/editarPatch/${req.params.registroID}`,
+        isModerador: isModerador,
       });
     } else {
       res.redirect("/login");

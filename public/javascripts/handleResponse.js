@@ -24,6 +24,14 @@ export function handleResponse(res, url, message) {
           confirmButtonText: "Entendido",
         });
       }
+      if (res.errors && !res.globalError) {
+        Swal.fire({
+          title: "Atención!",
+          text: "Hay un campo erroneo. Cambialo para poder crear la publicación",
+          icon: "warning",
+          confirmButtonText: "Entendido",
+        });
+      }
       resolve(res);
     }, 1100);
   });

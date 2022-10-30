@@ -3,7 +3,10 @@ const Publicacion = require("../models/Publicacion");
 const Respuestas = require("../models/Respuestas");
 const Solicitudes = require("../models/Solicitudes");
 const { secureRegistro } = require("../utils/formDatabaseClean");
-const { sendNotificacion } = require("../controllers/NotificacionesController");
+const {
+  sendNotificacion,
+  getTodayDateFormated,
+} = require("../controllers/NotificacionesController");
 const Mascota = require("../models/Mascota");
 
 exports.getListaSolicitudesPublicacion = (req, res, next) => {
@@ -27,6 +30,7 @@ exports.getListaSolicitudesPublicacion = (req, res, next) => {
         res.render("listaSolicitudes", {
           Mascotas: result.Mascota,
           PublicacionNombre: result.Titulo,
+          Tipo: req.session.Tipo,
         });
       });
   } else res.redirect("/login");
@@ -87,11 +91,20 @@ exports.aceptarSolicitud = (req, res, next) => {
           });
         } else {
           return new Promise((resolve, reject) => {
+            let Fecha_Generacion = getTodayDateFormated();
             resolve(
               Solicitudes.query()
-                .patchAndFetchById(req.params.SolicitudID, { Estado: 1 })
+                .patchAndFetchById(req.params.SolicitudID, {
+                  Estado: 1,
+                  Fecha_Inicio: Fecha_Generacion,
+                })
                 .then((result) => {
                   // sendNotificacion;
+                  Mascota.query()
+                    .findById(result.ID_Mascota)
+                    .patch({ Fecha_Ultima_Solicitud: Fecha_Generacion })
+                    .then(() => {});
+
                   getUsuarioMascota(
                     req.params.MascotaID,
                     result.ID_Usuario,

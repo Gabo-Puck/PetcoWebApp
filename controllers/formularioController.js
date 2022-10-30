@@ -67,6 +67,7 @@ exports.responder_formulario_get = [
             Response: response,
             templatePreguntasRespuestas: res.templateHtml,
             idMascota: req.params.idMascota,
+            Tipo: req.session.Tipo,
           });
         } else {
           res.redirect("../login");
@@ -389,7 +390,7 @@ function validateRespuestaAbiertaOpcional(res, respuesta) {
 }
 
 exports.crearFormulario = (req, res) => {
-  res.render("Formulario/CrearFormulario");
+  res.render("Formulario/CrearFormulario", { Tipo: req.session.Tipo });
 };
 
 exports.verSolicitud = (req, res) => {
@@ -712,6 +713,7 @@ exports.formulario_edit_get = [
           } else {
             res.render("Formulario/EditarFormulario", {
               Response: response,
+              Tipo: req.session.Tipo,
             });
           }
           // console.log(response);

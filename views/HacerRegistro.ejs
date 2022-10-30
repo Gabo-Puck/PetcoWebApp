@@ -3,7 +3,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, height=device-height initial-scale=1.0" />
-    <title>Document</title>
+    <title><%=title%></title>
     <link rel="stylesheet" , href="/stylesheets/style.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script
@@ -58,11 +58,11 @@
     </style>
     <!-- <div style="height: 100vh;"> -->
       
-      <div class="card border-info container-fluid my-5" style="width: 85%; margin: auto">
-        <h1 class="d-flex justify-content-center mt-5 mb-6 card-title"><%=title%></h1>
-        <div class="card-body">
+      <div class="card border-info container-fluid my-5 p-0" style="width: 85%; margin: auto">
+        <h1 class="d-flex justify-content-center mt-5 mb-6 card-title text-center"><%=title%></h1>
+        <div class="card-body px-2 px-sm-3">
           <form
-            class="card bg-light px-5 "
+            class="card bg-light px-2 px-sm-4"
             
             method="POST"
             enctype="multipart/form-data"
@@ -75,20 +75,28 @@
                 <div class="mb-3 mx-auto form-row tipos">
                   <%let displayOrg =""%>
                   <%let displayCom =""%>
-                    <%let checkedOrg =""%>
-                    <%let checkedCom =""%>
-                    <%if(RegistroPrevio==null){%>
+                  <%let valueComun = 2%>
+                  <%let checkedOrg =""%>
+                  <%let checkedCom =""%>
+                  <%if(isModerador){%>
+                    <%checkedCom = "checked"%>
+                    <%displayOrg = "d-none"%>
+                    <%valueComun = 3%>
+                  <%}%>
+                  <%if(RegistroPrevio==null){%>
+                    
                       <%checkedOrg = "checked"%>
-                    <%}else{%>
-                      <%if(RegistroPrevio.Tipo_Usuario==2){%>
-                        <%checkedCom = "checked"%>
-                        <%displayOrg = "d-none"%>
-                      <%}%>
-                      <%if(RegistroPrevio.Tipo_Usuario==1){%>
-                        <%checkedOrg = "checked"%>
-                        <%displayCom = "d-none"%>
-                      <%}%>
+
+                  <%}else{%>
+                    <%if(RegistroPrevio.Tipo_Usuario==2){%>
+                      <%checkedCom = "checked"%>
+                      <%displayOrg = "d-none"%>
                     <%}%>
+                    <%if(RegistroPrevio.Tipo_Usuario==1){%>
+                      <%checkedOrg = "checked"%>
+                      <%displayCom = "d-none"%>
+                    <%}%>
+                  <%}%>
                   <div class="col <%=displayOrg%>">
                     <div class="d-flex justify-content-center">
                       <label for="Tipo1">Organizacion</label>
@@ -111,7 +119,11 @@
                   </div>
                   <div class="col <%=displayCom%>" id="me">
                     <div class="d-flex justify-content-center">
-                      <label for="Tipo2">Común</label>
+                      <%if(isModerador){%>
+                        <label for="Tipo2">Moderador</label>
+                      <%}else{%>
+                        <label for="Tipo2">Común</label>
+                      <%}%>
                     </div>
 
                     <div>
@@ -123,13 +135,13 @@
                         placeholder=""
                         name="Tipo"
                         id="Tipo2"
-                        value="2"
+                        value="<%=valueComun%>"
                       />
                       
                     </div>
                   </div>
                 </div>
-                <div class="form-row">
+                <div class="form-row mb-3">
                   <div class="col">
                     <label for="Nombre">Nombre:</label>
                     <input
@@ -143,7 +155,7 @@
                     
                   </div>
     
-                  <div class="col-md-4 apellido">
+                  <div class="col-lg-4 apellido">
                     <label for="ApellidoP">Apellido Paterno</label>
                     <input
                       id="ApellidoP"
@@ -155,7 +167,7 @@
                     />
                   </div>
     
-                  <div class="col-md-4 apellido">
+                  <div class="col-lg-4 apellido">
                     <label for="ApellidoM">Apellido Materno</label>
                     <input
                       id="ApellidoM"
@@ -168,7 +180,7 @@
                   </div>
                 </div>
     
-                <div id="correoForm" class="form-row">
+                <div id="correoForm" class="form-row mb-3">
                   
                   <div class="col">
                     <label for="Correo">Correo</label>
@@ -182,7 +194,7 @@
                     />
                   </div>
                 </div>
-                <div class="form-row">
+                <div class="form-row mb-4">
                   <div class="col-md">
                     <label for="Telefono">Telefono:</label>
                     <input
@@ -300,7 +312,7 @@
                     <%nuloComBack = "NULO"%>
                   <%}%>
 
-                  <%if(RegistroPrevio.Tipo_Usuario==2){ %>
+                  <%if(RegistroPrevio.Tipo_Usuario==2 || RegistroPrevio.Tipo_Usuario==3){ %>
                     <%imgComFrontal = RegistroPrevio.Documento_Identidad.split(";")[0]%>
                     <%imgComFrontal = imgComFrontal.replace(/public/g, "")%>
                     <%imgComFrontal = imgComFrontal.replaceAll("\\", "/")%>
@@ -309,11 +321,13 @@
                     <%imgComTrasera = imgComTrasera.replaceAll("\\", "/")%>
                     <%nuloOrg = "NULO"%>
                   <%}%>
+
+                  
                   
                 
                 <%}%>
                 <div class="form-row" id="TipoComun">
-                    <div class="row d-flex flex-column align-items-center align-content-center" style="width: 100%">
+                    <div class="row d-flex flex-column align-items-center align-content-center mx-auto" style="width: 100%">
                       <div class="form-row d-flex justify-content-center my-2">
                           Fotografía INE parte frontal
                         </p>
@@ -342,7 +356,7 @@
                         </div>
                       
                     </div>
-                    <div class="row d-flex flex-column align-items-center align-content-center" style="width: 100%">
+                    <div class="row d-flex flex-column align-items-center align-content-center mx-auto" style="width: 100%">
                       <div class="form-row d-flex justify-content-center my-2">
                         Fotografía INE parte trasera
                       </div>
@@ -369,7 +383,7 @@
                     </div>
                 </div>
                 <div id="TipoOrg">
-                  <div class="row d-flex flex-column align-items-center align-content-center" style="width: 100%">
+                  <div class="row d-flex flex-column align-items-center align-content-center mx-auto" style="width: 100%">
                     <div class="form-row d-flex justify-content-center my-2">
                       Fotografía CIF o Factura
                     </div>
@@ -397,7 +411,7 @@
                   </div>
                 </div>
                 <div class="d-flex justify-content-end">
-                  <button id="submitButton" class="btn btn-info my-6" type="button">
+                  <button id="submitButton" class="btn btn-info my-5" type="button">
                     Enviar
                   </button>
                 </div>
@@ -490,7 +504,7 @@
           getImage(imgURL,archivoOrg,InputFileOrg)
         <%}%>
 
-        <%if(RegistroPrevio.Tipo_Usuario==2){%>
+        <%if(RegistroPrevio.Tipo_Usuario==2 || RegistroPrevio.Tipo_Usuario==3){%>
           
           let imgUrlIneFront =  "<%=RegistroPrevio.Documento_Identidad.split(";")[0]%>";
           imgUrlIneFront =imgUrlIneFront
@@ -918,7 +932,7 @@ document.querySelectorAll(".invalid-feedback").forEach(feedBackElement=>{
         Nombre.placeholder = "Nombre de tu Organización";
         // PreviewOrg.src = "";
       }
-      if (activeType == 2) {
+      if (activeType == 2 || activeType == 3) {
         //- Tipo Comun
         InputFileOrg.name = "NULO"
         InputFileINEFrontal.name="Documento_Identidad2";
@@ -928,10 +942,15 @@ document.querySelectorAll(".invalid-feedback").forEach(feedBackElement=>{
         InputFileOrg.value = "";
         ApellidoBox[0].style.display = "block";
         ApellidoBox[1].style.display = "block";
+        <%if(isModerador){%>
+          Nombre.placeholder = "Nombre de la INE";
+        ApellidoP.placeholder = "Apellido paterno de la INE";
+        ApellidoM.placeholder = "Apellido materno de la INE";
+        <%}else{%>
         Nombre.placeholder = "Nombre de tu INE";
         ApellidoP.placeholder = "Apellido paterno de tu INE";
         ApellidoM.placeholder = "Apellido materno de tu INE";
-        
+        <%}%>
           // PreviewComunFrente.src = "";
           // PreviewComunTrasera.src = "";
         ApellidoP.name = "ApellidoP";

@@ -7,6 +7,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Formularios</title>
   <link rel="stylesheet" href="/stylesheets/bootstrap-5.2.0-dist/themes/Lumen/bootstrap.css" />
+  <script
+  src="https://cdn.socket.io/4.5.0/socket.io.min.js"
+  integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k"
+  crossorigin="anonymous"
+></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"
     integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA=="
@@ -136,7 +143,7 @@
 /* boring stuff */
 body {
   font-family: "Helvetica", sans-serif;  
-  padding: 30px 0;
+  padding: 0 0 30px 0;
   font-weight: 300;
 }
 
@@ -191,10 +198,11 @@ p {
 </head>
 
 <body>
+  <%- include ("../partials/header") %>
 
     
     
-    <div class="container">
+    <div class="container my-0">
     
     
     
@@ -349,6 +357,8 @@ p {
       });
     }
   </script>
+    <script type="module" src="/javascripts/feed.js"></script>
+
 </body>
 
 </html>

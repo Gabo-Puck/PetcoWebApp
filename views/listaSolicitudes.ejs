@@ -14,6 +14,11 @@
     />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="/stylesheets/bootstrap-5.2.0-dist/js/bootstrap.bundle.min.js"></script>
+    <script
+      src="https://cdn.socket.io/4.5.0/socket.io.min.js"
+      integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k"
+      crossorigin="anonymous"
+    ></script>
     <!-- Bootstrap theme Lumen from bootswatch -->
     <!-- Bootstrap bundle -->
     <!-- Jquery -->
@@ -29,7 +34,7 @@
     />
     <!-- Sweetalert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <title>Lista Solicitudes para</title>
+    <title>Lista Solicitudes</title>
     <style>
       .openMenuMascotas {
         transform: rotate(270deg);
@@ -63,7 +68,7 @@
         background-repeat: no-repeat;
       }
 
-      .offcanvas-body > *:last-child {
+      #offcanvasBodyMascotas > *:last-child {
         border-bottom: 1px solid black;
       }
       h5,
@@ -77,7 +82,7 @@
         background-color: #89b3f1;
         color: white;
       }
-      .offcanvas {
+      #offcanvasScrolling {
         background-color: #66a3ff;
       }
       .loadingScreenLayer {
@@ -133,6 +138,8 @@
     </script>
   </head>
   <body>
+    <%- include ("partials/header") %>
+
     <div class="preguntaTemplateFormularioSolicitud card d-none mb-3">
       <p class="preguntaFormularioSolicitud fs-4 fw-bold ms-2 mb-1"></p>
       <ul class="respuestasFormularioSolicitud"></ul>
@@ -188,11 +195,20 @@
     <!-- Main container -->
     <div class="mainContainer">
       <!-- Carta solicitud -->
-      <div class="mainContainerSolicitudes w-100 h-10" style="z-index: 2">
-        <div class="cardContainer"></div>
+      <div
+        class="mainContainerSolicitudes w-100 h-10 position-relative"
+        style="z-index: 2"
+      >
+        <div class="cardContainer">
+          <div
+            class="mx-auto my-auto h-100 w-100 d-flex align-items-center justify-content-center d-none avisoListaRegistros position-absolute top-50 start-50 translate-middle"
+          >
+            <h2 class="">No hay solicitudes para esta mascota</h2>
+          </div>
+        </div>
         <!-- Botón para abrir Offcanvas de mascotas -->
         <button
-          class="btnMenuMascota btnMenuMascotaOpen position-fixed top-0 start-0"
+          class="btnMenuMascota btnMenuMascotaOpen position-absolute top-0 start-0"
           type="button"
           data-bs-toggle="offcanvas"
           data-bs-target="#offcanvasScrolling"
@@ -207,7 +223,7 @@
         <div>
           <!--  -->
           <div
-            class="offcanvas offcanvas-start"
+            class="offcanvas offcanvas-start mt-5"
             data-bs-scroll="true"
             tabindex="-1"
             id="offcanvasScrolling"
@@ -239,7 +255,7 @@
             <!-- Cabecera de menu offcanvas mascotas -->
 
             <!-- Cuerpo menu offcanvas -->
-            <div class="offcanvas-body p-0"></div>
+            <div class="offcanvas-body p-0" id="offcanvasBodyMascotas"></div>
             <!-- Cuerpo menu offcanvas -->
           </div>
         </div>
@@ -344,6 +360,7 @@
       </div>
       <!-- Cuerpo carta -->
     </div>
+    <script type="module" src="/javascripts/feed.js"></script>
 
     <script type="module" src="/javascripts/Solicitudes.js"></script>
   </body>

@@ -33,6 +33,12 @@ const iconsFace = document.querySelectorAll(".face-feedback");
 
 const abortarProceso = document.querySelector("#abortarProceso");
 
+Date.prototype.addDays = function (days) {
+  var date = new Date(this.valueOf());
+  date.setDate(date.getDate() + days);
+  return date;
+};
+
 pasoCompletadoCheckBox.addEventListener("change", (e) => {
   if (pasoCompletadoCheckBox.checked == "1") {
     Swal.fire({
@@ -160,6 +166,7 @@ const infoPasoProceso = {
   title: document.querySelector(".infoPasoProceso .card-title "), //Propiedad que representa el titulo del encabezado del elemento "card" de bootstrap
   body: document.querySelector(".infoPasoProceso .card.body"), //Propiedad que representa el cuerpo del elemento "card" de bootstrap
   text: document.querySelector(".infoPasoProceso .card-text"), //Propiedad que representa el texto dentro del cuerpo del elemento "card" de bootstrap
+  footer: document.querySelector(".infoPasoProceso .card-footer"), //Propiedad que representa el texto dentro del cuerpo del elemento "card" de bootstrap
   subirArchivo: document.querySelector("#subirArchivo"), //Propiedad que representa el boton para subir archivo dentro del cuerpo del elemento "card" de bootstrap
   descargarArchivoSubido: document.querySelector("#descargarArchivoSubido"), //Propiedad que representa el boton para descargar el archivo subido por el usuario adoptante
   descargarArchivoProtocolo: document.querySelector(
@@ -424,8 +431,22 @@ function addListenerToProgressDot(dot) {
       idPaso = e.target.id.split("-")[1];
     }
     // alert(`pasos[${idPaso}] = ${pasos[idPaso]}`);
+    let options = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
     infoPasoProceso.title.textContent = PasosProceso[idPaso].Titulo_Paso;
     infoPasoProceso.text.textContent = PasosProceso[idPaso].Descripcion;
+    let fechaLimite = new Date();
+
+    fechaLimite = fechaLimite.addDays(PasosProceso[idPaso].DiasEstimados);
+
+    infoPasoProceso.footer.textContent = `Fecha limite: ${fechaLimite.toLocaleDateString(
+      "es-MX",
+      options
+    )}`;
     infoPasoProceso.header
       .querySelector("#pasoCompletado")
       .parentElement.classList.add("d-none");

@@ -175,7 +175,18 @@ function displayRegistroData(registro, modalRegistro) {
   let estado = modalRegistro.querySelector("#EstadoRegistroLista");
   let municipio = modalRegistro.querySelector("#MunicipioRegistroLista");
 
-  let tipo = registro.Tipo_Usuario == 1 ? "headerOrganizacion" : "headerComun";
+  let tipo;
+
+  if (registro.Tipo_Usuario == 1) {
+    tipo = "headerOrganizacion";
+  }
+
+  if (registro.Tipo_Usuario == 2) {
+    tipo = "headerComun";
+  }
+  if (registro.Tipo_Usuario == 3) {
+    tipo = "headerModerador";
+  }
 
   let header = modalRegistro.querySelector(".modal-header");
   header.classList.remove("headerOrganizacion");
