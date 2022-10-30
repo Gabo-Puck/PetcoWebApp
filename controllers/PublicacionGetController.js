@@ -434,6 +434,8 @@ exports.paysuccess = (req, res) => {
           isCompletadoMeta(meta);
         });
     });
+
+    
 };
 
 function isCompletadoMeta(idMeta) {

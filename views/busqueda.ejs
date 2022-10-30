@@ -120,6 +120,7 @@
                 <div class="form-group col">
                     <label for="exampleSelect1" class="form-label mt-4">Tamaño</label>
                     <select class="form-select" name="BTamano" id="tamanos" style="display: table-cell;">
+                        <option value="0">Cualquiera</option>
                         <option value="1">Muy pequeño</option>
                         <option value="2">Pequeño</option>
                         <option value="3">Mediano</option>
@@ -131,6 +132,7 @@
                 <div class="form-group col">
                     <label for="exampleSelect1" class="form-label mt-4">Castrado</label>
                     <select class="form-select" name="BCastrado" id="castrados" style="display: table-cell;">
+                        <option value="0">Cualquiera</option>
                         <option value="1">Castrado</option>
                         <option value="2">No castrado</option>
                         <option value="3">Sin informacion</option>
@@ -140,6 +142,7 @@
                 <div class="form-group col">
                     <label for="exampleSelect1" class="form-label mt-4">Salud</label>
                     <select class="form-select" name="BSalud" id="saludes"  style="display: table-cell;">
+                      <option value="0">Cualquiera</option>
                         <option value="1">Enfermo</option>
                         <option value="2">Discapacitado</option>
                         <option value="3">Sano</option>
@@ -150,21 +153,53 @@
                 <div class="form-group col">
                     <label for="exampleSelect1" class="form-label mt-4">Estado</label>
                     <select class="form-select" name="BEstado" id="estados" style="display: table-cell;">
+                        <option value="0">Cualquiera</option>
                         <option value="1">Libre</option>
                         <option value="2">En consideracion</option>
                         <option value="3">En proceso</option>
                         <option value="4">Adoptado</option>
                     </select>
                 </div>
+
+                <div class="form-group col">
+                  <label for="exampleSelect1" class="form-label mt-4">Edad</label>
+                  <select class="form-select" name="Bedad"  id="edades" style="display: table-cell;">
+                  
+                      <option value="1">Menor de un año</option>
+                      <option value="6">Hasta 5 años</option>
+                      <option value="11">Hasta 10 años</option>
+                      <option value="21">Hasta 20 años</option>
+                      <option value="31">Hasta 30 años</option>
+
+                  </select>
+              </div>
+
             </div>
 
-            <input  type="range" class="form-range mt-2" min="0" max="30" step="1" id="edades" name="Bedad" oninput="this.nextElementSibling.value = this.value">
-            <output><%=Iedad%></output>
-            <label for="customRange3" class="form-label ">Años</label>
+            <div class="row mt-2">
 
-            <div class="container">
-                <button type="submit" class="btn btn-outline-primary mt-2"><i class="fa-solid fa-magnifying-glass"></i></button>
+              <div class="col">
+                <div class="form-group col">
+                  <select class="form-select" name="Borden"  id="ordenes" style="display: table-cell;">
+                      <option value="0">Ordenar Cronologicamente</option>
+                      <option value="1">Ordenar por relevancia</option>
+                  </select>
+              </div>               
+              </div>
+
+              <div class="col">
+                
+                  <button type="submit" class="btn btn-outline-primary btn-block"><i class="fa-solid fa-magnifying-glass"></i></button>
+              
+              </div>
+
             </div>
+        
+
+            
+
+        
+
         </form>
     </div>
 
@@ -178,7 +213,7 @@
                 
             <img src="https://thumbs.gfycat.com/MadeupWillingKronosaurus-max-1mb.gif"
                 style="object-fit: cover; height: 300px;" />
-            <h3 style="color: white;">Card tittle</h3>
+            <h3 style="color: black;">Card tittle</h3>
             <br>
             <br>
             <br>
@@ -230,13 +265,40 @@
 
         window.onload = function () { //Se ejecuta al terminar de cargar la pagina
           //Determinar longitud principal
-            select1= document.getElementById("animales").selectedIndex = '<%=Iespecie%>'-1;
-            select2= document.getElementById("tamanos").selectedIndex = '<%=Itamano%>'-1;
-            select3= document.getElementById("castrados").selectedIndex = '<%=Icastrado%>'-1;
-            select4= document.getElementById("saludes").selectedIndex = '<%=Isalud%>'-1;
-            select5= document.getElementById("estados").selectedIndex = '<%=Iestado%>'-1;
+            select1= document.getElementById("animales").selectedIndex = '<%=Iespecie%>' -1;
+            select2= document.getElementById("tamanos").selectedIndex = '<%=Itamano%>';
+            select3= document.getElementById("castrados").selectedIndex = '<%=Icastrado%>';
+            select4= document.getElementById("saludes").selectedIndex = '<%=Isalud%>';
+            select5= document.getElementById("estados").selectedIndex = '<%=Iestado%>';
+            select5= document.getElementById("ordenes").selectedIndex = '<%=Iorden%>';
+
             rangoedad= document.getElementById("edades");
-            rangoedad.value='<%=Iedad%>';
+            console.log("🚀 ~ file: busqueda.ejs ~ line 255 ~ rangoedad", rangoedad)
+
+            
+            edadelegida ='<%=Iedad%>';
+            console.log("🚀 ~ file: busqueda.ejs ~ line 257 ~ edadelegida", edadelegida)
+
+          if (edadelegida == 6) {
+            rangoedad.selectedIndex=1;
+          }
+
+          if (edadelegida == 11) {
+            rangoedad.selectedIndex=2;
+          }
+
+          if (edadelegida == 21) {
+            rangoedad.selectedIndex=3;
+          }
+
+          if (edadelegida == 31) {
+            rangoedad.selectedIndex=4;
+          }
+
+            
+            
+
+            
 
           if (MascotaJS != undefined)
         {

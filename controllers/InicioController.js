@@ -133,73 +133,8 @@ exports.CerrarSession = (req, res, next) => {
 exports.Pguardadas = (req, res, next) => {
   let prueba = new Array();
 
-  Publicacion.query()
-    .where("publicacion.Activo", "=", 1)
-    .withGraphJoined("Mascota.MascotasPublicacion")
-    .withGraphJoined("Mascota.MascotasEstado")
-    .withGraphJoined("Mascota.MascotasImagenes")
-    .select(
-      "publicacion.*",
-      Publicacion.relatedQuery("PublicacionLike").count().as("numberOfLikes")
-    )
-    .select(
-      "publicacion.*",
-      Publicacion.relatedQuery("PublicacionReporte")
-        .count()
-        .as("numberOfReports")
-    )
-    .withGraphJoined("PublicacionGuardada")
-    .orderByRaw("numberOfReports")
-    .orderBy("numberOfLikes", "desc")
-    .orderByRaw("Reportes_Peso")
-    .then((resultado) => {
-      //console.log('Separador ------------------------');
-      //console.log(resultado);
 
-  req.session.destroy(() => {
-    res.redirect('/');
-  })
-
-      for (let i = 0; i < resultado.length; i++) {
-        for (let j = 0; j < resultado[i].PublicacionGuardada.length; j++) {
-          if (
-            resultado[i].PublicacionGuardada[j].ID_Usuario ==
-            req.session.IdSession
-          ) {
-            //console.log(resultado[i].Mascota[j].Nombre);
-            prueba[contador] = resultado[i].Mascota[j];
-            contador++;
-          }
-        }
-        //console.log('Aqui acaba una publicacion y sus mascotas')
-      }
-
-      res.render("feed.ejs", {
-        MascotaRender: prueba,
-        Tipo: req.session.Tipo,
-      });
-      //console.log(prueba);
-    });
-};
-
-// Publicacion.query()
-// .withGraphJoined('PublicacionGuardada')
-// .then((result) => {
-//   res.json(result);
-// })
-
-exports.CerrarSession = (req, res, next) => {
-  console.log("owo");
-
-  req.session.destroy(() => {
-    res.redirect("/");
-  });
-};
-
-exports.Pguardadas = (req, res, next) => {
-  let prueba = new Array();
-
-
+  
   Publicacion.query()
     .where("publicacion.Activo", "=", 1)
     .withGraphJoined("Mascota.MascotasPublicacion")
