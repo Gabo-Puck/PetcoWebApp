@@ -330,15 +330,15 @@ span.psw {
                                                 role="button" aria-haspopup="true" aria-expanded="false"><i
                                                     class="fa-regular fa-flag" style="color: #2FA1DA"></i></a>
                                             <div class="dropdown-menu">
-                                                <a class="dropdown-item" id="Spam" aria-valuenow="5" href="#">Reportar
+                                                <a class="dropdown-item" id="Spam" aria-valuenow="5" valor="Spam" href="#">Reportar
                                                     este usuario por Spam</a>
-                                                <a class="dropdown-item" id="Odio" href="#">Este usuario incita al
+                                                <a class="dropdown-item" id="Odio"  valor="Odio" href="#">Este usuario incita al
                                                     odio</a>
-                                                <a class="dropdown-item" id="Maltrato" href="#">El usuario promueve el
+                                                <a class="dropdown-item" id="Maltrato" href="#" valor="Maltrato animal">El usuario promueve el
                                                     maltrato animal</a>
-                                                <a class="dropdown-item" id="InformacionErronea" href="#">La informacion
+                                                <a class="dropdown-item" id="InformacionErronea" href="#" valor="Información errónea">La informacion
                                                     que provee es erronea</a>
-                                                <a class="dropdown-item" id="Ventas" href="#">Reportar por promocionar
+                                                <a class="dropdown-item" id="Ventas" href="#" valor="Promocionar ventas">Reportar por promocionar
                                                     ventas</a>
                                                 <div class="dropdown-divider"></div>
                                                 <a class="dropdown-item" id="Otro" href="#">Otro</a>
@@ -391,7 +391,7 @@ span.psw {
                                                         confirmButtonText: 'Si, estoy seguro.'
                                                     }).then((result) => {
                                                         if (result.isConfirmed) {
-                                                            Reportar(R1.id, 1);
+                                                            Reportar(R1.getAttribute("valor"), 1);
 
                                                         }
                                                     })
@@ -409,7 +409,7 @@ span.psw {
                                                         confirmButtonText: 'Si, estoy seguro.'
                                                     }).then((result) => {
                                                         if (result.isConfirmed) {
-                                                            Reportar(R2.id, 3);
+                                                            Reportar(R2.getAttribute("valor"), 3);
 
                                                         }
                                                     })
@@ -427,7 +427,7 @@ span.psw {
                                                         confirmButtonText: 'Si, estoy seguro.'
                                                     }).then((result) => {
                                                         if (result.isConfirmed) {
-                                                            Reportar(R3.id, 5);
+                                                            Reportar(R3.getAttribute("valor"), 5);
 
                                                         }
                                                     })
@@ -445,7 +445,7 @@ span.psw {
                                                         confirmButtonText: 'Si, estoy seguro.'
                                                     }).then((result) => {
                                                         if (result.isConfirmed) {
-                                                            Reportar(R4.id, 2);
+                                                            Reportar(R4.getAttribute("valor"), 2);
 
                                                         }
                                                     })
@@ -463,7 +463,7 @@ span.psw {
                                                         confirmButtonText: 'Si, estoy seguro.'
                                                     }).then((result) => {
                                                         if (result.isConfirmed) {
-                                                            Reportar(R5.id, 3);
+                                                            Reportar(R5.getAttribute("valor"), 3);
 
                                                         }
                                                     })

@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      src="https://kit.fontawesome.com/f0156fc078.js"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="/stylesheets/bootstrap-5.2.0-dist/themes/Lumen/bootstrap.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="/stylesheets/bootstrap-5.2.0-dist/js/bootstrap.bundle.min.js"></script>
+    <script
+      src="https://cdn.socket.io/4.5.0/socket.io.min.js"
+      integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k"
+      crossorigin="anonymous"
+    ></script>
+    <!-- Bootstrap theme Lumen from bootswatch -->
+    <!-- Bootstrap bundle -->
+    <!-- Jquery -->
+    <!-- Popper -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"
+    />
+    <!-- Sweetalert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>Lista publicaciones reportadas</title>
+    <style>
+      .openMenuMascotas {
+        transform: rotate(270deg);
+        display: inline-block;
+      }
+      .closeMenuMascotas {
+        transform: rotate(180deg);
+        display: inline-block;
+      }
+
+      .btnMenuMascota {
+        background-color: transparent;
+        border: none;
+      }
+      .btnMenuMascotaOpen {
+        position: absolute;
+      }
+      .mascotaMenuOffCanvas {
+        border: none;
+        background-color: transparent;
+        padding: 1em 0;
+        width: 100%;
+        border-top: 1px solid black;
+        /* border-bottom: -1px solid black; */
+      }
+
+      .fotoMascota {
+        background-size: 100% 100%;
+        width: 8vh;
+        height: 8vh;
+        background-repeat: no-repeat;
+      }
+
+      #offcanvasBodyMascotas > *:last-child {
+        border-bottom: 1px solid black;
+      }
+      h5,
+      button {
+        word-break: break-all;
+      }
+      button {
+        text-align: center;
+      }
+      .activeButtonMascota {
+        background-color: #89b3f1;
+        color: white;
+      }
+      #offcanvasScrolling {
+        background-color: #66a3ff;
+      }
+      .loadingScreenLayer {
+        height: 100vh;
+      }
+      .mainContainerSolicitudes {
+        height: 100vh;
+      }
+      .loadingSpinnerSolicitudes {
+        z-index: 2000;
+      }
+      .fotoPerfilSolicitud {
+        /* background-image: url("https://m.media-amazon.com/images/I/71ZcXHsUk1L.__AC_SX300_SY300_QL70_FMwebp_.jpg"); */
+        /* background-size: 100% 100%; */
+        width: 80%;
+        text-align: center;
+        position: relative;
+        padding-bottom: 80%;
+        border-radius: 50%;
+        overflow: hidden;
+        background-color: #3c8bfb;
+      }
+      .fotoPerfilSolicitud img {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        object-fit: cover;
+      }
+      .controlSolicitud div {
+        width: 50%;
+      }
+      .controlSolicitud div button {
+        width: 100%;
+      }
+
+      #alertPublicacionActiva {
+        color: #737373;
+        transition: color, 0.5s;
+        cursor: pointer;
+      }
+
+      #alertPublicacionActiva:hover,
+      #alertPublicacionActiva:active {
+        color: #939393;
+      }
+
+      @media (max-width: 767px) {
+        .fotoPerfilSolicitud {
+          width: 40%;
+          padding-bottom: 40%;
+        }
+      }
+      @media (min-width: 768px) and (max-width: 1023px) {
+        .fotoPerfilSolicitud {
+          width: 100%;
+          padding-bottom: 100%;
+        }
+      }
+    </style>
+    <script></script>
+  </head>
+  <body>
+    <%- include ("../partials/header") %>
+    <div class="position-relative w-90 mx-auto" style="height: 100vh">
+      <table
+        class="table table-borderless table-striped table-hover align-middle classTablaTemplate d-none"
+      >
+        <thead>
+          <tr class="d-flex">
+            <!-- <th scope="col" class="text-break col-3">Usuario que Reporta</th> -->
+            <th scope="col" class="text-break col-1"></th>
+            <th scope="col" class="text-break col-9">Motivo</th>
+            <th scope="col" class="text-break col-1"></th>
+            <!-- <th scope="col">Peso</th>
+            <th scope="col"># Reportes</th> -->
+          </tr>
+        </thead>
+        <tbody class="table-group-divider">
+          <tr class="d-flex d-none rowTablaClass">
+            <!-- <td class="text-break col-3">Gabriel Esqueda Guzmán</td> -->
+            <td class="col-1 position-relative">
+              <div
+                class="form-check position-absolute top-50 start-50 translate-middle p-0"
+              >
+                <input
+                  class="form-check-input mx-auto checkItemSelect"
+                  type="checkbox"
+                  value=""
+                  id="flexCheckDefault"
+                />
+              </div>
+            </td>
+            <td
+              class="text-break col-10 razon"
+              style="text-justify: inter-word; text-align: justify"
+            ></td>
+            <td scope="row" class="col-1 position-relative px-1">
+              <button
+                class="btn btn-outline-info px-2 position-absolute top-50 start-50 translate-middle py-1 buttonMasInfo"
+                data-bs-toggle="modal"
+                data-bs-target="#modalInfoPesoUsuario"
+              >
+                <i class="fa-solid fa-ellipsis-vertical"></i>
+              </button>
+            </td>
+            <!-- <td class="text-break">123456</td>
+                        <td class="text-break">123456</td> -->
+            <!-- <td class="text-break mx-auto align-center"></td> -->
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="container mt-2 position-relative">
+        <div
+          class="position-absolute top-0 end-0 me-2 mt-0 fs-1 d-none"
+          id="alertPublicacionActiva"
+          data-bs-toggle="modal"
+          data-bs-target="#modalActivarEliminarP"
+        >
+          <i class="fa-solid fa-circle-exclamation"></i>
+        </div>
+        <br />
+        <div>
+          <h2 class="text-center text-break">Reportes de la publicación:</h2>
+          <h5 class="text-center text-break">" <%=Publicacion.Titulo%> "</h5>
+        </div>
+        <h4>Filtrar reportes:</h4>
+        <div class="d-flex">
+          <div class="col">
+            <div class="row row justify-content-center">
+              <div class="row mb-3">
+                <div class="input-group mb-2">
+                  <select
+                    name=""
+                    id="selectorOpcionesReportes"
+                    class="form-select"
+                  >
+                    <option value="0" selected>Cualquiera</option>
+                    <option value="1">Spam</option>
+                    <option value="2">Incitar Odio</option>
+                    <option value="3">Maltrato animal</option>
+                    <option value="4">Información erronea</option>
+                    <option value="5">Promocionar ventas</option>
+                    <option value="6">Otro</option>
+                  </select>
+                  <button
+                    class="btn btn-outline-info"
+                    type="button"
+                    id="obtenerReportes"
+                  >
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="row w-100 mb-3">
+                <div class="col me-3 d-none d-sm-block">
+                  <div class="row mb-2">
+                    <button class="btn btn-success botonValidarSeleccionados">
+                      Validar seleccionados
+                    </button>
+                  </div>
+                  <div class="row">
+                    <button class="btn btn-success botonValidarTodos">
+                      Validar todos
+                    </button>
+                  </div>
+                </div>
+                <div class="col d-none d-sm-block">
+                  <div class="row mb-2">
+                    <button class="btn btn-danger botonInvalidarSeleccionados">
+                      Invalidar seleccionados
+                    </button>
+                  </div>
+                  <div class="row">
+                    <button class="btn btn-danger botonInvalidarTodos">
+                      Invalidar todos
+                    </button>
+                  </div>
+                </div>
+                <div class="col d-flex d-sm-none">
+                  <button
+                    type="button"
+                    class="ms-auto btn btn-info py-0"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalOpcionesControl"
+                  >
+                    <i class="fa-solid fa-ellipsis"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <a href="/petco/publicacion/adopciones/<%=Publicacion.ID%>"
+                >Ver publicacion</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Modal para activar y eliminar la publicacion -->
+      <div
+        class="modal fade"
+        id="modalActivarEliminarP"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
+        tabindex="-1"
+        aria-labelledby="staticBackdropLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="staticBackdropLabel">
+                Publicacion desactivada
+              </h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <div class="col mx-auto">
+                <div class="row">
+                  <h1 class="text-center">Atención</h1>
+                  <p class="fs-5 text-center">
+                    La publicación actual esta desactivada debido a la cantidad
+                    de reportes que ha recibido.
+                  </p>
+                  <p class="fs-5 text-center">
+                    Te pedimos que revises minuciosamente los reportes así como
+                    la publicación. ¡Gracias!.
+                  </p>
+                </div>
+                <div class="row mb-2 mx-auto text-break" style="width: 80%">
+                  <button
+                    class="btn btn-success"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalActivarPublicacion"
+                  >
+                    Acivar publicacion
+                  </button>
+                </div>
+                <div class="row mx-auto text-break" style="width: 80%">
+                  <button
+                    class="btn btn-danger"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalEliminarPublicacion"
+                  >
+                    Eliminar publicación
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Modal para eliminar publicacion -->
+      <div
+        class="modal fade"
+        id="modalEliminarPublicacion"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">
+                Eliminar publicacion
+              </h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <div class="col mx-auto">
+                <div class="row">
+                  <h1 class="text-center">¿Estas seguro?</h1>
+                  <p class="fs-5 text-center">
+                    Al eliminar la publicacion se eliminará todo lo relacionado
+                    a ella. Esto incluye los procesos activos, archivos de los
+                    procesos activos, mascotas, comentarios, reportes y metas
+                  </p>
+                </div>
+                <div class="row mb-2 mx-auto text-break" style="width: 50%">
+                  <button class="btn btn-danger" id="botonEliminarPublicacion">
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Modal para activar publicacion -->
+      <div
+        class="modal fade"
+        id="modalActivarPublicacion"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">
+                Activar publicación
+              </h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <div class="col mx-auto">
+                <div class="row">
+                  <h1 class="text-center">¿Estas seguro?</h1>
+                  <p class="fs-5 text-center">
+                    Al activar la publicación se volverá visible a los usuarios
+                  </p>
+                </div>
+                <div class="row mb-2 mx-auto text-break" style="width: 50%">
+                  <button class="btn btn-success" id="botonActivarPublicacion">
+                    Activar
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Modal para las opciones de los reportes -->
+      <div
+        class="modal fade"
+        id="modalInfoPesoUsuario"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">
+                Información reporte
+              </h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <h3>Usuario que reporta</h3>
+              <p class="usuarioReporta"></p>
+              <div class="d-none selectorPeso">
+                <h3>Asignar peso</h3>
+                <select name="" id="selectorPesoOtro" class="form-select">
+                  <option value="0" selected>Sin asignar</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Modal para las opciones de control de moderador -->
+      <div
+        class="modal fade"
+        id="modalOpcionesControl"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
+        tabindex="-1"
+        aria-labelledby="staticBackdropLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="staticBackdropLabel">
+                Opciones
+              </h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <div class="col w-75 mx-auto">
+                <div class="row mb-2">
+                  <button class="btn btn-success botonValidarSeleccionados">
+                    Validar seleccionados
+                  </button>
+                </div>
+                <div class="row">
+                  <button class="btn btn-success botonValidarTodos">
+                    Validar todos
+                  </button>
+                </div>
+              </div>
+              <div class="col w-75 mx-auto mt-3">
+                <div class="row mb-2">
+                  <button class="btn btn-danger botonInvalidarSeleccionados">
+                    Invalidar seleccionados
+                  </button>
+                </div>
+                <div class="row">
+                  <button class="btn btn-danger botonInvalidarTodos">
+                    Invalidar todos
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="table-responsive px-1">
+        <table
+          class="table table-borderless table-striped table-hover align-middle classTablaTemplate"
+        >
+          <thead>
+            <tr class="d-flex">
+              <!-- <th scope="col" class="text-break col-3">Usuario que Reporta</th> -->
+              <th scope="col" class="text-break col-1"></th>
+              <th scope="col" class="text-break col-9">Motivo</th>
+              <th scope="col" class="text-break col-1"></th>
+              <!-- <th scope="col">Peso</th>
+              <th scope="col"># Reportes</th> -->
+            </tr>
+          </thead>
+          <tbody class="table-group-divider" id="cuerpoTabla"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      const botonValidarSeleccionados = document.querySelectorAll(".botonValidarSeleccionados");
+      const botonValidarTodos = document.querySelectorAll(".botonValidarTodos")
+      const botonInvalidarSeleccionados = document.querySelectorAll(".botonInvalidarSeleccionados")
+      const botonInvalidarTodos = document.querySelectorAll(".botonInvalidarTodos");
+      const alertPublicacionActiva = document.querySelector("#alertPublicacionActiva");
+      const botonActivarPublicacion = document.querySelector("#botonActivarPublicacion");
+      const botonEliminarPublicacion = document.querySelector("#botonEliminarPublicacion");
+
+
+      let opcionesMap = new Map();
+      opcionesMap.set("Spam","");
+      opcionesMap.set("Odio","");
+      opcionesMap.set("Maltrato animal","");
+      opcionesMap.set("Información errónea","");
+      opcionesMap.set("Promocionar ventas","");
+      let reportesCargados = [];
+      let reporteActual;
+      const buttonBuscarReportes = document.querySelector("#obtenerReportes");
+      const selectorOpciones = document.querySelector(
+        "#selectorOpcionesReportes"
+      );
+      const publicacion = <%=Publicacion.ID%>;
+      const publicacionActiva = <%=Publicacion.Activo%>;
+      if(publicacionActiva==0){
+        alertPublicacionActiva.classList.remove("d-none");
+      }
+      const templateRow = document.querySelector("classTablaTemplate");
+      const cuerpoTabla = document.querySelector("#cuerpoTabla");
+      botonActivarPublicacion.addEventListener("click",(e)=>{
+        fetch("/moderador/activarPublicacion",
+        {method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({idPublicacion:publicacion})}
+        )
+        .then((res)=>res.json())
+        .then((res)=>{
+            if(res=="ok"){
+                Swal.fire("Correcto", "Se ha activado la publicación", "success");
+                alertPublicacionActiva.classList.add("d-none");
+            }else{
+                throw new Error("Algo ha salido mal")
+            }
+        }).catch((err)=>{
+            Swal.fire("Atencion", "Algo ha salido mal,intenta más tarde", "error");
+        })
+      })
+      botonEliminarPublicacion.addEventListener("click",(e)=>{
+        fetch("/moderador/eliminarPublicacion",
+        {method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({idPublicacion:publicacion})}
+        )
+        .then((res)=>res.json())
+        .then((res)=>{
+            if(res=="ok"){
+                Swal.fire("Correcto", "Se ha eliminado la publicación", "success");
+                alertPublicacionActiva.classList.add("d-none");
+            }else{
+                throw new Error("Algo ha salido mal")
+            }
+        }).catch((err)=>{
+            Swal.fire("Atencion", "Algo ha salido mal,intenta más tarde", "error");
+        })
+      })
+      buttonBuscarReportes.addEventListener("click", (e) => {
+        let selectorValue = selectorOpciones.value;
+        console.log(
+          "🚀 ~ file: verPublicacionReportes.ejs ~ line 200 ~ buttonBuscarReportes.addEventListener ~ value",
+          selectorValue
+        );
+        fetch(
+          `/moderador/obtenerReportesPublicacion/${publicacion}/${selectorValue}`
+        ).then((res)=>res.json()).then((res)=>{
+            res.forEach((reporte)=>{
+                if(!opcionesMap.has(reporte.Razon)){
+                    reporte.Peso = 0;
+                }
+            })
+            renderReportes(res)
+        });
+      });
+
+      botonValidarSeleccionados.forEach((boton)=>{
+          boton.addEventListener("click",(e)=>{
+              let checkItemSelectArray = document.querySelectorAll("input:checked");
+              if(checkItemSelectArray.length==0){
+                Swal.fire("Atención", "Seleccione por lo menos un reporte", "warning");
+                return;
+              }
+              let reportes = {
+                arrayReportes:[],
+                arrayReportesOtro:[]
+              }
+              let idArray = [];
+
+              let isError = false;
+              document.querySelectorAll(".table-warning").forEach((element)=>{
+                element.classList.remove("table-warning");
+              })
+              checkItemSelectArray.forEach((checkItem)=>{
+                const id = checkItem.getAttribute('data-bs-indexArray')
+                idArray.push(id);
+                const reporteSelected = reportesCargados.find(x => Number(x.ID) == Number(id.trim()));;
+                let reporteRow = document.querySelector(`#reporte-${reporteSelected.ID}`);
+                reporteRow.classList.remove("table-warning");
+
+                if(reporteSelected.Peso==undefined){
+                   reportes.arrayReportes.push(reporteSelected);
+                }else{
+                    if(reporteSelected.Peso==0){
+                        isError=true;
+                        reporteRow.classList.add("table-warning");
+                    }else{
+                        reportes.arrayReportesOtro.push(reporteSelected);
+
+                    }
+                }
+
+            })
+            if(isError){
+                Swal.fire("Atención", "Por favor asigne un peso a todos los reportes clasificados como 'otro'", "warning");
+                return;
+            }
+            sendReportesValidar(reportes,idArray);
+            //   console.log("🚀 ~ file: verPublicacionReportes.ejs ~ line 421 ~ boton.addEventListener ~ arrayReportes", arrayReportes)
+            //   console.log("🚀 ~ file: verPublicacionReportes.ejs ~ line 423 ~ boton.addEventListener ~ arrayReportesOtro", arrayReportesOtro)
+
+          })
+      })
+
+      botonValidarTodos.forEach((boton)=>{
+          boton.addEventListener("click",(e)=>{
+            if(reportesCargados.length==0){
+                Swal.fire("Atención", "Cargue reportes porfavor", "warning");
+                return;
+              }
+
+              let reportes = {
+                arrayReportes:[],
+                arrayReportesOtro:[]
+              }
+              let isError = false;
+              let idArray = "todos";
+              document.querySelectorAll(".table-warning").forEach((element)=>{
+                element.classList.remove("table-warning");
+              })
+              reportesCargados.forEach((reporte)=>{
+                let reporteRow = document.querySelector(`#reporte-${reporte.ID}`);
+                if(reporte.Peso==undefined){
+                    reportes.arrayReportes.push(reporte);
+                }else{
+                    if(reporte.Peso==0){
+                        isError=true;
+                        reporteRow.classList.add("table-warning");
+                    }else{
+                        reportes.arrayReportesOtro.push(reporte);
+
+                    }
+                }
+              })
+            if(isError){
+                Swal.fire("Atención", "Por favor asigne un peso a todos los reportes clasificados como 'otro'", "warning");
+                return;
+            }
+            // console.log("🚀 ~ file: verPublicacionReportes.ejs ~ line 421 ~ boton.addEventListener ~ arrayReportes", arrayReportes)
+            //   console.log("🚀 ~ file: verPublicacionReportes.ejs ~ line 423 ~ boton.addEventListener ~ arrayReportesOtro", arrayReportesOtro)
+            sendReportesValidar(reportes,idArray);
+
+          })
+      })
+
+      botonInvalidarSeleccionados.forEach((boton)=>{
+        boton.addEventListener("click",()=>{
+            let checkItemSelectArray = document.querySelectorAll("input:checked");
+            if(checkItemSelectArray.length==0){
+              Swal.fire("Atención", "Seleccione por lo menos un reporte", "warning");
+              return;
+            }
+            let reportes = {
+                arrayReportes:[],
+                arrayReportesOtro:[]
+              }
+            let idArray = [];
+
+            document.querySelectorAll(".table-warning").forEach((element)=>{
+                element.classList.remove("table-warning");
+            })
+            checkItemSelectArray.forEach((checkItem)=>{
+              const id = checkItem.getAttribute('data-bs-indexArray')
+              idArray.push(id);
+              const reporteSelected = reportesCargados.find(x => Number(x.ID) == Number(id.trim()));
+              let reporteRow = document.querySelector(`#reporte-${reporteSelected.ID}`);
+              reporteRow.classList.remove("table-warning");
+              if(reporteSelected.Peso==undefined){
+                  reportes.arrayReportes.push(reporteSelected);
+                }else{
+                    reportes.arrayReportesOtro.push(reporteSelected);
+                }
+            })
+            // console.log("🚀 ~ file: verPublicacionReportes.ejs ~ line 504 ~ boton.addEventListener ~ arrayReportes", arrayReportes)
+            // console.log("🚀 ~ file: verPublicacionReportes.ejs ~ line 506 ~ boton.addEventListener ~ arrayReportesOtro", arrayReportesOtro)
+            sendReportesInvalidar(reportes,idArray);
+        })
+      })
+
+      botonInvalidarTodos.forEach((boton)=>{
+        boton.addEventListener("click",()=>{
+            if(reportesCargados.length==0){
+                Swal.fire("Atención", "Cargue reportes porfavor", "warning");
+                return;
+              }
+
+              let reportes = {
+                arrayReportes:[],
+                arrayReportesOtro:[]
+              }
+              let idArray = "todos";
+
+
+              let arrayIdReportesCargados = [];
+              let isError = false;
+              document.querySelectorAll(".table-warning").forEach((element)=>{
+                element.classList.remove("table-warning");
+              })
+              reportesCargados.forEach((reporte)=>{
+                let reporteRow = document.querySelector(`#reporte-${reporte.ID}`);
+                if(reporte.Peso==undefined){
+                    reportes.arrayReportes.push(reporte);
+                }else{
+                    reportes.arrayReportesOtro.push(reporte);
+                }
+              })
+
+            //   console.log("🚀 ~ file: verPublicacionReportes.ejs ~ line 421 ~ boton.addEventListener ~ arrayReportes", arrayReportes)
+            //   console.log("🚀 ~ file: verPublicacionReportes.ejs ~ line 423 ~ boton.addEventListener ~ arrayReportesOtro", arrayReportesOtro)
+              sendReportesInvalidar(reportes,idArray)
+        })
+      })
+
+      function sendReportesValidar(reportes,idArray){
+        console.log("🚀 ~ file: verPublicacionReportes.ejs ~ line 572 ~ sendReportesValidar ~ JSON.stringify(reportes)", JSON.stringify(reportes))
+        fetch("/moderador/validarReportesPublicacion",{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({reportes,publicacion})
+        })
+        .then((res)=>res.json())
+        .then((res)=>{
+            if(res=="ok"){
+                if(idArray!="todos"){
+
+                    idArray.forEach((id)=>{
+                        id = reportesCargados.findIndex(x => Number(x.ID) == Number(id.trim()));
+                        reportesCargados.splice(id,1);
+                    })
+                    console.log("🚀 ~ file: verPublicacionReportes.ejs ~ line 593 ~ idArray.forEach ~ reportesCargados", reportesCargados)
+                }else{
+                    reportesCargados = []
+                }
+                reportes.arrayReportesOtro.forEach((reporte)=>{
+                    let id = `reporte-${reporte.ID}`;
+                    document.querySelector(`#${id}`).remove();
+
+                })
+                reportes.arrayReportes.forEach((reporte)=>{
+                    let id = `reporte-${reporte.ID}`;
+                    document.querySelector(`#${id}`).remove();
+                })
+                Swal.fire("Correcto", "Reportes invalidados correctamente", "success");
+            }else{
+                Swal.fire("Error", "Algo ha salido mal, intenta más tarde", "error");
+                throw new Error("Algo ha salido mal");
+
+            }
+        }).catch((err)=>{
+            console.log(err);
+            Swal.fire("Error", "Algo ha salido mal, intenta más tarde", "error");
+        })
+      }
+
+
+
+      function sendReportesInvalidar(reportes,idArray){
+        fetch("/moderador/invalidarReportesPublicacion",{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({reportes,publicacion})
+        })
+        .then((res)=>res.json())
+        .then((res)=>{
+            if(res=="ok"){
+                if(idArray!="todos"){
+
+                    console.log("🚀 ~ file: verPublicacionReportes.ejs ~ line 632 ~ idArray.forEach ~ reportesCargados", reportesCargados)
+                    idArray.forEach((id)=>{
+                        id = reportesCargados.findIndex(x => Number(x.ID) == Number(id.trim()));
+                        reportesCargados.splice(id,1);
+                    })
+                    console.log("🚀 ~ file: verPublicacionReportes.ejs ~ line 633 ~ idArray.forEach ~ reportesCargados", reportesCargados)
+                }else{
+                    reportesCargados = []
+                }
+                reportes.arrayReportesOtro.forEach((reporte)=>{
+                    let id = `reporte-${reporte.ID}`;
+                    document.querySelector(`#${id}`).remove();
+                })
+                reportes.arrayReportes.forEach((reporte)=>{
+                    let id = `reporte-${reporte.ID}`;
+                    document.querySelector(`#${id}`).remove();
+                })
+
+                Swal.fire("Correcto", "Reportes invalidados correctamente", "success");
+            }else{
+                throw new Error("Algo ha salido mal");
+            }
+        }).catch((err)=>{
+            console.log(err);
+            Swal.fire("Error", "Algo ha salido mal, intenta más tarde", "error");
+
+        })
+
+      }
+
+      function renderReportes(reportes){
+        $(cuerpoTabla).empty();
+        if(reportes.length==0){
+            Swal.fire("Atención", "No hay reportes de este tipo", "warning");
+        }else{
+            reportesCargados = reportes;
+            for (let index = 0; index < reportes.length; index++) {
+                let newRow = document.querySelector(".rowTablaClass").cloneNode(true);
+                newRow.classList.remove("d-none");
+                const element = reportes[index];
+                newRow.id=`reporte-${element.ID}`;
+                newRow.querySelector(".razon").textContent = element.Razon;
+                newRow.querySelector(".buttonMasInfo").setAttribute("data-bs-indexArray",element.ID)
+                newRow.querySelector(".checkItemSelect").setAttribute("data-bs-indexArray",element.ID)
+                cuerpoTabla.appendChild(newRow)
+            }
+        }
+
+      }
+      const modalInfoPesoUsuario = document.getElementById('modalInfoPesoUsuario');
+      const modalSelectorPeso = modalInfoPesoUsuario.querySelector('#selectorPesoOtro');
+      modalSelectorPeso.addEventListener("change",(e)=>{
+          reporteActual.Peso = modalSelectorPeso.value;
+          console.log("🚀 ~ file: verPublicacionReportes.ejs ~ line 418 ~ modalSelectorPeso.addEventListener ~ reportesCargados", reportesCargados)
+      })
+      modalInfoPesoUsuario.addEventListener("hidden.bs.modal",()=>{
+          modalSelectorPeso.value = 0;
+
+      })
+      modalInfoPesoUsuario.addEventListener('show.bs.modal', event => {
+        // Button that triggered the modal
+        const button = event.relatedTarget
+        // Extract info from data-bs-* attributes
+        const id = button.getAttribute('data-bs-indexArray')
+        // If necessary, you could initiate an AJAX request here
+        // and then do the updating in a callback.
+        //
+        // Update the modal's content.
+        let x = "";
+
+        const modalUsuarioReporta = modalInfoPesoUsuario.querySelector('.usuarioReporta')
+        reporteActual = reportesCargados.find(x => Number(x.ID) == Number(id.trim()));
+        modalUsuarioReporta.textContent = reporteActual.ReporteUsuarioReporta.UsuarioRegistro.Nombre;
+
+            if(reporteActual.Peso==undefined){
+                modalSelectorPeso.parentElement.classList.add("d-none");
+            }else{
+                modalSelectorPeso.value = reporteActual.Peso;
+                modalSelectorPeso.parentElement.classList.remove("d-none");
+            }
+
+      })
+    </script>
+    <script type="module" src="/javascripts/feed.js"></script>
+  </body>
+</html>

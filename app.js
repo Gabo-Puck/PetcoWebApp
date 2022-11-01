@@ -42,7 +42,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // app.use("/inicio", indexRouter);
 app.use("/petco", isLogged, authRequired);
 app.use("/registro", registroRouter);
-app.use("/moderador", isLogged, authRequiredModerador);
+app.use("/moderador", authRequiredModerador);
 //app.use("/formulario", formulariosRouter);
 app.use("/login", loginRouter);
 // app.use("/protocolo", ProtocoloRouter);

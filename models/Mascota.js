@@ -120,7 +120,7 @@ class Mascota extends BaseModel {
       },
       MascotasProceso: {
         modelClass: Pasos_Mascota,
-        realtion: Model.HasManyRelation,
+        relation: Model.HasManyRelation,
         join: {
           from: "mascota.ID",
           to: "paso_mascota.ID_Mascota",

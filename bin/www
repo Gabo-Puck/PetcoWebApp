@@ -158,7 +158,7 @@ io.on("connection", (socket) => {
           .findOne({ "paso_mascota.ID": idPasoMascota })
           .then((PasoActual) => {
             console.log(PasoActual);
-            if (PasoActual.Mascota.Estado != 3) {
+            if (PasoActual.Mascota.ID_Estado != 3) {
               io.to(socket.userID).emit(
                 "error-paso-completado-lista-registro",
                 {

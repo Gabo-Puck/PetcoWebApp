@@ -173,7 +173,7 @@ function handleResponse(res) {
           confirmButtonText: "Siguiente",
         }).then((sweetResult) => {
           if (sweetResult.isConfirmed) {
-            window.location = "petco/dashboard";
+            window.location = "/petco/dashboard";
           }
         });
       }
