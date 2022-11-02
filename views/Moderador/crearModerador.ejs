@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LogIn</title>
+    <link rel="stylesheet" , href="/stylesheets/style.css" />
+  </head>
+
+  <style>
+    body {
+      background-image: url("https://img.freepik.com/p-seamless-pattern-with-pets-medicines-food-cat-collar-dog-with-bandaged-paw_192280-216.jpg");
+    }
+    .loginCard {
+      width: 30%;
+    }
+    .containerLogin {
+      height: 45%;
+    }
+    @media (min-width: 320px) and (max-width: 800px) {
+      .loginCard {
+        width: 85%;
+      }
+      .containerLogin {
+        height: 50%;
+      }
+    }
+  </style>
+
+  <body>
+    <div class="container h-100">
+      <div class="row align-items-center h-100">
+        <div class="col-4 w-100 containerLogin">
+          <div
+            class="card h-100 border-primary justify-content-center loginCard mx-auto position-relative"
+            style="text-align: center"
+          >
+            <div class="card-header">Iniciar Sesión Moderador</div>
+
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+            <div class="card-body">
+              <form
+                action="/login/CheckLogin"
+                class="d-flex flex-column justify-content-between h-100"
+                method="post"
+              >
+                <div>
+                  <div class="form-group mb-3">
+                    <input
+                      type="text"
+                      name="Correo"
+                      placeholder="Correo"
+                      class="form-control"
+                      required
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <input
+                      type="password"
+                      name="Password"
+                      placeholder="Contraseña"
+                      class="form-control"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Acceder</button>
+                <div class="d-flex flex-column">
+                  <a href="/login/recuperarContrasena">Recuperar contraseña</a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <% if (typeof alert !="undefined" ) { %>
+    <script>
+             Swal.fire({
+                 title: '<%= alertTitle %>',
+                 text: '<%= alertMessage %>',
+                 icon: '<%= alertIcon %>',
+                 showConfirmButton: <%= showCofirmButton %>,
+                 timer: <%= timer %>
+      }).then(() => {
+                     window.location = '/<%=ruta %>'
+                 })
+    </script>
+    <% } %>
+  </body>
+</html>

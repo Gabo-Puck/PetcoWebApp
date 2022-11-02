@@ -1,6 +1,7 @@
 import { retrieveParent } from "/javascripts/FormulariosFunctions.js";
+let aviso = document.querySelector(".avisoListaRegistros").cloneNode(true);
 
-const offCanvasMenuMascotas = document.querySelector(".offcanvas-body");
+const offCanvasMenuMascotas = document.querySelector("#offcanvasBodyMascotas");
 const loadingSpinnerSolicitudes = document.querySelector(
   ".loadingSpinnerSolicitudes"
 );
@@ -102,6 +103,16 @@ function rechazarSolicitud(idSolicitud, idMascota) {
 
 function renderSolicitudes(solicitudes) {
   $(cardContainer).empty();
+  if (solicitudes.length == 0) {
+    let avisoCardContainer = aviso.cloneNode(true);
+    avisoCardContainer.classList.remove("d-none");
+    cardContainer.appendChild(avisoCardContainer);
+    return;
+  } else {
+    let avisoCardContainer = aviso.cloneNode(true);
+    avisoCardContainer.classList.add("d-none");
+    cardContainer.appendChild(avisoCardContainer);
+  }
   solicitudes.forEach((solicitudFetch) => {
     const solicitud = cartaSolicitudTemplate.cloneNode(true);
     solicitud.querySelector(".nombreUsuario").textContent =
@@ -173,6 +184,8 @@ function updateSolicitudes(buttonTriggered) {
   parentCardTemplate.classList.add("border-warning");
   const aceptarButton = parentCardTemplate.querySelector(".aceptarButton");
   retrieveParent(aceptarButton, "row").remove();
+  const rechazarButton = parentCardTemplate.querySelector(".rechazarButton");
+  retrieveParent(rechazarButton, "row").remove();
   const progresoButton = parentCardTemplate.querySelector(".progresoButton");
   const parentRowProgresoButton = retrieveParent(progresoButton, "row");
   parentRowProgresoButton.classList.remove("d-none");

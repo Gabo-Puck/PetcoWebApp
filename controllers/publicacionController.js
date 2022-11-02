@@ -42,10 +42,26 @@ exports.prueba = (req, res) => {
 var acceptedTypes = ["image/jpeg", "image/png"];
 
 const getMascotaTemplate = (req, res, next) => {
-  res.render("Publicacion/mascotaTemplate", {}, (error, html) => {
-    res.htmlTemplate = html.replace(/\r?\n|\r/g, " ");
-    next();
-  });
+  Usuario.query()
+    .findById(req.session.IdSession)
+    .then((UsuarioFind) => {
+      res.render(
+        "Publicacion/mascotaTemplate",
+        { AceptaDonaciones: UsuarioFind.AceptaDonaciones },
+        (error, html) => {
+          if (error) {
+            next(error);
+          } else {
+            res.htmlTemplate = html.replace(/\r?\n|\r/g, " ");
+            next();
+          }
+        }
+      );
+    })
+    .catch((err) => {
+      console.log(err);
+      next(err);
+    });
 };
 
 const getAllEspecieWithVacuna = (req, res, next) => {
@@ -120,6 +136,7 @@ exports.crearPublicacion = [
         Tamanos: res.Tamanos,
         ProtocolosUsuario: res.ProtocolosUsuario,
       },
+      Tipo: req.session.Tipo,
     }),
 ];
 
@@ -169,8 +186,35 @@ exports.crearPublicacionGuardar = [
     req.body.Reportes_Peso = 0;
     req.body.ID_Usuario = req.session.IdSession;
     let protocolos = [];
+    let dateNow = new Date(Date.now());
+    let date = dateNow.toLocaleDateString("es-MX");
+    let time = dateNow.toLocaleTimeString("es-MX");
+    let date2 = date.split("/");
+    let time2 = time.split(":");
+    var dateFormatted = new Date(
+      date2[2],
+      date2[1] - 1,
+      date2[0],
+      time2[0],
+      time2[1],
+      time2[2]
+    );
+    var dateGeneracion =
+      dateFormatted.getFullYear() +
+      "-" +
+      (dateFormatted.getMonth() + 1) +
+      "-" +
+      dateFormatted.getDate();
+    var timeGeneracion =
+      dateFormatted.getHours() +
+      ":" +
+      dateFormatted.getMinutes() +
+      ":" +
+      dateFormatted.getSeconds();
+    var Fecha_Generacion = dateGeneracion + " " + timeGeneracion;
     for (let index = 0; index < req.body.Mascota.length; index++) {
       const mascota = req.body.Mascota[index];
+      req.body.Mascota[index].Fecha_Ultima_Solicitud = Fecha_Generacion;
       if (mascota.MascotasMetas.length == 0) {
         delete mascota.MascotasMetas;
       }
@@ -213,11 +257,12 @@ exports.crearPublicacionGuardar = [
       .then((promises) => Promise.all(promises))
       .then(() => uploadFiles(res))
       .then(() => res.json("ok"))
-      .catch((err) =>
+      .catch((err) => {
+        console.log(err);
         res.json({
           globalError: "<p>Algo ha salido mal</p><p>Intentalo más tarde</p>",
-        })
-      );
+        });
+      });
   },
 ];
 
@@ -267,7 +312,7 @@ function createPromisesPasosMascota(ID_Mascota, ID_Protocolo) {
         PasosMascotaInsert.push({
           ID_Mascota: ID_Mascota,
           ID_Paso: element.ID,
-          Completado: 1,
+          Completado: 3,
         });
       } else {
         PasosMascotaInsert.push({

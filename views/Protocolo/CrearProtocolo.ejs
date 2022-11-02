@@ -11,6 +11,11 @@
       const templatehtml = parse.parseFromString(template, "text/html");
       const paso = templatehtml.querySelector(".Paso");
     </script>
+        <script
+        src="https://cdn.socket.io/4.5.0/socket.io.min.js"
+        integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k"
+        crossorigin="anonymous"
+      ></script>
     <script
       src="https://kit.fontawesome.com/f0156fc078.js"
       crossorigin="anonymous"
@@ -36,6 +41,8 @@
   </head>
 
   <body class="main">
+    <%- include ("../partials/header") %>
+
     <style>
       .custom-loader {
         animation: none !important;
@@ -93,6 +100,7 @@
     
   </div>
 
+  <script type="module" src="/javascripts/feed.js"></script>
 
     <script type="module" src="/javascripts/CrearProtocolo.js"></script>
   </body>

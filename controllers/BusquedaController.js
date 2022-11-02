@@ -8,32 +8,30 @@ exports.pagina = (req, res) => {
     let mascotasfiltradas = new Array();
     let contador = 0;
 
-    const indicador = ["=", "=", "=", "=", "=", "<"];
-    var orden;
+  const indicador = ["=", "=", "=", "=", "=", "<"];
+  var orden;
 
-    if (req.params.orden == 0) {
-        orden = "publicacion.ID";
-    }
-    else {
-        orden = "numberOfLikes";
-    }
+  if (req.params.orden == 0) {
+    orden = "publicacion.ID";
+  } else {
+    orden = "numberOfLikes";
+  }
 
+  if (req.params.tamano == 0) {
+    indicador[1] = ">=";
+  }
 
-    if (req.params.tamano == 0) {
-        indicador[1] = ">=";
-    }
+  if (req.params.castrado == 0) {
+    indicador[2] = ">=";
+  }
 
-    if (req.params.castrado == 0) {
-        indicador[2] = ">=";
-    }
+  if (req.params.salud == 0) {
+    indicador[3] = ">=";
+  }
 
-    if (req.params.salud == 0) {
-        indicador[3] = ">=";
-    }
-
-    if (req.params.estado == 0) {
-        indicador[4] = ">=";
-    }
+  if (req.params.estado == 0) {
+    indicador[4] = ">=";
+  }
 
     // Mascota.query()
     //     .withGraphJoined("MascotasPublicacion")
@@ -132,11 +130,9 @@ exports.pagina = (req, res) => {
 };
 
 exports.form = (req, res) => {
+  console.log(req.body);
 
-
-    console.log(req.body);
-
-    res.redirect(`/petco/busqueda/coincidencias/${req.body.BEspecie}/${req.body.BTamano}/${req.body.BCastrado}/${req.body.BSalud}/${req.body.BEstado}/${req.body.Bedad}/${req.body.Borden}`);
-
-
-}
+  res.redirect(
+    `/petco/busqueda/coincidencias/${req.body.BEspecie}/${req.body.BTamano}/${req.body.BCastrado}/${req.body.BSalud}/${req.body.BEstado}/${req.body.Bedad}/${req.body.Borden}`
+  );
+};

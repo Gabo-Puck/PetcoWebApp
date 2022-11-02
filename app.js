@@ -12,6 +12,7 @@ var vacunasRouter = require("./routes/vacunas");
 var publicacionget = require("./routes/PublicacionGetRouter");
 var loginRouter = require("./routes/login");
 var authRequired = require("./routes/authRequired");
+var authRequiredModerador = require("./routes/authRequiredModerador");
 var app = express();
 
 const session = require("express-session");
@@ -41,6 +42,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // app.use("/inicio", indexRouter);
 app.use("/petco", isLogged, authRequired);
 app.use("/registro", registroRouter);
+app.use("/moderador", authRequiredModerador);
 //app.use("/formulario", formulariosRouter);
 app.use("/login", loginRouter);
 // app.use("/protocolo", ProtocoloRouter);

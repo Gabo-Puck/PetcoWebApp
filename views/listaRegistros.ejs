@@ -24,6 +24,8 @@
         --color-hover-tipo-comun: #70cee480;
         --color-border-tipo-organizacion: #965786;
         --color-hover-tipo-organizacion: #96578680;
+        --color-border-tipo-moderador: #FED67E;
+        --color-hover-tipo-moderador: #fbd073;
       }
 
       .modal-body::-webkit-scrollbar{
@@ -70,8 +72,7 @@
         border-radius: 0.5em;
         border-left: 1vw solid var(--color-border-tipo-comun);
         background-color: white;
-        transition: background-color 1s;
-
+        transition: background-color 0.7s;
       }
 
       .cartaTipoOrganizacion {
@@ -81,11 +82,21 @@
         background-color: white;
         transition: background-color 0.7s;
       }
+      .cartaTipoModerador {
+        border: 1px solid var(--color-border-tipo-moderador);
+        border-radius: 0.5em;
+        border-left: 1vw solid var(--color-border-tipo-moderador);
+        background-color: white;
+        transition: background-color 0.7s;
+      }
       .cartaTipoComun:hover{
         background-color: var(--color-hover-tipo-comun);
       }
       .cartaTipoOrganizacion:hover{
         background-color: var(--color-hover-tipo-organizacion);
+      }
+      .cartaTipoModerador:hover{
+        background-color: var(--color-hover-tipo-moderador);
       }
       .TipoRegistro {
         color: gray;
@@ -96,7 +107,10 @@
       }
       .headerOrganizacion{
         background-color: var(--color-hover-tipo-organizacion);
+      }
 
+      .headerModerador{
+        background-color: var(--color-hover-tipo-moderador);
       }
       .listElementRegistro:hover,.imgRegistroPendiente:hover{
         cursor: pointer;
@@ -128,6 +142,10 @@
                   <%tipoClase = "cartaTipoComun"%>
                   <%tipoTexto = "Común"%>
               <%}%>
+              <%if(registros[i].Tipo_Usuario==3){%>
+                <%tipoClase = "cartaTipoModerador"%>
+                <%tipoTexto = "Moderador"%>
+            <%}%>
               <li class="listElementRegistro <%=tipoClase%> rounded-end position-relative mb-4" data-bs-toggle="modal" data-bs-target="#modalRegistroView" data-bs-whatever="r-<%=registros[i].ID%>" id="r-<%=registros[i].ID%>">
                   <div class="row ps-1">
                   <div class="row pt-2">

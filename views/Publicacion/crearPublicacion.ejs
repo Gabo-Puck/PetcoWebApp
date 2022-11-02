@@ -8,6 +8,11 @@
       src="https://kit.fontawesome.com/f0156fc078.js"
       crossorigin="anonymous"
     ></script>
+    <script
+      src="https://cdn.socket.io/4.5.0/socket.io.min.js"
+      integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k"
+      crossorigin="anonymous"
+    ></script>
     <link
       rel="stylesheet"
       href="/stylesheets/bootstrap-5.2.0-dist/themes/Lumen/bootstrap.css"
@@ -90,6 +95,8 @@
     </style>
   </head>
   <body style="background-color: #aaa">
+    <%- include ("../partials/header") %>
+
     <div
       class="swiper mySwiper swiper-h card my-3 align-items-center border border-0 mascotasScreen"
     >
@@ -136,5 +143,7 @@
     </button>
     <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
   </body>
+  <script type="module" src="/javascripts/feed.js"></script>
+
   <script src="/javascripts/crearPublicaciones.js" type="module"></script>
 </html>

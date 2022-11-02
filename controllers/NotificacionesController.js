@@ -47,6 +47,9 @@ exports.sendNotificacion = (Descripcion, Origen, ID_Usuario, io) => {
         console.log(ID_Usuario);
         io.to(Number(ID_Usuario)).emit("notificacion-nueva", notificacion);
         resolve();
+      })
+      .catch((err) => {
+        console.log(err);
       });
   });
 };
@@ -76,4 +79,33 @@ exports.patchLeidoNotificaciones = (req, res, next) => {
       console.log(err);
       next(err);
     });
+};
+exports.getTodayDateFormated = () => {
+  let dateNow = new Date(Date.now());
+  let date = dateNow.toLocaleDateString("es-MX");
+  let time = dateNow.toLocaleTimeString("es-MX");
+  let date2 = date.split("/");
+  let time2 = time.split(":");
+  let dateFormatted = new Date(
+    date2[2],
+    date2[1] - 1,
+    date2[0],
+    time2[0],
+    time2[1],
+    time2[2]
+  );
+  let dateGeneracion =
+    dateFormatted.getFullYear() +
+    "-" +
+    (dateFormatted.getMonth() + 1) +
+    "-" +
+    dateFormatted.getDate();
+  let timeGeneracion =
+    dateFormatted.getHours() +
+    ":" +
+    dateFormatted.getMinutes() +
+    ":" +
+    dateFormatted.getSeconds();
+  let Fecha_Generacion = dateGeneracion + " " + timeGeneracion;
+  return Fecha_Generacion;
 };

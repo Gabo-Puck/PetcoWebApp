@@ -13,6 +13,7 @@ class Pasos_Mascota extends Model {
 
   static get relationMappings() {
     const Paso = require("./Paso");
+    const Mascota = require("./Mascota");
     return {
       Paso: {
         relation: Model.HasOneRelation,
@@ -20,6 +21,14 @@ class Pasos_Mascota extends Model {
         join: {
           from: "paso_mascota.ID_Paso",
           to: "paso.ID",
+        },
+      },
+      Mascota: {
+        relation: Model.HasOneRelation,
+        modelClass: Mascota,
+        join: {
+          from: "paso_mascota.ID_Mascota",
+          to: "mascota.ID",
         },
       },
     };

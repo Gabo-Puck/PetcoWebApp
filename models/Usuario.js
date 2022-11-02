@@ -21,6 +21,8 @@ class Usuario extends BaseModel {
     const Protocolo = require("./Protocolo");
     const Registro = require("./Registro");
     const Notificaciones = require("./Notificaciones");
+    const Reportes_Publicacion = require("./Reporte_Publicacion");
+    const Publicacion = require("./Publicacion");
 
     return {
       Especies: {
@@ -73,6 +75,30 @@ class Usuario extends BaseModel {
         join: {
           from: "usuario.ID",
           to: "notificaciones.ID_Usuario",
+        },
+      },
+      ReportesEnviados: {
+        relation: Model.HasManyRelation,
+        modelClass: Reportes_Publicacion,
+        join: {
+          from: "usuario.ID",
+          to: "reporte_publicacion.ID_Usuario_Reporta",
+        },
+      },
+      ReportesRecibidos: {
+        relation: Model.HasManyRelation,
+        modelClass: Reportes_Publicacion,
+        join: {
+          from: "usuario.ID",
+          to: "reporte_publicacion.ID_Usuario_Reportado",
+        },
+      },
+      Publicaciones: {
+        relation: Model.HasManyRelation,
+        modelClass: Publicacion,
+        join: {
+          from: "usuario.ID",
+          to: "publicacion.ID_Usuario",
         },
       },
     };

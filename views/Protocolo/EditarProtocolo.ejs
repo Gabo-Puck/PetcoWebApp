@@ -17,6 +17,13 @@
       src="https://kit.fontawesome.com/f0156fc078.js"
       crossorigin="anonymous"
     ></script>
+    <script
+    src="https://cdn.socket.io/4.5.0/socket.io.min.js"
+    integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k"
+    crossorigin="anonymous"
+  ></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
     <link
       rel="stylesheet"
       href="/stylesheets/bootstrap-5.2.0-dist/themes/Lumen/bootstrap.css"
@@ -38,6 +45,8 @@
   </head>
 
   <body class="main">
+    <%- include ("../partials/header") %>
+
     <style>
       .custom-loader {
         animation: none !important;
@@ -111,6 +120,7 @@
 
 
   </div>
+  <script type="module" src="/javascripts/feed.js"></script>
   
     <script type="module" src="/javascripts/EditarProtocolo.js"></script>
   </body>

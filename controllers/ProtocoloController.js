@@ -89,6 +89,7 @@ exports.list = [
       formularios: res.formularios,
       Response: req.htmlTemplate,
       pasos: res.pasos,
+      Tipo: req.session.Tipo,
     });
   },
 ];
@@ -360,8 +361,8 @@ exports.ProtocoloCrear = [
   check("Pasos.*.DiasEstimados")
     .isLength({ min: 1 })
     .withMessage("Los días estimados deben de tener por lo menos 1 numero")
-    .isInt()
-    .withMessage("Los días estimados deben ser números"),
+    .isInt({ min: 1, max: 10 })
+    .withMessage("Los días estimados deben ser un numero entre 1 y 10"),
   check("Titulo")
     .isLength({ min: 10 })
     .withMessage("El titulo debe de tener por lo menos 10 caracteres"),
@@ -401,6 +402,7 @@ exports.ProtocoloEditarGet = [
           protocolo: protocolo,
           pasos: res.pasos,
           Response: req.htmlTemplate,
+          Tipo: req.session.Tipo,
         })
       );
     // res.render("Protocolo/EditarProtocolo");

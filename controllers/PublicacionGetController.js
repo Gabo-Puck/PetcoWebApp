@@ -14,6 +14,7 @@ const Like = require("../models/Like");
 const Publicacion_Guardada = require("../models/Publicacion_Guardada");
 const Reporte_Publicacion = require("../models/Reporte_Publicacion");
 const { sendNotificacion } = require("./NotificacionesController");
+const { forEach } = require("lodash");
 
 paypal.configure({
   mode: "sandbox", //sandbox or live
@@ -218,7 +219,6 @@ exports.psaveds = (req, res) => {
   }
 };
 
-
 exports.reportarUsuario = (req, res) => {
   console.log(req.params);
   Reporte_Publicacion.query()
@@ -226,25 +226,29 @@ exports.reportarUsuario = (req, res) => {
       razon: req.params.motivo,
       ID_Usuario_Reporta: req.session.IdSession,
       ID_Usuario_Reportado: req.params.usuarioreportado,
-      ID_Publicacion: null
-
+      ID_Publicacion: null,
     })
-    .then((resp) => { })
+    .then((resp) => {});
 
-    Usuario.query()
+  Usuario.query()
     .findOne({ ID: req.params.usuarioreportado })
     .then((UsuarioFind) => {
-    
-      if (UsuarioFind.Reputacion >= -100 || UsuarioFind.Reputacion <=100)
-      UsuarioFind.$query()
-        .patch({ Reputacion: parseInt(UsuarioFind.Reputacion) - parseInt(req.params.peso) })
-        .then(() => {  });
-
+      if (UsuarioFind.Reputacion >= -100 || UsuarioFind.Reputacion <= 100)
+        UsuarioFind.$query()
+          .patch({
+            Reputacion:
+              parseInt(UsuarioFind.Reputacion) - parseInt(req.params.peso),
+          })
+          .then(() => {
+            let descripcion = `Tu perfil ha recibido un reporte por ${req.params.motivo}`;
+            let origen = `/petco/perfil/usuario/${req.params.usuarioreportado}`;
+            let idUsuario = req.params.usuarioreportado;
+            sendNotificacion(descripcion, origen, idUsuario, req.app.io);
+          });
     });
 
-
   res.json("Se realizo el fetch");
-}
+};
 
 exports.reportar = (req, res) => {
   console.log(req.params);
@@ -256,7 +260,7 @@ exports.reportar = (req, res) => {
       ID_Publicacion: req.params.publicacion,
     })
     .then((resp) => {
-      let descripcion = `Haz recibido un reporte por: ${req.params.motivo}`;
+      let descripcion = `Haz recibido un reporte en una publicación por: ${req.params.motivo}`;
       let origen = `/petco/publicacion/adopciones/${req.params.publicacion}`;
       let usuarioReportado = req.params.usuarioreportado;
       sendNotificacion(descripcion, origen, usuarioReportado, req.app.io);
@@ -288,7 +292,7 @@ exports.reportar = (req, res) => {
           }
         });
     });
-  }
+};
 //Controlar publicaciones
 var aporte;
 var meta;
@@ -312,7 +316,6 @@ exports.donacionMetas = (req, res) => {
         MascotaRender: MascotaP,
       });
     });
-    
 };
 
 exports.pay = (req, res) => {
@@ -431,14 +434,20 @@ exports.paysuccess = (req, res) => {
           let descripcion = `¡${usuarioFind.UsuarioRegistro.Nombre} ha aportado a una meta!`;
           let origen = "aquí va la url de donde se ven las metas";
           sendNotificacion(descripcion, origen, idOrganizacion, req.app.io);
-          isCompletadoMeta(meta);
+          isCompletadoMeta(meta, req.app.io);
         });
     });
-
-    
 };
+// Publicacion.query().orderBy("peso").then((pub) => {
+//   let res = new Array();
+//   pub.forEach((p) => {
+//     p.$query().withGraphJoined("Mascotas").where("ID_Salud", "=", 1).then((results) => {
+//       res.push(results);
 
-function isCompletadoMeta(idMeta) {
+//     });
+//   })
+// })
+function isCompletadoMeta(idMeta, io) {
   Metas.query()
     .withGraphJoined("[MetasDonaciones,Mascota]")
     .findById(idMeta)
@@ -458,11 +467,11 @@ function isCompletadoMeta(idMeta) {
             let descripcion = `¡Felicidades! la meta de la mascota: "${Meta.Mascota.Nombre} se ha completado"`;
             let origen = "aqui va la url de las metas";
             let usuario = Meta.MetasDonaciones[0].ID_Organizacion;
-            sendNotificacion(descripcion, origen, usuario);
+            sendNotificacion(descripcion, origen, usuario, io);
           });
       }
     });
 }
 exports.paycancel = (req, res) => {
   res.send("Cancelled");
-}
+};
