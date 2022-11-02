@@ -9,11 +9,12 @@
     "AceptaArchivo": 0,
     "PasoProceso": [
       {
-        "ID": 58,
-        "ID_Mascota": 63,
+        "ID": 128,
+        "ID_Mascota": 80,
         "ID_Paso": 1,
         "Completado": 3,
-        "Archivo": null
+        "Archivo": null,
+        "Fecha_Limite": "2022-11-02T04:58:50.000Z"
       }
     ]
   },
@@ -27,47 +28,50 @@
     "AceptaArchivo": 0,
     "PasoProceso": [
       {
-        "ID": 59,
-        "ID_Mascota": 63,
+        "ID": 129,
+        "ID_Mascota": 80,
         "ID_Paso": 2,
         "Completado": 0,
-        "Archivo": null
+        "Archivo": null,
+        "Fecha_Limite": "2022-11-05T04:58:50.000Z"
       }
     ]
   },
   {
-    "ID": 82,
-    "Titulo_Paso": "Titulo del paso 1 de formulario de prueba",
-    "Descripcion": "Este paso no contiene un archivo y permite subir archivos",
-    "DiasEstimados": 10,
-    "Archivo": "",
-    "ID_Protocolo": 38,
-    "AceptaArchivo": 1,
-    "PasoProceso": [
-      {
-        "ID": 60,
-        "ID_Mascota": 63,
-        "ID_Paso": 82,
-        "Completado": 0,
-        "Archivo": "public\\archivosPasos\\1665105537141-166835810.pdf"
-      }
-    ]
-  },
-  {
-    "ID": 83,
-    "Titulo_Paso": "Titulo del paso 2 de formulario de prueba",
-    "Descripcion": "Este paso contiene un archivo y no permite subir archivos",
+    "ID": 85,
+    "Titulo_Paso": "Paso 1 paso 1",
+    "Descripcion": "descripcion 1 descripcion 1",
     "DiasEstimados": 2,
-    "Archivo": "public\\archivosPasos\\1665019719054-610178437.pdf",
-    "ID_Protocolo": 38,
+    "Archivo": "",
+    "ID_Protocolo": 39,
     "AceptaArchivo": 0,
     "PasoProceso": [
       {
-        "ID": 61,
-        "ID_Mascota": 63,
-        "ID_Paso": 83,
+        "ID": 130,
+        "ID_Mascota": 80,
+        "ID_Paso": 85,
         "Completado": 0,
-        "Archivo": null
+        "Archivo": null,
+        "Fecha_Limite": "2022-11-07T04:58:50.000Z"
+      }
+    ]
+  },
+  {
+    "ID": 86,
+    "Titulo_Paso": "Paso 2 paso 2",
+    "Descripcion": "descripcion 2 descripcion 2",
+    "DiasEstimados": 3,
+    "Archivo": "public\\archivosPasos\\1667087900941-660206477.pdf",
+    "ID_Protocolo": 39,
+    "AceptaArchivo": 1,
+    "PasoProceso": [
+      {
+        "ID": 131,
+        "ID_Mascota": 80,
+        "ID_Paso": 86,
+        "Completado": 0,
+        "Archivo": null,
+        "Fecha_Limite": "2022-11-10T04:58:50.000Z"
       }
     ]
   }

@@ -128,7 +128,11 @@ const guardarButton = document
             title: "Listo!",
             text: `Se han guardado tus respuestas!'`,
             icon: "success",
-            confirmButtonText: "Siguiente",
+            confirmButtonText: "Ok",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showCloseButton: false,
+            showCancelButton: false,
           }).then((sweetResult) => {
             if (sweetResult.isConfirmed) {
               window.location = "google.com";
@@ -205,7 +209,12 @@ function addPreguntasForm() {
   var form = document.querySelector("form");
   Formulario.Preguntas.forEach((pregunta) => {
     var newPregunta = preguntaTemplate.cloneNode(true);
-    newPregunta.querySelector("b").innerText = pregunta.Pregunta;
+    let obligatoriaChar = "";
+    if (pregunta.Opcional == 0) {
+      obligatoriaChar = "* ";
+    }
+    newPregunta.querySelector("b").innerText =
+      obligatoriaChar + pregunta.Pregunta;
     if (pregunta.Tipo == 1) {
       renderPreguntasAbiertasForm(pregunta, newPregunta);
     }

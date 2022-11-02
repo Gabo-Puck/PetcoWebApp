@@ -27,7 +27,7 @@ class Paso extends BaseModel {
           from: "paso.ID",
           through: {
             from: "paso_mascota.ID_Paso",
-            to: "paso_mascota.ID.Mascota",
+            to: "paso_mascota.ID_Mascota",
           },
           to: "mascota.ID",
         },

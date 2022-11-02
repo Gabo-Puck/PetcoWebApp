@@ -9,7 +9,11 @@ export function handleResponse(res, url, message) {
           title: "Listo!",
           text: message,
           icon: "success",
-          confirmButtonText: "Siguiente",
+          confirmButtonText: "Ok",
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          showCloseButton: false,
+          showCancelButton: false,
         }).then((sweetResult) => {
           if (sweetResult.isConfirmed) {
             window.location = url;

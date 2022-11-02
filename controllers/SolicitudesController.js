@@ -6,8 +6,16 @@ const { secureRegistro } = require("../utils/formDatabaseClean");
 const {
   sendNotificacion,
   getTodayDateFormated,
+  getDateFormated,
 } = require("../controllers/NotificacionesController");
 const Mascota = require("../models/Mascota");
+const Usuario = require("../models/Usuario");
+
+Date.prototype.addDays = function (days) {
+  var date = new Date(this.valueOf());
+  date.setDate(date.getDate() + days);
+  return date;
+};
 
 exports.getListaSolicitudesPublicacion = (req, res, next) => {
   //Importante Borrar esta parte
@@ -83,12 +91,19 @@ exports.aceptarSolicitud = (req, res, next) => {
     // res.json("ok");
     Solicitudes.query()
       .where("ID_Mascota", "=", req.params.MascotaID)
-      .andWhere("Estado", "=", "1")
+      .andWhere("Estado", ">=", "1")
       .then((solicitudes) => {
         if (solicitudes.length >= 1) {
-          return res.json({
-            error: "<p>Ya hay una solicitud en proceso activo</p>",
-          });
+          if (solicitudes[0].Estado == 1) {
+            return res.json({
+              error: "<p>Ya hay una solicitud en proceso activo</p>",
+            });
+          }
+          if (solicitudes[0].Estado == 2) {
+            return res.json({
+              error: "<p>Esta mascota ya se adopto</p>",
+            });
+          }
         } else {
           return new Promise((resolve, reject) => {
             let Fecha_Generacion = getTodayDateFormated();
@@ -100,18 +115,70 @@ exports.aceptarSolicitud = (req, res, next) => {
                 })
                 .then((result) => {
                   // sendNotificacion;
-                  Mascota.query()
-                    .findById(result.ID_Mascota)
-                    .patch({ Fecha_Ultima_Solicitud: Fecha_Generacion })
-                    .then(() => {});
 
-                  getUsuarioMascota(
-                    req.params.MascotaID,
-                    result.ID_Usuario,
-                    req,
-                    "ha aceptado su solicitud para proceso de adopción"
-                  );
-                  res.json("ok");
+                  Mascota.query()
+                    // .findById(result.ID_Mascota)
+                    .patchAndFetchById(result.ID_Mascota, {
+                      Fecha_Ultima_Solicitud: Fecha_Generacion,
+                    })
+                    .then((Mascota) => {
+                      return new Promise((resolve, reject) => {
+                        if (Mascota) {
+                          Mascota.$query()
+                            .withGraphJoined("MascotasProceso.[Paso]")
+                            .then((mascotaPasos) => {
+                              let fecha = new Date(Fecha_Generacion);
+                              let arrayPromesasAceptar = [];
+                              console.log(mascotaPasos);
+                              mascotaPasos.MascotasProceso.forEach((paso) => {
+                                fecha = fecha.addDays(paso.Paso.DiasEstimados);
+                                arrayPromesasAceptar.push(
+                                  patchFechaPasosMascota(paso, fecha)
+                                );
+                                arrayPromesasAceptar.push(
+                                  patchPasosDefaultPromise(paso)
+                                );
+                              });
+
+                              resolve(arrayPromesasAceptar);
+                            })
+                            .catch((err) => {
+                              console.log(err);
+                              return res.json({
+                                error:
+                                  "<p>Algo ha salido mal</p><p>Intentelo más tarde</p>",
+                              });
+                            });
+                        }
+                      });
+                    })
+                    .then((arrayPromesasAceptar) => {
+                      Promise.all(arrayPromesasAceptar)
+                        .then(() => {
+                          console.log("hola");
+                          getUsuarioMascota(
+                            req.params.MascotaID,
+                            result.ID_Usuario,
+                            req,
+                            "ha aceptado su solicitud para proceso de adopción"
+                          );
+                          res.json("ok");
+                        })
+                        .catch((err) => {
+                          console.log(err);
+                          return res.json({
+                            error:
+                              "<p>Algo ha salido mal</p><p>Intentelo más tarde</p>",
+                          });
+                        });
+                    })
+                    .catch((err) => {
+                      console.log(err);
+                      return res.json({
+                        error:
+                          "<p>Algo ha salido mal</p><p>Intentelo más tarde</p>",
+                      });
+                    });
                 })
             );
           });
@@ -125,6 +192,21 @@ exports.aceptarSolicitud = (req, res, next) => {
       });
   }
 };
+
+function patchFechaPasosMascota(paso, fecha) {
+  console.log(
+    "🚀 ~ file: SolicitudesController.js ~ line 178 ~ patchFechaPasosMascota ~ fecha",
+    fecha
+  );
+  let fechaFormat = getDateFormated(fecha);
+  return new Promise((resolve, reject) => {
+    resolve(
+      paso.$query().patch({
+        Fecha_Limite: fechaFormat,
+      })
+    );
+  });
+}
 
 function getUsuarioMascota(MascotaID, ID_Usuario, req, msg) {
   return new Promise((resolve, reject) => {
@@ -170,7 +252,25 @@ exports.denegarSolicitud = (req, res, next) => {
           .delete()
           .then(() => {
             sendNotificacion(descripcion, origen, idUsuario, req.app.io);
-            res.json("ok");
+            Mascota.query()
+              .withGraphJoined("MascotasSolicitudes")
+              .findById(req.params.MascotaID)
+              .then((mascotaSolicitudes) => {
+                if (mascotaSolicitudes) {
+                  if (mascotaSolicitudes.MascotasSolicitudes.length == 0) {
+                    mascotaSolicitudes
+                      .$query()
+                      .patch({ ID_Estado: 1 })
+                      .then(() => {});
+                  }
+                  res.json("ok");
+                } else {
+                  return res.json({
+                    error:
+                      "<p>Algo ha salido mal</p><p>Intentelo más tarde</p>",
+                  });
+                }
+              });
           })
           .catch((err) => {
             console.log(err);
@@ -193,4 +293,28 @@ exports.denegarSolicitud = (req, res, next) => {
     //     res.json("ok");
     //   })
   }
+};
+
+function patchPasosDefaultPromise(PasoProceso) {
+  let valueCompletado = 0;
+  if (PasoProceso.ID_Paso == 1) {
+    valueCompletado = 3;
+  }
+  return new Promise((resolve, reject) => {
+    resolve(
+      PasoProceso.$query()
+        .patch({
+          Completado: valueCompletado,
+          Archivo: null,
+        })
+        .then(() => {})
+    );
+  });
+}
+
+exports.verSolicitudesUsuario = (req, res, next) => {
+  Usuario.query()
+    .withGraphFetched("Solicitudes")
+    .findById()
+    .then((UsuarioSolicitudes) => {});
 };

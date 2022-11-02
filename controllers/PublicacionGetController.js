@@ -82,6 +82,10 @@ exports.query = [
               .withGraphJoined("MascotasMetas.MetasDonaciones")
               .where("mascota.ID_Publicacion", "=", req.params.idPublicacion)
               .then((MascotaP) => {
+                if (MascotaP.length == 0) {
+                  res.redirect("/login");
+                  return;
+                }
                 let isDueno = false;
                 if (
                   req.session.IdSession == MascotaP[0].MP.PublicacionUsuario.ID
@@ -111,6 +115,10 @@ exports.query = [
                       arrayMascotasSolicitud: res.arrayMascotasSolicitud,
                     });
                   });
+              })
+              .catch((err) => {
+                console.log(err);
+                next(err);
               });
           });
       });

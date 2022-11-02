@@ -2,6 +2,7 @@ const { forEach } = require("lodash");
 const Estado = require("../models/Estado");
 const Imagenes = require("../models/Imagenes");
 const Publicacion = require("../models/Publicacion");
+const Registro = require("../models/Registro");
 const Reporte_Publicacion = require("../models/Reporte_Publicacion");
 const Usuario = require("../models/Usuario");
 const { deleteFiles } = require("../utils/multipartRequestHandle/index");
@@ -845,6 +846,7 @@ exports.eliminarUsuario = (req, res, next) => {
       // console.log(archivos);
       // Promise.all(promises).then(() => console.log("ok"));
       //aqui empieza el codigo
+      let registroID = usuarioFind.FK_Registro;
       console.log(
         "🚀 ~ file: pruebaContarDonaciones.js ~ line 229 ~ .then ~ PublicacionesReportadas.Publicaciones[1]",
         usuarioFind
@@ -905,8 +907,12 @@ exports.eliminarUsuario = (req, res, next) => {
           let borrarArchivosPromises = deleteFiles(req);
           Promise.all(arrayPromises).then(() => {
             Promise.all(borrarArchivosPromises).then(() => {
-              console.log("Todo correcto");
-              res.json("ok");
+              Registro.query()
+                .deleteById(registroID)
+                .then(() => {
+                  console.log("Todo correcto");
+                  res.json("ok");
+                });
             });
           });
         });

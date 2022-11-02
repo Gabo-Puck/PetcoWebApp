@@ -59,6 +59,8 @@
       --info-paso-border-adoptante:#CAABBF;
       --info-paso-text-header-adoptante:#BE3154;
       --info-paso-border-completado:#415a80;
+      --info-icon-completado:#B7DF69;
+      --info-icon-no-completado:#9EC9E2;
     }
 
     .inputMessageChatProceso input,
@@ -279,6 +281,13 @@
     border-color: var(--info-paso-border-dueno);
     background-color: var(--info-paso-border-dueno);
 
+  }
+
+  .fa-check{
+    color:var(--info-icon-completado);
+  }
+  .fa-circle-question{
+    color:var(--info-icon-no-completado);
   }
 
   .pasoActualCompletadoAdoptante{
@@ -541,6 +550,22 @@
           </div>
         </div>
         <div class="card-body pb-3" style="overflow-y: scroll">
+          <div class="col">
+            <!-- <i class="fa-solid fa-check d-none"></i>
+            <i class="fa-regular fa-circle-question d-flex"></i> -->
+            <%let otro=UsuarioPeer.Nombre%>
+            <%let tu=Usuario.Usuario.Nombre%>
+            <%if(tipo==1){%>
+              <div class="row text-muted d-flex"><p><i class="duenoStatusPaso me-1"></i><%=tu%>(Tú)</p></div>
+              <div class="row text-muted d-flex"><p><i class="adoptanteStatusPaso me-1"></i><%=otro%></p></div>
+            <%}%>
+            <%if(tipo==2){%>
+              <div class="row text-muted d-flex"><p><i class="adoptanteStatusPaso me-1"></i><%=tu%>(Tú)</p></div>
+              <div class="row text-muted d-flex"><p><i class="duenoStatusPaso me-1"></i><%=otro%></p></div>
+            <%}%>
+              
+            
+          </div>
           <h4 class="tituloPasoProceso card-title">Paso 1</h4>
           <p class="descripcionPasoProceso card-text">
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos

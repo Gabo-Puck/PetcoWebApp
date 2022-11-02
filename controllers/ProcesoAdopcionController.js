@@ -38,7 +38,7 @@ exports.getProceso = [
           req.params.MascotaID
         )
         .then((PasosProceso) => {
-          isProcesoCompleted(res, PasosProceso);
+          // isProcesoCompleted(res, PasosProceso);
           console.log("ESTOA QUI");
           let tipoUsuario = res.isAdoptante ? 2 : 1; //Si existe res.isAdoptante el usuario será adoptante (2), si no existe entonces será dueño (1)
           let ROOM_ID = encrypt(req.params.MascotaID);
@@ -140,7 +140,39 @@ exports.uploadFile = [
           ID_Mascota: req.body.MascotaID,
           ID_Paso: req.body.PasoID,
         })
-        .patch({ Archivo: req.body.archivoPaso })
+        .then((PasoMascotaFound) => {
+          return new Promise((resolve, reject) => {
+            let archivo = PasoMascotaFound.Archivo;
+            req.deleteFilesPath = [];
+            req.deleteFilesPath.push(archivo);
+            console.log("archivoPASO", req.body.archivoPaso);
+            if (
+              req.body.archivoPaso != "" &&
+              req.body.archivoPaso != null &&
+              req.body.archivoPaso != "undefined"
+            ) {
+              if (archivo != null) {
+                let deletePromises = deleteFiles(req);
+                Promise.all(deletePromises).then(() => {
+                  PasoMascotaFound.$query()
+                    .patch({ Archivo: req.body.archivoPaso })
+                    .then((resultFetch) => {
+                      resolve(resultFetch);
+                    });
+                });
+              } else {
+                PasoMascotaFound.$query()
+                  .patch({ Archivo: req.body.archivoPaso })
+                  .then((resultFetch) => {
+                    resolve(resultFetch);
+                  });
+              }
+            } else {
+              resolve(1);
+              req.body.archivoPaso = archivo;
+            }
+          });
+        })
         .then((resultFetch) => {
           console.log(resultFetch);
           if (resultFetch > 0) {
@@ -201,7 +233,14 @@ exports.patchReputacion = [
     }
   },
 ];
-
+// io.to(socket.userID).emit(
+//   "error-paso-completado-lista-registro",
+//   {
+//     error:
+//       "Este proceso se ha finalizado y no puedes mandar mensajes",
+//     idPasoAfectado: 0,
+//   }
+// );
 exports.abortarProceso = [
   isAdoptante,
   isDuenoMascota,
@@ -217,27 +256,34 @@ exports.abortarProceso = [
           req.body.MascotaID
         )
         .then((PasosProceso) => {
-          res.PasosProceso = PasosProceso;
-          req.deleteFilesPath = [];
-          let arrayProm = [];
-          PasosProceso[0].MascotasPasos.forEach((pasoProceso) => {
-            if (pasoProceso.Archivo != null) {
-              req.deleteFilesPath.push(pasoProceso.Archivo);
-            }
-            console.log(pasoProceso);
-            arrayProm.push(
-              patchPasosDefaultPromise(pasoProceso.PasoProceso[0])
+          if (PasosProceso[0].ID_Estado == 4) {
+            res.json(
+              "<p>Este proceso se encuentra completado</p><p>No lo puedes abortar</p>"
             );
-          });
-          console.log(arrayProm);
-          return new Promise((resolve, reject) => {
-            resolve(arrayProm);
-          });
+            return;
+          } else {
+            res.PasosProceso = PasosProceso;
+            req.deleteFilesPath = [];
+            let arrayProm = [];
+            PasosProceso[0].MascotasPasos.forEach((pasoProceso) => {
+              if (pasoProceso.PasoProceso[0].Archivo != null) {
+                req.deleteFilesPath.push(
+                  pasoProceso.PasoProceso[0].Archivo.replaceAll("\\", "/")
+                );
+              }
+              console.log(pasoProceso);
+              arrayProm.push(
+                patchPasosDefaultPromise(pasoProceso.PasoProceso[0])
+              );
+            });
+            console.log(arrayProm);
+            return new Promise((resolve, reject) => {
+              resolve(arrayProm);
+            });
+          }
         })
         .then((arrayProm) => Promise.all(arrayProm))
-        .then(() => {
-          deleteFiles(req);
-        })
+        .then(() => Promise.all(deleteFiles(req)))
         .then(() => {
           return new Promise((resolve, reject) => {
             resolve(
@@ -289,6 +335,7 @@ function patchPasosDefaultPromise(PasoProceso) {
         .patch({
           Completado: valueCompletado,
           Archivo: null,
+          Fecha_Limite: null,
         })
         .then(() => {})
     );

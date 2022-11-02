@@ -33,6 +33,9 @@ const iconsFace = document.querySelectorAll(".face-feedback");
 
 const abortarProceso = document.querySelector("#abortarProceso");
 
+const duenoStatusPaso = document.querySelector(".duenoStatusPaso");
+const adoptanteStatusPaso = document.querySelector(".adoptanteStatusPaso");
+
 Date.prototype.addDays = function (days) {
   var date = new Date(this.valueOf());
   date.setDate(date.getDate() + days);
@@ -45,6 +48,8 @@ pasoCompletadoCheckBox.addEventListener("change", (e) => {
       title: "¡Hola!",
       html: "<p>¿Deseas marcar este paso como compleado?</p>",
       showDenyButton: true,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
       confirmButtonText: "Si",
       denyButtonText: `No`,
     }).then((result) => {
@@ -52,6 +57,20 @@ pasoCompletadoCheckBox.addEventListener("change", (e) => {
       if (result.isConfirmed) {
         // Swal.fire('Saved!', '', 'success')
         //hacer algo para guardar el paso
+        if (
+          PasosProceso[idPaso].PasoProceso[0].Archivo == null &&
+          tipo == 1 &&
+          PasosProceso[idPaso].AceptaArchivo == 1
+        ) {
+          pasoCompletadoCheckBox.checked = 0;
+
+          Swal.fire(
+            `Debes esperar a que ${UsuarioPeer.Nombre} suba el archivo`,
+            "",
+            "warning"
+          );
+          reutrn;
+        }
         let isUltimo = false;
         if (PasosProceso.length - 1 == idPaso) {
           isUltimo = true;
@@ -76,6 +95,8 @@ pasoCompletadoCheckBox.addEventListener("change", (e) => {
       title: "¡Hola!",
       html: "<p>¿Deseas desmarcar este paso como compleado?</p>",
       showDenyButton: true,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
       confirmButtonText: "Si",
       denyButtonText: `No`,
     }).then((result) => {
@@ -137,7 +158,7 @@ function abortarProcesoFetch() {
           }
         });
       } else {
-        throw new Error("Algo ha salido mal");
+        Swal.fire("¡Atención!", res, "error");
       }
     })
     .catch((err) => {
@@ -431,6 +452,10 @@ function addListenerToProgressDot(dot) {
       idPaso = e.target.id.split("-")[1];
     }
     // alert(`pasos[${idPaso}] = ${pasos[idPaso]}`);
+    duenoStatusPaso.classList.remove("fa-solid", "fa-check");
+    duenoStatusPaso.classList.remove("fa-regular", "fa-circle-question");
+    adoptanteStatusPaso.classList.remove("fa-solid", "fa-check");
+    adoptanteStatusPaso.classList.remove("fa-regular", "fa-circle-question");
     let options = {
       weekday: "long",
       year: "numeric",
@@ -439,9 +464,9 @@ function addListenerToProgressDot(dot) {
     };
     infoPasoProceso.title.textContent = PasosProceso[idPaso].Titulo_Paso;
     infoPasoProceso.text.textContent = PasosProceso[idPaso].Descripcion;
-    let fechaLimite = new Date();
-
-    fechaLimite = fechaLimite.addDays(PasosProceso[idPaso].DiasEstimados);
+    let fechaLimite = new Date(
+      PasosProceso[idPaso].PasoProceso[0].Fecha_Limite
+    );
 
     infoPasoProceso.footer.textContent = `Fecha limite: ${fechaLimite.toLocaleDateString(
       "es-MX",
@@ -501,6 +526,8 @@ function addListenerToProgressDot(dot) {
       ).checked = 0;
     }
     if (PasosProceso[idPaso].PasoProceso[0].Completado == 1) {
+      duenoStatusPaso.classList.add("fa-solid", "fa-check");
+      adoptanteStatusPaso.classList.add("fa-regular", "fa-circle-question");
       infoPasoProceso.infoPasoProceso.classList.add(
         "pasoActualCompletadoDueno"
       );
@@ -512,6 +539,8 @@ function addListenerToProgressDot(dot) {
       );
     }
     if (PasosProceso[idPaso].PasoProceso[0].Completado == 2) {
+      duenoStatusPaso.classList.add("fa-regular", "fa-circle-question");
+      adoptanteStatusPaso.classList.add("fa-solid", "fa-check");
       infoPasoProceso.infoPasoProceso.classList.remove(
         "pasoActualCompletadoDueno"
       );
@@ -526,6 +555,8 @@ function addListenerToProgressDot(dot) {
       );
     }
     if (PasosProceso[idPaso].PasoProceso[0].Completado == 0) {
+      duenoStatusPaso.classList.add("fa-regular", "fa-circle-question");
+      adoptanteStatusPaso.classList.add("fa-regular", "fa-circle-question");
       infoPasoProceso.infoPasoProceso.classList.remove(
         "pasoActualCompletadoDueno"
       );
@@ -540,6 +571,8 @@ function addListenerToProgressDot(dot) {
       ).checked = 0;
     }
     if (PasosProceso[idPaso].PasoProceso[0].Completado == 3) {
+      duenoStatusPaso.classList.add("fa-solid", "fa-check");
+      adoptanteStatusPaso.classList.add("fa-solid", "fa-check");
       infoPasoProceso.infoPasoProceso.classList.remove(
         "pasoActualCompletadoDueno"
       );

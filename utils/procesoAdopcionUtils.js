@@ -23,7 +23,7 @@ exports.isAdoptante = (req, res, next) => {
     )
     .where("mascota.ID", "=", MascotaID)
     .andWhere("_t0.ID_Usuario", "=", req.session.IdSession)
-    .andWhere("_t0.Estado", "=", 1)
+    .andWhere("_t0.Estado", ">=", 1)
     // .debug()
     .then((usuarioSolicitud) => {
       console.log(usuarioSolicitud);
@@ -72,7 +72,7 @@ exports.isDuenoMascota = (req, res, next) => {
       )
       .where("mascota.ID", "=", MascotaID)
       .andWhere("_t0.ID_Usuario", "=", req.session.IdSession)
-      .andWhere("_t1.Estado", "=", 1)
+      .andWhere("_t1.Estado", ">=", 1)
       .then((usuarioDueno) => {
         console.log(usuarioDueno);
         if (usuarioDueno.length == 1) {
