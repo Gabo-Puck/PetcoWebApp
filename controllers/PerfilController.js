@@ -10,6 +10,7 @@ const Donaciones = require("../models/Donaciones");
 const Like = require("../models/Like");
 const Publicacion_Guardada = require("../models/Publicacion_Guardada");
 const Reporte_Publicacion = require("../models/Reporte_Publicacion");
+const Usuario_Bloqueado = require("../models/Usuario_Bloqueado");
 
 paypal.configure({
   mode: "sandbox", //sandbox or live
@@ -32,74 +33,143 @@ let dateTime = date + " " + time;
 console.log(dateTime);
 
 exports.pagina = (req, res, next) => {
-  idOrganizacion = req.params.idUsuario;
-  Usuario.query()
-    .withGraphJoined("UsuarioRegistro")
-    .where("usuario.ID", "=", req.params.idUsuario)
-    .then((result) => {
-      console.log(
-        "🚀 ~ file: PerfilController.js ~ line 40 ~ .then ~ result",
-        result
-      );
-      if (result.length == 0) {
-        res.redirect("/login");
-      } else {
-        idu = result[0].UsuarioRegistro.ID;
-        Publicacion.query()
-          .where("publicacion.ID_Usuario", "=", req.params.idUsuario)
-          .withGraphJoined("Mascota.MascotasPublicacion")
-          .withGraphJoined("Mascota.MascotasEstado")
-          .withGraphJoined("Mascota.MascotasImagenes")
-          .then((resultado) => {
-            let mascotasUsuario = new Array();
-            let contador = 0;
 
-            for (let i = 0; i < resultado.length; i++) {
-              for (let j = 0; j < resultado[i].Mascota.length; j++) {
-                console.log(resultado[i].Mascota[j]);
-                mascotasUsuario[contador] = resultado[i].Mascota[j];
-                contador++;
-              }
+    idOrganizacion = req.params.idUsuario;
+
+    console.log('w');
+    Usuario_Bloqueado.query()
+        .then((r) => {
+            ban = false;
+            for (let i = 0; i < r.length; i++) {
+                console.log('a' + r[i].ID_Usuario + ' b ' + r[i].ID_Bloqueado)
+
+                if (r[i].ID_Usuario == req.session.IdSession && r[i].ID_Bloqueado == req.params.idUsuario
+                    || (r[i].ID_Usuario == req.params.idUsuario && r[i].ID_Bloqueado == req.session.IdSession)
+                ) {
+                    console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+                    ban = true;
+                }
+
+
+
             }
 
-            console.log(
-              "🚀 ~ file: PerfilController.js ~ line 26 ~ .then ~ mascotasUsuario",
-              mascotasUsuario
-            );
-            mascotasUsuario.reverse();
+            if (ban == true) {
+                res.redirect('petco/inicio')
 
-            res.render("perfil.ejs", {
-              user: result,
-              idUsuarioPublicacion: req.params.idUsuario,
-              MascotaRender: mascotasUsuario,
-              Tipo: req.session.Tipo,
-            });
-          });
-      }
-    });
+            }
+            else {
+                //No se bloquearon lso usuarios
+                Usuario.query()
+                    .withGraphJoined('UsuarioRegistro')
+                    .where('usuario.ID', '=', req.params.idUsuario)
+                    .then((result) => {
+
+                        idu = result[0].UsuarioRegistro.ID;
+
+                        Publicacion.query()
+                            .where('publicacion.ID_Usuario', '=', req.params.idUsuario)
+                            .andWhere("publicacion.Activo", "=", 1)
+                            .withGraphJoined("Mascota.MascotasPublicacion")
+                            .withGraphJoined("Mascota.MascotasEstado")
+                            .withGraphJoined("Mascota.MascotasImagenes")
+                            .then((resultado) => {
+
+                                let mascotasUsuario = new Array();
+                                let contador = 0;
+
+
+                                for (let i = 0; i < resultado.length; i++) {
+
+                                    for (let j = 0; j < resultado[i].Mascota.length; j++) {
+
+                                        //      console.log(resultado[i].Mascota[j]);
+                                        mascotasUsuario[contador] = resultado[i].Mascota[j];
+                                        contador++;
+                                    }
+
+
+                                }
+
+                                //console.log("🚀 ~ file: PerfilController.js ~ line 26 ~ .then ~ mascotasUsuario", mascotasUsuario)
+                                mascotasUsuario.reverse();
+
+                                res.render('perfil.ejs', {
+                                    user: result,
+                                    idUsuarioPublicacion: req.params.idUsuario,
+                                    MascotaRender: mascotasUsuario,
+                                    currentUser: req.session.IdSession,
+                                    Tipo: req.session.Tipo,
+                                });
+
+                            })
+
+                    })
+            }
+        })
+
+
+
+
+
 };
 
-// exports.fetchPaypalDonation = (req, res, next) => {
-//     aporte=req.params.Cantidad;
-//     console.log("🚀 ~ file: PerfilController.js ~ line 80 ~ aporte", aporte)
-//     idOrganizacion= req.params.idDonante;
-//     console.log("🚀 ~ file: PerfilController.js ~ line 82 ~ idOrganizacion", idOrganizacion)
-//     res.json("Se hizo el Json");
 
-// }
+exports.DonacionesUser = (req, res, next) => {
+
+    Donaciones.query()
+    .where('donaciones.ID_Organizacion', '=', req.params.idUsuario)
+    .withGraphJoined('DonacionesUsuario.UsuarioRegistro')
+    .withGraphJoined('DonacionesMetas.Mascota.MascotasPublicacion')
+    .then((rDonacion)=>{
+        console.log(rDonacion);
+        res.render('Verdonaciones.ejs', {
+            donacionesPerfil:rDonacion,
+            Tipo: req.session.Tipo,
+        });
+    })
+
+}
+
+exports.bloquear = (req, res, next) => {
+    Usuario_Bloqueado.query()
+        .insert({
+            ID_Usuario: req.session.IdSession,
+            ID_Bloqueado: req.params.idB
+        })
+        .then(() => { });
+    res.json('Se hizo la query');
+
+}
+
+
+
+
+exports.fetchDonation = (req, res, next) => {
+
+    Usuario.query()
+        .where("usuario.ID", "=", req.session.IdSession)
+        .patch({ AceptaDonaciones: req.params.bandera })
+        .then({});
+
+    res.json('Se hizo la query')
+
+
+}
 
 exports.pay = (req, res) => {
-  console.log(req.body);
-  aporte = req.body.cantidad;
-  console.log("🚀 ~ file: PerfilController.js ~ line 102 ~ aporte", aporte);
+    console.log(req.body);
+    aporte = req.body.cantidad;
+    console.log("🚀 ~ file: PerfilController.js ~ line 102 ~ aporte", aporte)
 
-  Registro.query()
-    .withGraphJoined("RegistroUsuario")
-    .where("RegistroUsuario.FK_Registro", "=", idu)
-    .then((query) => {
-      //id organizacion
-      correopago = query[0].Correo;
-      console.log(query[0].Correo);
+
+    Registro.query()
+        .withGraphJoined("RegistroUsuario")
+        .where("RegistroUsuario.FK_Registro", "=", idu)
+        .then((query) => {
+            //id organizacion
+            correopago = query[0].Correo;
+            console.log(query[0].Correo);
 
       const create_payment_json = {
         intent: "sale",

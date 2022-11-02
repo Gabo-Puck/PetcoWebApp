@@ -16,6 +16,10 @@ router.get("/cerrarsession", feed_start.CerrarSession);
 
 router.get("/PublicacionesGuardadas", feed_start.Pguardadas);
 
+router.get("/CurrentUser", feed_start.SessionInfo);
+
+
+
 
 //router.post("/CheckLogin", registro_Login.CheckDB);
 

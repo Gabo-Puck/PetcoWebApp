@@ -5,87 +5,68 @@
   var notificacionesNoLeidasRef = [];
 </script>
 
-<nav
-  class="navbar navbar-expand-lg navbar-light bg-light sticky-top"
-  style="text-align: center"
->
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top" style="text-align: center">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Navbar</a>
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#navbarColor03"
-      aria-controls="navbarColor03"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-    >
+    <a class="navbar-brand" href="#" style="color:rgba(0, 0, 0, 0.0);" id="perfilUbicacion">
+      <img alt="Qries" id="ImagenUsuario"
+        style="float:left; width: 50px; height:50px ; object-fit:cover; position: relative; border-radius: 50%;" src="">
+
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor03"
+      aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarColor03">
       <ul class="navbar-nav me-auto">
         <li class="nav-item">
-          <a class="nav-link active" href="/petco/inicio"
-            >Inicio
+          <a class="nav-link active" href="/petco/inicio">Inicio
             <span class="visually-hidden">(current)</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/petco/publicacion/crear">Publicar</a>
+          <a class="nav-link" href="/publicacion/crear">Publicar</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="#" id="buscarForm">Buscar</a>
         </li>
 
         <li class="nav-item dropdown">
-          <a
-            class="nav-link dropdown-toggle"
-            data-bs-toggle="dropdown"
-            href="#"
-            role="button"
-            aria-haspopup="true"
-            aria-expanded="false"
-            ><i class="fa-solid fa-bars fa-lg"></i
-          ></a>
+          <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+            aria-expanded="false"><i class="fa-solid fa-bars fa-lg"></i></a>
           <div class="dropdown-menu">
-            <a class="dropdown-item" href="/petco/inicio/PublicacionesGuardadas"
-              >Publicaciones Guardadas</a
-            >
+            <a class="dropdown-item" href="/petco/inicio/PublicacionesGuardadas">Publicaciones Guardadas</a>
             <a class="dropdown-item" href="#">Another action</a>
-            <a class="dropdown-item" href="#">Something else here</a>
             <%if(Tipo==1){%>
-            <!-- Cosas de organizacion -->
-            <a class="dropdown-item" href="/petco/dashboard">Dashboard</a>
-
-            <%}%> <%if(Tipo==2){%>
-            <!-- Cosas de comun -->
-            <a class="dropdown-item" href="#">Ver procesos</a>
-
+            <a class="dropdown-item" href="#" id="VerD">Ver donaciones</a>
             <%}%>
-            <div class="dropdown-divider"></div>
-            <a
-              class="dropdown-item"
-              href="/petco/inicio/cerrarsession/"
-              id="logout"
-              >Cerrar sesion
-              <i class="fa-solid fa-door-open fa-lg" style="color: #ea2340"></i
-            ></a>
+
+            <%if(Tipo==1){%>
+              <a class="dropdown-item" href="/petco/dashboard">Dashboard</a>
+
+              <!-- Cosas de organizacion -->
+              <%}%>
+                <%if(Tipo==2){%>
+                  <!-- Cosas de comun -->
+                  <a class="dropdown-item" href="#">Ver procesos</a>
+
+                  <%}%>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="/petco/inicio/cerrarsession/" id="logout">Cerrar sesion
+                      <i class="fa-solid fa-door-open fa-lg" style="color: #ea2340"></i></a>
           </div>
         </li>
       </ul>
 
       <a class="mt-2">
-        <a
-          style="margin-right: 1%"
-          data-bs-toggle="offcanvas"
-          href="#notificacionesOffCanvas"
-          role="button"
-          aria-controls="notificacionesOffCanvas"
-          class="position-relative"
-          id="notificacionesIconNavbar"
-        >
+        <a style="margin-right: 1%" data-bs-toggle="offcanvas" href="#notificacionesOffCanvas" role="button"
+          aria-controls="notificacionesOffCanvas" class="position-relative" id="notificacionesIconNavbar">
           <i class="fa-regular fa-bell fa-lg pe-2"></i>
-          <span
-            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none"
-            id="notificacionesSinLeerCount"
-          >
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none"
+            id="notificacionesSinLeerCount">
             <!-- 99+ -->
             <span class="visually-hidden">unread messages</span>
           </span>
@@ -94,12 +75,8 @@
     </div>
   </div>
 </nav>
-<a
-  href="#"
-  target="_blank"
-  class="list-group-item list-group-item-action m-0 notificacionTemplate d-none"
-  style="text-decoration: none"
->
+<a href="#" target="_blank" class="list-group-item list-group-item-action m-0 notificacionTemplate d-none"
+  style="text-decoration: none">
   <p style="color: black" class="mb-2 ms-0 text-break descripcionNotificacion">
     DescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDescripcion
   </p>
@@ -107,27 +84,148 @@
     Fechaaaaaaaaaaaaaaaaaaaaaaaaaa
   </p>
 </a>
-<div
-  class="offcanvas offcanvas-end"
-  tabindex="-1"
-  id="notificacionesOffCanvas"
-  aria-labelledby="notificacionesOffCanvasLabel"
-  data-bs-scroll="true"
-  data-bs-backdrop="false"
->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="notificacionesOffCanvas"
+  aria-labelledby="notificacionesOffCanvasLabel" data-bs-scroll="true" data-bs-backdrop="false">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title" id="offcanvasExampleLabel">Notificaciones</h5>
-    <button
-      type="button"
-      class="btn-close"
-      data-bs-dismiss="offcanvas"
-      aria-label="Close"
-    ></button>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body px-0">
     <div class="list-group list-group-flush" id="notificacionesContainer"></div>
   </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- BUSQUEDA -->
+<script>
+  buscar = document.getElementById('buscarForm').addEventListener("click", myFunction);
+  function myFunction() {
+    Swal.fire({
+
+      html: `<form action="/petco/busqueda/ingreso" method="post">
+    <div class="row container">
+
+            <label for="exampleSelect1" class="form-label mt-4">Especie</label>
+            <select class="form-select" name="BEspecie" id="animales" style="display: table-cell;">
+                <option value="1" >Asno</option>
+                <option value="2">Pato</option>
+                <option value="3">Buey</option>
+                <option value="4">Caballo</option>
+                <option value="5" >Cabra</option>
+                <option value="6">Cerdo</option>
+                <option value="7">Chinchilla</option>
+                <option value="8">Codorniz</option>
+                <option value="9" >Conejillo de indias</option>
+                <option value="10">Gallina</option>
+                <option value="11">Ganzo</option>
+                <option value="12">Gato</option>
+                <option value="13" >Huron</option>
+                <option value="14">Hamster</option>
+                <option value="15">Iguana</option>
+                <option value="16">Mulo</option>
+                <option value="17">Ovejas</option>
+                <option value="18">Paloma</option>
+                <option value="19">Perro</option>
+                <option value="20">Raton</option>
+                <option value="21">Serpiente</option>
+                <option value="22">Tortuga</option>
+                <option value="23">Vaca</option>
+                <option value="24">Toro</option>
+            
+            </select>
+
+            <label for="exampleSelect1" class="form-label mt-4">Tamaño</label>
+            <select class="form-select" name="BTamano" id="tamanos" style="display: table-cell;">
+                <option value="0">Cualquiera</option>
+                <option value="1">Muy pequeño</option>
+                <option value="2">Pequeño</option>
+                <option value="3">Mediano</option>
+                <option value="4">Grande</option>
+                <option value="5">Muy grande</option>
+            </select>
+
+       
+            <label for="exampleSelect1" class="form-label mt-4">Castrado</label>
+            <select class="form-select" name="BCastrado" id="castrados" style="display: table-cell;">
+                <option value="0">Cualquiera</option>
+                <option value="1">Castrado</option>
+                <option value="2">No castrado</option>
+                <option value="3">Sin informacion</option>
+            </select>
+
+            <label for="exampleSelect1" class="form-label mt-4">Salud</label>
+            <select class="form-select" name="BSalud" id="saludes"  style="display: table-cell;">
+              <option value="0">Cualquiera</option>
+                <option value="1">Enfermo</option>
+                <option value="2">Discapacitado</option>
+                <option value="3">Sano</option>
+                
+            </select>
+
+            <label for="exampleSelect1" class="form-label mt-4">Estado</label>
+            <select class="form-select" name="BEstado" id="estados" style="display: table-cell;">
+                <option value="0">Cualquiera</option>
+                <option value="1">Libre</option>
+                <option value="2">En consideracion</option>
+                <option value="3">En proceso</option>
+                <option value="4">Adoptado</option>
+            </select>
+
+          <label for="exampleSelect1" class="form-label mt-4">Edad</label>
+          <select class="form-select" name="Bedad"  id="edades" style="display: table-cell;">
+          
+              <option value="1">Menor de un año</option>
+              <option value="6">Hasta 5 años</option>
+              <option value="11">Hasta 10 años</option>
+              <option value="21">Hasta 20 años</option>
+              <option value="31">Hasta 30 años</option>
+
+          </select>
+
+          <label for="exampleSelect1" class="form-label mt-4">Orden</label>
+          <select class="form-select" name="Borden"  id="ordenes" style="display: table-cell;">
+              <option value="0">Ordenar Cronologicamente</option>
+              <option value="1">Ordenar por relevancia</option>
+          </select>
+      
+
+          <button type="submit" class="btn btn-outline-primary btn-block mt-4"><i class="fa-solid fa-magnifying-glass"></i></button>
+
+    </div>
+
+    
+    
+</form>`,
+
+      showConfirmButton: false
+    })
+  }
+</script>
+
+
+
+<script>
+
+  imagenUser = document.getElementById("ImagenUsuario");
+  donacionesModule = document.getElementById("VerD");
+  perfilL = document.getElementById("perfilUbicacion");
+
+  fetch(
+    `/petco/inicio/CurrentUser`
+  )
+    .then((res) => res.json())
+    .then((res) => {
+
+      console.log("🚀 ~ file: LikeScript.js ~ line 16 ~ .then ~ res", res[0].Foto_Perfil);
+      imagenUser.src = res[0].Foto_Perfil;
+      perfilL.href = "/petco/perfil/usuario/" + res[0].ID;
+      donacionesModule.href = "/petco/perfil/Dusuario/"+ res[0].ID;
+
+    });
+
+</script>
+
+
 
 <script type="module" src="/javascripts/getNotificaciones.js"></script>
 <script type="module" src="/javascripts/headerNavbar.js"></script>
