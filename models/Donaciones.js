@@ -1,6 +1,7 @@
 var { Model } = require("objection");
 var knex = require("../knex");
 var BaseModel = require("./BaseModel");
+const Usuario = require("./Usuario");
 
 Model.knex(knex);
 
@@ -18,7 +19,16 @@ class Donaciones extends BaseModel {
                 relation: Model.BelongsToOneRelation,
                 join: {
                     from: "donaciones.ID_Meta",
-                    to: "meta.ID",
+                    to: "metas.ID",
+                },
+            },
+
+            DonacionesUsuario: {
+                modelClass: Usuario,
+                relation: Model.BelongsToOneRelation,
+                join: {
+                    from: "donaciones.ID_Usuario",
+                    to: "usuario.ID",
                 },
             },
 

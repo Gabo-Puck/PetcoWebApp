@@ -82,6 +82,8 @@ exports.CheckDB = (req, res, next) => {
         req.session.Logged = true;
         req.session.IdSession = Results[0].RegistroUsuario.ID;
         req.session.Tipo = Results[0].Tipo_Usuario;
+        req.session.ImagenSesion = Results[0].RegistroUsuario.Foto_Perfil;
+
         console.log(Results[0]);
         console.log(req.session.Tipo);
 

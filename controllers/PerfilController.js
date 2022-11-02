@@ -10,6 +10,7 @@ const Donaciones = require("../models/Donaciones");
 const Like = require("../models/Like");
 const Publicacion_Guardada = require("../models/Publicacion_Guardada");
 const Reporte_Publicacion = require("../models/Reporte_Publicacion");
+const Usuario_Bloqueado = require("../models/Usuario_Bloqueado");
 
 paypal.configure({
     mode: "sandbox", //sandbox or live
@@ -21,7 +22,7 @@ paypal.configure({
 let idOrganizacion;
 let idr;
 let correopago = "";
-let aporte=3;
+let aporte = 3;
 let today = new Date();
 let date = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
 let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
@@ -32,76 +33,138 @@ console.log(dateTime);
 
 exports.pagina = (req, res, next) => {
 
-  
-    idOrganizacion=req.params.idUsuario;
-    Usuario.query()
-    .withGraphJoined('UsuarioRegistro')
-        .where('usuario.ID', '=', req.params.idUsuario)
-        .then((result) => {
-          idu = result[0].UsuarioRegistro.ID; 
+    idOrganizacion = req.params.idUsuario;
 
-            Publicacion.query()
-                .where('publicacion.ID_Usuario', '=', req.params.idUsuario)
-                .withGraphJoined("Mascota.MascotasPublicacion")
-                .withGraphJoined("Mascota.MascotasEstado")
-                .withGraphJoined("Mascota.MascotasImagenes")
-                .then((resultado) => {
+    console.log('w');
+    Usuario_Bloqueado.query()
+        .then((r) => {
+            ban = false;
+            for (let i = 0; i < r.length; i++) {
+                console.log('a' + r[i].ID_Usuario + ' b ' + r[i].ID_Bloqueado)
 
-                    let mascotasUsuario = new Array();
-                    let contador = 0;
+                if (r[i].ID_Usuario == req.session.IdSession && r[i].ID_Bloqueado == req.params.idUsuario
+                    || (r[i].ID_Usuario == req.params.idUsuario && r[i].ID_Bloqueado == req.session.IdSession)
+                ) {
+                    console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+                    ban = true;
+                }
 
 
-                    for (let i = 0; i < resultado.length; i++) {
 
-                        for (let j = 0; j < resultado[i].Mascota.length; j++) {
+            }
 
-                            console.log(resultado[i].Mascota[j]);
-                            mascotasUsuario[contador] = resultado[i].Mascota[j];
-                            contador++;
-                        }
+            if (ban == true) {
+                res.redirect('petco/inicio')
+
+            }
+            else {
+                //No se bloquearon lso usuarios
+                Usuario.query()
+                    .withGraphJoined('UsuarioRegistro')
+                    .where('usuario.ID', '=', req.params.idUsuario)
+                    .then((result) => {
+
+                        idu = result[0].UsuarioRegistro.ID;
+
+                        Publicacion.query()
+                            .where('publicacion.ID_Usuario', '=', req.params.idUsuario)
+                            .andWhere("publicacion.Activo", "=", 1)
+                            .withGraphJoined("Mascota.MascotasPublicacion")
+                            .withGraphJoined("Mascota.MascotasEstado")
+                            .withGraphJoined("Mascota.MascotasImagenes")
+                            .then((resultado) => {
+
+                                let mascotasUsuario = new Array();
+                                let contador = 0;
 
 
-                    }
+                                for (let i = 0; i < resultado.length; i++) {
 
-                    console.log("🚀 ~ file: PerfilController.js ~ line 26 ~ .then ~ mascotasUsuario", mascotasUsuario)
-                    mascotasUsuario.reverse();
+                                    for (let j = 0; j < resultado[i].Mascota.length; j++) {
 
-                    res.render('perfil.ejs', {
-                        user: result,
-                        idUsuarioPublicacion: req.params.idUsuario,
-                        MascotaRender: mascotasUsuario
-                    });
+                                        //      console.log(resultado[i].Mascota[j]);
+                                        mascotasUsuario[contador] = resultado[i].Mascota[j];
+                                        contador++;
+                                    }
 
-                })
 
+                                }
+
+                                //console.log("🚀 ~ file: PerfilController.js ~ line 26 ~ .then ~ mascotasUsuario", mascotasUsuario)
+                                mascotasUsuario.reverse();
+
+                                res.render('perfil.ejs', {
+                                    user: result,
+                                    idUsuarioPublicacion: req.params.idUsuario,
+                                    MascotaRender: mascotasUsuario,
+                                    currentUser: req.session.IdSession,
+                                    Tipo: req.session.Tipo,
+                                });
+
+                            })
+
+                    })
+            }
         })
 
-     
+
+
+
 
 };
 
 
+exports.DonacionesUser = (req, res, next) => {
+
+    Donaciones.query()
+    .where('donaciones.ID_Organizacion', '=', req.params.idUsuario)
+    .withGraphJoined('DonacionesUsuario.UsuarioRegistro')
+    .withGraphJoined('DonacionesMetas.Mascota.MascotasPublicacion')
+    .then((rDonacion)=>{
+        console.log(rDonacion);
+        res.render('Verdonaciones.ejs', {
+            donacionesPerfil:rDonacion,
+            Tipo: req.session.Tipo,
+        });
+    })
+
+}
+
+exports.bloquear = (req, res, next) => {
+    Usuario_Bloqueado.query()
+        .insert({
+            ID_Usuario: req.session.IdSession,
+            ID_Bloqueado: req.params.idB
+        })
+        .then(() => { });
+    res.json('Se hizo la query');
+
+}
 
 
 
-// exports.fetchPaypalDonation = (req, res, next) => {
-//     aporte=req.params.Cantidad;
-//     console.log("🚀 ~ file: PerfilController.js ~ line 80 ~ aporte", aporte)
-//     idOrganizacion= req.params.idDonante;
-//     console.log("🚀 ~ file: PerfilController.js ~ line 82 ~ idOrganizacion", idOrganizacion)
-//     res.json("Se hizo el Json");
-    
-// }    
+
+exports.fetchDonation = (req, res, next) => {
+
+    Usuario.query()
+        .where("usuario.ID", "=", req.session.IdSession)
+        .patch({ AceptaDonaciones: req.params.bandera })
+        .then({});
+
+    res.json('Se hizo la query')
+
+
+}
 
 
 
 
 exports.pay = (req, res) => {
     console.log(req.body);
-    aporte= req.body.cantidad;
+    aporte = req.body.cantidad;
     console.log("🚀 ~ file: PerfilController.js ~ line 102 ~ aporte", aporte)
-    
-    
+
+
     Registro.query()
         .withGraphJoined("RegistroUsuario")
         .where("RegistroUsuario.FK_Registro", "=", idu)
@@ -158,20 +221,20 @@ exports.pay = (req, res) => {
 };
 
 exports.paysuccess = (req, res) => {
-  
+
 
     Donaciones.query()
-    .insert({
-        ID_Organizacion: parseInt(idOrganizacion),
-        ID_Usuario: req.session.IdSession,
-        Cantidad: aporte,
-        Fecha: dateTime,
-    })
-    .then((registroCreado) => {
-        console.log(registroCreado);
-    });
-  
- 
+        .insert({
+            ID_Organizacion: parseInt(idOrganizacion),
+            ID_Usuario: req.session.IdSession,
+            Cantidad: aporte,
+            Fecha: dateTime,
+        })
+        .then((registroCreado) => {
+            console.log(registroCreado);
+        });
+
+
 
     const payerId = req.query.PayerID;
     const paymentId = req.query.paymentId;
@@ -202,9 +265,9 @@ exports.paysuccess = (req, res) => {
         }
     );
 
-  
 
- 
+
+
 
 
 };
