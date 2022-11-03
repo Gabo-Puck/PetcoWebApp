@@ -28,6 +28,8 @@ const { ValidationError } = require("./utils/ValidationError");
 const {
   deleteNotificacionesMeses,
   deleteUsuarioInactividad,
+  deleteUsuariosSinValidar,
+  deleteMascotasInactivas,
 } = require("./controllers/rutinasChrono");
 
 app.use(sessionMiddleware);
@@ -91,6 +93,8 @@ const job = schedule.scheduleJob("*/1 * * * *", function (dated) {
   console.log("1 minuto");
   deleteNotificacionesMeses(dated);
   deleteUsuarioInactividad(dated);
+  deleteUsuariosSinValidar(dated);
+  deleteMascotasInactivas(dated);
 });
 
 // catch 404 and forward to error handler

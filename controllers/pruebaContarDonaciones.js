@@ -584,37 +584,159 @@ Date.prototype.substractMonths = function (months) {
 
 //USUARIOS INACTIVOS
 
+// let hoy = new Date(Date.now());
+// let fecha = getDateFormated(hoy);
+// let date2 = new Date(fecha);
+// date2 = date2.substractMonths(12);
+// console.log(
+//   date2.toLocaleDateString("es-MX", date2.toLocaleTimeString("es-MX"))
+// );
+
+// Usuario.query()
+//   .withGraphJoined(
+//     "[Publicaciones.[Mascota.[MascotasImagenes,MascotasProceso]],Protocolos.[Pasos]]",
+//     { minimize: true }
+//   )
+//   .where("usuario.UltimaConexion", "<", date2)
+//   .then((usuariosEliminar) => {
+//     // console.log(usuariosEliminar);
+//     console.log(
+//       `Usuarios a borrar a partir de la fecha: ${date2.toLocaleDateString(
+//         "es-MX"
+//       )} ${date2.toLocaleTimeString("es-MX")}`
+//     );
+//     console.log(`Fecha de ejecución ${fecha}`);
+//     console.log(usuariosEliminar);
+//     let usuariosPromises = [];
+//     usuariosEliminar.forEach((usuario) => {
+//       usuariosPromises.push(deleteUsuarioPromise(usuario));
+//     });
+//     Promise.all(usuariosPromises).then(() => {
+//       console.log(`Se han eliminado ${usuariosEliminar.length} usuarios`);
+//     });
+//   });
+
+//USUARIOS SIN VALIDACION
+// let hoy = new Date(Date.now());
+// let fecha = getDateFormated(hoy);
+// let date2 = new Date(fecha);
+// date2 = date2.substractMonths(5);
+// console.log(
+//   date2.toLocaleDateString("es-MX", date2.toLocaleTimeString("es-MX"))
+// );
+
+// Registro.query()
+//   .withGraphJoined("RegistroUsuario")
+//   .where("Fecha_Registro", "<", date2)
+//   .then((registrosEliminar) => {
+//     // console.log(usuariosEliminar);
+
+//     console.log(
+//       `Usuarios sin validar a borrar a partir de la fecha: ${date2.toLocaleDateString(
+//         "es-MX"
+//       )} ${date2.toLocaleTimeString("es-MX")}`
+//     );
+//     let usuariosEliminarArray = [];
+//     registrosEliminar.forEach((usuario) => {
+//       if (usuario.RegistroUsuario == null) {
+//         usuariosEliminarArray.push(usuario);
+//       }
+//     });
+//     console.log(`Fecha de ejecución ${fecha}`);
+
+//     console.log(usuariosEliminarArray);
+//     let registrosPromises = [];
+//     registrosEliminar.forEach((registro) => {
+//       registrosPromises.push(deleteRegistroPromise(registro));
+//     });
+//     Promise.all(usuariosPromises).then(() => {
+//       console.log(`Se han eliminado ${registrosEliminar.length} usuarios`);
+//     });
+//   });
+
+// function deleteRegistroPromise(registro) {
+//   return new Promise((resolve, reject) => {
+//     let documentos = registro.Documento_Identidad.split(";");
+//     let req = {
+//       deleteFilesPath: [],
+//     };
+//     documentos.forEach((documento) => {
+//       let pathCorrected = "public/" + documento;
+//       if (pathCorrected != "public/") {
+//         req.deleteFilesPath.push(pathCorrected);
+//       }
+//     });
+//     registro
+//       .$query()
+//       .delete()
+//       .then(() => {
+//         Promise.all(deleteFiles(req)).then(() => {
+//           resolve("ok");
+//         });
+//       });
+//   });
+// }
+
+//Mascotas inactivas
 let hoy = new Date(Date.now());
 let fecha = getDateFormated(hoy);
 let date2 = new Date(fecha);
-date2 = date2.substractMonths(12);
+date2 = date2.substractMonths(4);
 console.log(
   date2.toLocaleDateString("es-MX", date2.toLocaleTimeString("es-MX"))
 );
 
-Usuario.query()
-  .withGraphJoined(
-    "[Publicaciones.[Mascota.[MascotasImagenes,MascotasProceso]],Protocolos.[Pasos]]",
-    { minimize: true }
-  )
-  .where("usuario.UltimaConexion", "<", date2)
-  .then((usuariosEliminar) => {
-    // console.log(usuariosEliminar);
+Mascota.query()
+  .where("Fecha_Ultima_Solicitud", "<", date2)
+  .withGraphJoined("Mascota.[MascotasImagenes,MascotasProceso]")
+  .then((MascotasEliminar) => {
     console.log(
-      `Usuarios a borrar a partir de la fecha: ${date2.toLocaleDateString(
+      `Mascotas inactivas a borrar a partir de la fecha: ${date2.toLocaleDateString(
         "es-MX"
       )} ${date2.toLocaleTimeString("es-MX")}`
     );
-    console.log(`Fecha de ejecución ${fecha}`);
-    console.log(usuariosEliminar);
-    let usuariosPromises = [];
-    usuariosEliminar.forEach((usuario) => {
-      usuariosPromises.push(deleteUsuarioPromise(usuario));
+    let promisesMascotas = [];
+    MascotasEliminar.forEach((mascota) => {
+      promiseMascotas.push(deleteMascotaPromise(mascota));
     });
-    Promise.all(usuariosPromises).then(() => {
-      console.log(`Se han eliminado ${usuariosEliminar.length} usuarios`);
+    console.log(`Fecha de ejecución ${fecha}`);
+    Promise.all(promisesMascotas).then(() => {
+      console.log(`Se han eliminado ${MascotasEliminar.length} mascotas`);
     });
   });
+
+function deleteMascotaPromise(mascota) {
+  return new Promise((resolve, reject) => {
+    let req = {};
+    req.deleteFilesPath = [];
+    let arrayImagenesID = [];
+    let mascotasPublicacion = PublicacionUsuario.Mascota;
+    console.log(
+      "🚀 ~ file: pruebaContarDonaciones.js ~ line 115 ~ PublicacionesReportadas.Mascota.forEach ~  mascota.MascotasImagenes",
+      mascota.MascotasImagenes
+    );
+    let arrayImagenes = mascota.MascotasImagenes.map(
+      (x) => "public" + x.Ruta.replaceAll("\\", "/")
+    );
+    let arrayID = mascota.MascotasImagenes.map((x) => x.ID);
+    arrayImagenesID = arrayImagenesID.concat(arrayID);
+    let arrayArchivos = mascota.MascotasProceso.filter(
+      (PasoArchivo) => PasoArchivo.Archivo != null
+    );
+    arrayArchivos = arrayArchivos.map((x) => x.Archivo.replaceAll("\\", "/"));
+    arrayImagenes = arrayImagenes.filter((Ruta) => Ruta != null);
+    req.deleteFilesPath = req.deleteFilesPath.concat(arrayImagenes);
+    req.deleteFilesPath = req.deleteFilesPath.concat(arrayArchivos);
+    mascota
+      .query()
+      .delete()
+      .then(() => {
+        Promise.all(deleteFiles(req)).then(() => {
+          resolve("ok");
+        });
+      });
+  });
+}
 
 function deleteUsuarioPromise(usuarioFind) {
   return new Promise((resolve, reject) => {

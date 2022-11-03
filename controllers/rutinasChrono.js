@@ -1,4 +1,5 @@
 const Imagenes = require("../models/Imagenes");
+const Mascota = require("../models/Mascota");
 const Notificaciones = require("../models/Notificaciones");
 const Registro = require("../models/Registro");
 const Usuario = require("../models/Usuario");
@@ -75,7 +76,147 @@ exports.deleteUsuarioInactividad = (fecha_exec) => {
     });
 };
 
-exports.deleteUsuariosSinValidar = (fecha_exec) => {};
+exports.deleteUsuariosSinValidar = (fecha_exec) => {
+  let fecha = getDateFormated(fecha_exec);
+  let date2 = new Date(fecha);
+  date2 = date2.substractMonths(5);
+  console.log(
+    date2.toLocaleDateString("es-MX", date2.toLocaleTimeString("es-MX"))
+  );
+
+  Registro.query()
+    .withGraphJoined("RegistroUsuario")
+    .where("Fecha_Registro", "<", date2)
+    .then((registrosEliminar) => {
+      // console.log(usuariosEliminar);
+
+      console.log(
+        `Usuarios sin validar a borrar a partir de la fecha: ${date2.toLocaleDateString(
+          "es-MX"
+        )} ${date2.toLocaleTimeString("es-MX")}`
+      );
+      let usuariosEliminarArray = [];
+      registrosEliminar.forEach((usuario) => {
+        if (usuario.RegistroUsuario == null) {
+          usuariosEliminarArray.push(usuario);
+        }
+      });
+      console.log(`Fecha de ejecución ${fecha}`);
+
+      console.log(usuariosEliminarArray);
+      let registrosPromises = [];
+      registrosEliminar.forEach((registro) => {
+        registrosPromises.push(deleteRegistroPromise(registro));
+      });
+      Promise.all(registrosPromises).then(() => {
+        console.log(`Se han eliminado ${registrosEliminar.length} usuarios`);
+      });
+    });
+};
+
+exports.deleteMascotasInactivas = (fecha_exec) => {
+  let fecha = getDateFormated(fecha_exec);
+  let date2 = new Date(fecha);
+  date2 = date2.substractMonths(4);
+  console.log(
+    date2.toLocaleDateString("es-MX", date2.toLocaleTimeString("es-MX"))
+  );
+
+  Mascota.query()
+    .where("Fecha_Ultima_Solicitud", "<", date2)
+    .withGraphJoined("[MascotasImagenes,MascotasProceso]")
+    .then((MascotasEliminar) => {
+      console.log(
+        `Mascotas inactivas a borrar a partir de la fecha: ${date2.toLocaleDateString(
+          "es-MX"
+        )} ${date2.toLocaleTimeString("es-MX")}`
+      );
+      let promisesMascotas = [];
+      MascotasEliminar.forEach((mascota) => {
+        promisesMascotas.push(deleteMascotaPromise(mascota));
+      });
+      console.log(`Fecha de ejecución ${fecha}`);
+      Promise.all(promisesMascotas).then(() => {
+        console.log(`Se han eliminado ${MascotasEliminar.length} mascotas`);
+      });
+    });
+};
+
+function deleteMascotaPromise(mascota) {
+  return new Promise((resolve, reject) => {
+    let req = {};
+    req.deleteFilesPath = [];
+    let arrayImagenesID = [];
+    console.log(
+      "🚀 ~ file: pruebaContarDonaciones.js ~ line 115 ~ PublicacionesReportadas.Mascota.forEach ~  mascota.MascotasImagenes",
+      mascota.MascotasImagenes
+    );
+    let arrayImagenes = mascota.MascotasImagenes.map(
+      (x) => "public" + x.Ruta.replaceAll("\\", "/")
+    );
+    let arrayID = mascota.MascotasImagenes.map((x) => x.ID);
+    arrayImagenesID = arrayImagenesID.concat(arrayID);
+    let arrayArchivos = mascota.MascotasProceso.filter(
+      (PasoArchivo) => PasoArchivo.Archivo != null
+    );
+    arrayArchivos = arrayArchivos.map((x) => x.Archivo.replaceAll("\\", "/"));
+    arrayImagenes = arrayImagenes.filter((Ruta) => Ruta != null);
+    req.deleteFilesPath = req.deleteFilesPath.concat(arrayImagenes);
+    req.deleteFilesPath = req.deleteFilesPath.concat(arrayArchivos);
+    let arrayPromises = [];
+    arrayID.forEach((id) => {
+      arrayPromises.push(createPromiseEliminarImagen(id));
+    });
+    mascota
+      .$query()
+      .delete()
+      .then(() => {
+        Promise.all(deleteFiles(req)).then(() => {
+          Promise.all(arrayPromises).then(() => {
+            resolve("ok");
+          });
+        });
+      });
+  });
+}
+
+function createPromiseEliminarImagen(id) {
+  // console.log(
+  //   "🚀 ~ file: ModeradorController.js ~ line 222 ~ createPromiseReporte ~ reporte",
+  //   reporte
+  // );
+  return new Promise((resolve, reject) => {
+    resolve(
+      Imagenes.query()
+        .findById(id)
+        .delete()
+        .then(() => {})
+    );
+  });
+}
+
+function deleteRegistroPromise(registro) {
+  return new Promise((resolve, reject) => {
+    let documentos = registro.Documento_Identidad.split(";");
+    let req = {
+      deleteFilesPath: [],
+    };
+    documentos.forEach((documento) => {
+      let pathCorrected = "public/" + documento;
+      if (pathCorrected != "public/") {
+        req.deleteFilesPath.push(pathCorrected);
+      }
+    });
+    registro
+      .$query()
+      .delete()
+      .then(() => {
+        Promise.all(deleteFiles(req)).then(() => {
+          resolve("ok");
+        });
+      });
+  });
+}
 
 function deleteUsuarioPromise(usuarioFind) {
   return new Promise((resolve, reject) => {
