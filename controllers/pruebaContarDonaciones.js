@@ -599,7 +599,21 @@ Usuario.query()
   )
   .where("usuario.UltimaConexion", "<", date2)
   .then((usuariosEliminar) => {
+    // console.log(usuariosEliminar);
+    console.log(
+      `Usuarios a borrar a partir de la fecha: ${date2.toLocaleDateString(
+        "es-MX"
+      )} ${date2.toLocaleTimeString("es-MX")}`
+    );
+    console.log(`Fecha de ejecución ${fecha}`);
     console.log(usuariosEliminar);
+    let usuariosPromises = [];
+    usuariosEliminar.forEach((usuario) => {
+      usuariosPromises.push(deleteUsuarioPromise(usuario));
+    });
+    Promise.all(usuariosPromises).then(() => {
+      console.log(`Se han eliminado ${usuariosEliminar.length} usuarios`);
+    });
   });
 
 function deleteUsuarioPromise(usuarioFind) {
@@ -670,6 +684,7 @@ function deleteUsuarioPromise(usuarioFind) {
               .then(() => {
                 console.log("Todo correcto");
                 // res.json("ok");
+                resolve("ok");
               });
           });
         });
@@ -677,6 +692,20 @@ function deleteUsuarioPromise(usuarioFind) {
   });
 }
 
+function createPromiseEliminarImagen(id) {
+  // console.log(
+  //   "🚀 ~ file: ModeradorController.js ~ line 222 ~ createPromiseReporte ~ reporte",
+  //   reporte
+  // );
+  return new Promise((resolve, reject) => {
+    resolve(
+      Imagenes.query()
+        .findById(id)
+        .delete()
+        .then(() => {})
+    );
+  });
+}
 // function getNotificacionesMeses(fecha_exec) {
 //   // Notificaciones.query().where()
 // }

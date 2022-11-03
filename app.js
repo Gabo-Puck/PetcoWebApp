@@ -25,7 +25,10 @@ const sessionMiddleware = session({
 });
 const cors = require("cors");
 const { ValidationError } = require("./utils/ValidationError");
-const { deleteNotificacionesMeses } = require("./controllers/rutinasChrono");
+const {
+  deleteNotificacionesMeses,
+  deleteUsuarioInactividad,
+} = require("./controllers/rutinasChrono");
 
 app.use(sessionMiddleware);
 app.use(cors());
@@ -87,6 +90,7 @@ const job = schedule.scheduleJob("*/1 * * * *", function (dated) {
   console.log(dated);
   console.log("1 minuto");
   deleteNotificacionesMeses(dated);
+  deleteUsuarioInactividad(dated);
 });
 
 // catch 404 and forward to error handler
