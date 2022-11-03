@@ -17,6 +17,7 @@ const {
 } = require("./NotificacionesController");
 const Mascota = require("../models/Mascota");
 const Pasos_Mascota = require("../models/Pasos_Mascota");
+const Notificaciones = require("../models/Notificaciones");
 
 // // Metas.query()
 // //   .withGraphJoined("[MetasDonaciones,Mascota]")
@@ -398,6 +399,12 @@ Date.prototype.addDays = function (days) {
   return date;
 };
 
+Date.prototype.substractMonths = function (months) {
+  var date = new Date(this.valueOf());
+  date.setMonth(date.getMonth() - months);
+  return date;
+};
+
 // let dateHoy = new Date(2003, 9, 1);
 // console.log(
 //   "🚀 ~ file: pruebaContarDonaciones.js ~ line 391 ~ dateHoy",
@@ -516,32 +523,163 @@ Date.prototype.addDays = function (days) {
 //     console.log(err);
 //   });
 
-Protocolo.query()
-  .withGraphJoined("[FormularioProtocolo,Pasos.[Mascota]]")
-  .where("protocolos.ID_Usuario", "=", 4)
-  .then((Protocolos) => {
-    // res.render("Formulario/FormDashboard.ejs", {
-    //   Elemento: Formularios,
-    //   Elemento2: Protocolos,
-    //   Tipo: req.session.Tipo,
-    // });
-    let Formularios = [];
-    Protocolos.forEach((protocolo) => {
-      console.log(protocolo.Titulo);
-      if (protocolo.Pasos[0].Mascota.length > 0) {
-        console.log("Este protocolo no se puede editar");
-        protocolo.isEditable = false;
-        protocolo.FormularioProtocolo.isEditable = false;
-      } else {
-        console.log("Este protocolo se puede editar");
-        protocolo.isEditable = true;
-        protocolo.FormularioProtocolo.isEditable = true;
-      }
-      Formularios.push(protocolo.FormularioProtocolo);
-      console.log(protocolo);
-      console.log("\n\n");
-    });
+// Protocolo.query()
+//   .withGraphJoined("[FormularioProtocolo,Pasos.[Mascota]]")
+//   .where("protocolos.ID_Usuario", "=", 4)
+//   .then((Protocolos) => {
+//     // res.render("Formulario/FormDashboard.ejs", {
+//     //   Elemento: Formularios,
+//     //   Elemento2: Protocolos,
+//     //   Tipo: req.session.Tipo,
+//     // });
+//     let Formularios = [];
+//     Protocolos.forEach((protocolo) => {
+//       console.log(protocolo.Titulo);
+//       if (protocolo.Pasos[0].Mascota.length > 0) {
+//         console.log("Este protocolo no se puede editar");
+//         protocolo.isEditable = false;
+//         protocolo.FormularioProtocolo.isEditable = false;
+//       } else {
+//         console.log("Este protocolo se puede editar");
+//         protocolo.isEditable = true;
+//         protocolo.FormularioProtocolo.isEditable = true;
+//       }
+//       Formularios.push(protocolo.FormularioProtocolo);
+//       console.log(protocolo);
+//       console.log("\n\n");
+//     });
+//   });
+
+//NOTIFICACIONES
+// let hoy = new Date(Date.now());
+// let fecha = getDateFormated(hoy);
+// let date2 = new Date(fecha);
+// date2 = date2.substractMonths(2);
+
+// console.log(date2);
+// Notificaciones.query()
+//   .where("Fecha_Generacion", "<", date2)
+//   .then((notificacionesBorrar) => {
+//     console.log(
+//       `Notificaciones a borrar a partir de la fecha: ${date2.toLocaleDateString(
+//         "es-MX"
+//       )} ${date2.toLocaleTimeString("es-MX")}`
+//     );
+//     console.log(`Fecha de ejecución ${fecha}`);
+//     console.log(notificacionesBorrar);
+//     let promises = [];
+//     notificacionesBorrar.forEach((notificacion) => {
+//       promises.push(promisesBorrarNotificacion(notificacion));
+//     });
+//     Promise.all(promises).then(() => {
+//       console.log(`${notificacionesBorrar.length} notificaciones borradas`);
+//     });
+//   });
+
+// function promisesBorrarNotificacion(notificacion) {
+//   return new Promise((resolve, reject) => {
+//     resolve(notificacion.$query().delete());
+//   });
+// }
+
+//USUARIOS INACTIVOS
+
+let hoy = new Date(Date.now());
+let fecha = getDateFormated(hoy);
+let date2 = new Date(fecha);
+date2 = date2.substractMonths(12);
+console.log(
+  date2.toLocaleDateString("es-MX", date2.toLocaleTimeString("es-MX"))
+);
+
+Usuario.query()
+  .withGraphJoined(
+    "[Publicaciones.[Mascota.[MascotasImagenes,MascotasProceso]],Protocolos.[Pasos]]",
+    { minimize: true }
+  )
+  .where("usuario.UltimaConexion", "<", date2)
+  .then((usuariosEliminar) => {
+    console.log(usuariosEliminar);
   });
+
+function deleteUsuarioPromise(usuarioFind) {
+  return new Promise((resolve, reject) => {
+    let registroID = usuarioFind.FK_Registro;
+    console.log(
+      "🚀 ~ file: pruebaContarDonaciones.js ~ line 229 ~ .then ~ PublicacionesReportadas.Publicaciones[1]",
+      usuarioFind
+    );
+    let req = {};
+    req.deleteFilesPath = [];
+    let arrayImagenesID = [];
+
+    usuarioFind.Publicaciones.forEach((PublicacionUsuario) => {
+      if (PublicacionUsuario.Mascota.length != 0) {
+        let mascotasPublicacion = PublicacionUsuario.Mascota;
+        mascotasPublicacion.forEach((mascota) => {
+          console.log(
+            "🚀 ~ file: pruebaContarDonaciones.js ~ line 115 ~ PublicacionesReportadas.Mascota.forEach ~  mascota.MascotasImagenes",
+            mascota.MascotasImagenes
+          );
+          let arrayImagenes = mascota.MascotasImagenes.map(
+            (x) => "public" + x.Ruta.replaceAll("\\", "/")
+          );
+          let arrayID = mascota.MascotasImagenes.map((x) => x.ID);
+          arrayImagenesID = arrayImagenesID.concat(arrayID);
+          let arrayArchivos = mascota.MascotasProceso.filter(
+            (PasoArchivo) => PasoArchivo.Archivo != null
+          );
+          arrayArchivos = arrayArchivos.map((x) =>
+            x.Archivo.replaceAll("\\", "/")
+          );
+          arrayImagenes = arrayImagenes.filter((Ruta) => Ruta != null);
+          req.deleteFilesPath = req.deleteFilesPath.concat(arrayImagenes);
+          req.deleteFilesPath = req.deleteFilesPath.concat(arrayArchivos);
+        });
+      }
+    });
+    if (usuarioFind.Protocolos.length != 0) {
+      let ProtocolosUsuario = usuarioFind.Protocolos;
+      ProtocolosUsuario.forEach((protocolo) => {
+        let arrayArchivos = protocolo.Pasos.map((x) =>
+          x.Archivo.replaceAll("\\", "/")
+        );
+        arrayArchivos = arrayArchivos.filter((Archivo) => Archivo != null);
+        req.deleteFilesPath = req.deleteFilesPath.concat(arrayArchivos);
+      });
+    }
+    if (
+      usuarioFind.Foto_Perfil != "/images/ImagenesPerfilUsuario/default.png"
+    ) {
+      req.deleteFilesPath.push(usuarioFind.Foto_Perfil);
+    }
+
+    usuarioFind
+      .$query()
+      .delete()
+      .then(() => {
+        let arrayPromises = [];
+        arrayImagenesID.forEach((idImagen) => {
+          arrayPromises.push(createPromiseEliminarImagen(idImagen));
+        });
+        let borrarArchivosPromises = deleteFiles(req);
+        Promise.all(arrayPromises).then(() => {
+          Promise.all(borrarArchivosPromises).then(() => {
+            Registro.query()
+              .deleteById(registroID)
+              .then(() => {
+                console.log("Todo correcto");
+                // res.json("ok");
+              });
+          });
+        });
+      });
+  });
+}
+
+// function getNotificacionesMeses(fecha_exec) {
+//   // Notificaciones.query().where()
+// }
 
 // Formulario.query()
 //   .where("formulario.ID_Usuario", "=", 4)

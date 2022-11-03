@@ -13,6 +13,7 @@ var publicacionget = require("./routes/PublicacionGetRouter");
 var loginRouter = require("./routes/login");
 var authRequired = require("./routes/authRequired");
 var authRequiredModerador = require("./routes/authRequiredModerador");
+var schedule = require("node-schedule");
 var app = express();
 
 const session = require("express-session");
@@ -24,6 +25,7 @@ const sessionMiddleware = session({
 });
 const cors = require("cors");
 const { ValidationError } = require("./utils/ValidationError");
+const { deleteNotificacionesMeses } = require("./controllers/rutinasChrono");
 
 app.use(sessionMiddleware);
 app.use(cors());
@@ -80,6 +82,13 @@ function isLoggedModerador(req, res, next) {
     return res.redirect("/login");
   }
 }
+
+const job = schedule.scheduleJob("*/1 * * * *", function (dated) {
+  console.log(dated);
+  console.log("1 minuto");
+  deleteNotificacionesMeses(dated);
+});
+
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));

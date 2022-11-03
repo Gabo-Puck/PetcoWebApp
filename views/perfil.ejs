@@ -742,7 +742,15 @@
 
         window.onload = function () { //Se ejecuta al terminar de cargar la pagina
           //Determinar longitud principal
-          animate('<%=user[0].Reputacion%>');
+          if ('<%=user[0].Reputacion%>' == 0)
+          {
+            animate('<%=user[0].Reputacion%>' +1 );
+          }
+          else
+          {
+            animate('<%=user[0].Reputacion%>');
+
+          }
 
           let InitialLoading = 0;
     
