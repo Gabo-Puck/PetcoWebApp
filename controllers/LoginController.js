@@ -110,6 +110,7 @@ exports.CheckDB = (req, res, next) => {
               });
             }
             if (Results[0].Tipo_Usuario == 3) {
+              req.session.isModerador = true;
               res.render("login.ejs", {
                 alert: true,
                 alertTitle: "Conexion Exitosa",

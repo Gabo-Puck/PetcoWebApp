@@ -295,6 +295,18 @@ exports.denegarSolicitud = (req, res, next) => {
   }
 };
 
+exports.eliminarSolicitud = (req, res, next) => {
+  Solicitudes.query()
+    .deleteById(req.body.SolicitudID)
+    .then(() => {
+      res.json("ok");
+    })
+    .catch((err) => {
+      console.log(err);
+      res.json("Algo ha salido mal, intentalo más tarde");
+    });
+};
+
 function patchPasosDefaultPromise(PasoProceso) {
   let valueCompletado = 0;
   if (PasoProceso.ID_Paso == 1) {
@@ -314,7 +326,16 @@ function patchPasosDefaultPromise(PasoProceso) {
 
 exports.verSolicitudesUsuario = (req, res, next) => {
   Usuario.query()
-    .withGraphFetched("Solicitudes")
-    .findById()
-    .then((UsuarioSolicitudes) => {});
+    .withGraphFetched("Solicitudes.Mascota.[MascotasImagenes,MascotasEspecie]")
+    .findById(req.session.IdSession)
+    .then((UsuarioSolicitudes) => {
+      console.log(
+        "🚀 ~ file: pruebaContarDonaciones.js ~ line 497 ~ .then ~ UsuarioSolicitudes",
+        UsuarioSolicitudes
+      );
+      res.render("usuarioVerSolicitudes.ejs", {
+        Tipo: req.session.Tipo,
+        UsuarioSolicitudes: UsuarioSolicitudes,
+      });
+    });
 };

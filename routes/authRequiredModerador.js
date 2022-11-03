@@ -2,12 +2,17 @@ var express = require("express");
 var router = express.Router();
 
 var Moderador_Controller = require("../controllers/ModeradorController");
+var Moderador_Controller2 = require("../controllers/registroController");
 
-router.get("/", Moderador_Controller.crearModeradorGet);
+router.get("/crearModerador", Moderador_Controller.crearModeradorGet);
 // Usuario reportes
 router.get(
   "/verReportesUsuarios",
   Moderador_Controller.verUsuariosReportadosGet
+);
+router.get(
+  "/registros_pendientes",
+  Moderador_Controller2.registros_pendientes_list
 );
 router.get(
   "/verUsuarioReportes/:idUsuario",
@@ -53,7 +58,7 @@ router.post(
 );
 
 router.post("/activarPublicacion", Moderador_Controller.activarPublicacion);
-router.post("/eliminarPublicacion", Moderador_Controller.eliminarPublicacion);
+router.post("/eliminarPublicacion", Moderador_Controller.desactivarPublicacion);
 //Publicacion reportes
 
 module.exports = router;

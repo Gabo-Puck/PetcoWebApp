@@ -39,24 +39,28 @@
             aria-expanded="false"><i class="fa-solid fa-bars fa-lg"></i></a>
           <div class="dropdown-menu">
             <a class="dropdown-item" href="/petco/inicio/PublicacionesGuardadas">Publicaciones Guardadas</a>
-            <a class="dropdown-item" href="#">Another action</a>
             <%if(Tipo==1){%>
             <a class="dropdown-item" href="#" id="VerD">Ver donaciones</a>
             <%}%>
 
             <%if(Tipo==1){%>
               <a class="dropdown-item" href="/petco/dashboard">Dashboard</a>
+              <a class="dropdown-item" href="/petco/solicitudes/verUsuario">Ver procesos</a>
 
               <!-- Cosas de organizacion -->
-              <%}%>
-                <%if(Tipo==2){%>
+            <%}%>
+            <%if(Tipo==2){%>
                   <!-- Cosas de comun -->
-                  <a class="dropdown-item" href="#">Ver procesos</a>
-
-                  <%}%>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="/petco/inicio/cerrarsession/" id="logout">Cerrar sesion
-                      <i class="fa-solid fa-door-open fa-lg" style="color: #ea2340"></i></a>
+              <a class="dropdown-item" href="/petco/solicitudes/verUsuario">Ver procesos</a>
+            <%}%>
+            <%if(Tipo==3){%>
+              <a class="dropdown-item" href="/moderador/registros_pendientes">Ver registros pendientes</a>
+              <a class="dropdown-item" href="/moderador/verReportesUsuarios">Ver reportes usuarios</a>
+              <a class="dropdown-item" href="/moderador/verReportes">Ver reportes publicaciones</a>
+            <%}%>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="/petco/inicio/cerrarsession/" id="logout">Cerrar sesion
+              <i class="fa-solid fa-door-open fa-lg" style="color: #ea2340"></i></a>
           </div>
         </li>
       </ul>

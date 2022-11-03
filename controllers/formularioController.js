@@ -724,6 +724,37 @@ exports.formulario_edit_get = [
   },
 ];
 
+exports.formulario_ver = [
+  getTemplatePreguntas,
+  (req, res) => {
+    if (req.session.Tipo == 1) {
+      var IdSession = req.session.IdSession;
+      res.permiso = true;
+      // console.log("a");
+      Formulario.query()
+        .withGraphJoined("Preguntas.[Opciones_Respuestas_Pregunta,Respuestas]")
+        .where("formulario.ID", "=", req.params.idFormulario)
+        .andWhere("formulario.ID_Usuario", "=", IdSession)
+        // .then((FormWPreguntas) => FormWPreguntas.json())
+        .then((Formulario) => promiseFetchTemplate(Formulario, res))
+        .then((response) => {
+          // console.log(FormWPreguntas);
+          if (response == "") {
+            res.redirect("/petco/dashboard");
+          } else {
+            res.render("Formulario/verFormulario", {
+              Response: response,
+              Tipo: req.session.Tipo,
+            });
+          }
+          // console.log(response);
+        });
+    } else {
+      res.redirect("/petco/inicio");
+    }
+  },
+];
+
 exports.formulario_edit_post = (req, res) => {
   // console.log(req.body);
 

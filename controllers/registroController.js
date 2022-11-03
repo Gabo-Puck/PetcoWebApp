@@ -384,8 +384,12 @@ const checkIfPendiente = (registro, res) => {
 
 const patchRegistroPendiente = (registro, pendiente) => {
   return new Promise((resolve, reject) => {
+    let Fecha_Registro = getTodayDateFormated();
     resolve(
-      Registro.query().patchAndFetchById(registro.ID, { Pendiente: pendiente })
+      Registro.query().patchAndFetchById(registro.ID, {
+        Pendiente: pendiente,
+        Fecha_Registro: Fecha_Registro,
+      })
     );
   });
 };
@@ -527,6 +531,7 @@ exports.registro_crear_post = [
           ).concat(" ", req.body.ApellidoM);
         }
         console.log(req.body);
+        let Fecha_Registro = getTodayDateFormated();
         Registro.query()
           .insert({
             Tipo_Usuario: req.body.Tipo,
@@ -537,6 +542,7 @@ exports.registro_crear_post = [
             Contrasena: req.body.Contrasena,
             Documento_Identidad: req.body.pathFilesSaved,
             Pendiente: 1,
+            Fecha_Registro: Fecha_Registro,
           })
           .then((registroCreado) => {
             return res.json({ res: "ok i did it" });
@@ -569,6 +575,8 @@ exports.registro_editar_patch = [
             req.body.ApellidoP
           ).concat(" ", req.body.ApellidoM);
         }
+        let Fecha_Registro = getTodayDateFormated();
+
         Registro.query()
           .findById(req.registroIdDecrypted)
           .patch({
@@ -580,6 +588,7 @@ exports.registro_editar_patch = [
             Contrasena: req.body.Contrasena,
             Documento_Identidad: req.body.pathFilesSaved,
             Pendiente: 1,
+            Fecha_Registro: Fecha_Registro,
           })
           .then((registroCreado) => {
             let as = "";
@@ -686,7 +695,10 @@ exports.registros_pendientes_list = (req, res, next) => {
     // .whereNot("RegistroUsuario.ID", ">", "0")
     .andWhere("registro.Pendiente", "=", "1")
     .then((registrosPendientes) => {
-      res.render("listaRegistros", { registros: registrosPendientes });
+      res.render("listaRegistros", {
+        registros: registrosPendientes,
+        Tipo: req.session.Tipo,
+      });
       // res.json(Result);
     })
     .catch((err) => {

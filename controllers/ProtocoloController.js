@@ -354,7 +354,7 @@ exports.ProtocoloCrear = [
   fetchInput(acceptedTypes, "./public/archivosPasos"),
   check("Pasos.*.Titulo_Paso")
     .isLength({ min: 10 })
-    .withMessage("El titulo debe de tener por lo menos 5 caracteres"),
+    .withMessage("El titulo debe de tener por lo menos 10 caracteres"),
   check("Pasos.*.Descripcion")
     .isLength({ min: 10 })
     .withMessage("La descripción debe de tener por lo menos 10 caracteres"),
@@ -408,6 +408,57 @@ exports.ProtocoloEditarGet = [
     // res.render("Protocolo/EditarProtocolo");
   },
 ];
+
+exports.ProtocoloVer = [
+  loadTemplate,
+  getFormularios,
+  getProtocolo,
+  (req, res) => {
+    Protocolo.query()
+      .withGraphJoined("Pasos")
+      .findOne({
+        "protocolos.ID_Usuario": req.session.IdSession,
+        "protocolos.ID": req.params.idProtocolo,
+      })
+      .then((protocolo) =>
+        res.render("Protocolo/verProtocolo", {
+          formularios: res.formularios,
+          protocolo: protocolo,
+          pasos: res.pasos,
+          Response: req.htmlTemplate,
+          Tipo: req.session.Tipo,
+        })
+      );
+    // res.render("Protocolo/EditarProtocolo");
+  },
+];
+
+exports.ProtocoloBorrar = (req, res, next) => {
+  Protocolo.query()
+    .withGraphJoined("Pasos")
+    .findById(req.params.idProtocolo)
+    .then((ProtocoloBorrar) => {
+      req.deleteFilesPath = [];
+      if (ProtocoloBorrar.Pasos.length > 0) {
+        ProtocoloBorrar.Pasos.forEach((pasoArchivo) => {
+          req.deleteFilesPath.push(pasoArchivo.Archivo);
+        });
+        ProtocoloBorrar.$query()
+          .delete()
+          .then(() => {
+            Promise.all(deleteFiles(req)).then(() => {
+              res.redirect("/petco/dashboard");
+            });
+          });
+      } else {
+        ProtocoloBorrar.$query()
+          .delete()
+          .then(() => {
+            res.redirect("/petco/dashboard");
+          });
+      }
+    });
+};
 function createPromisePatch(paso) {
   if (paso.Archivo == "") {
     delete paso.Archivo;
@@ -535,15 +586,15 @@ exports.ProtocoloEditarPost = [
   fetchInput(acceptedTypes, "./public/archivosPasos"),
   check("Pasos.*.Titulo_Paso")
     .isLength({ min: 10 })
-    .withMessage("El titulo debe de tener por lo menos 5 caracteres"),
+    .withMessage("El titulo debe de tener por lo menos 10 caracteres"),
   check("Pasos.*.Descripcion")
     .isLength({ min: 10 })
     .withMessage("La descripción debe de tener por lo menos 10 caracteres"),
   check("Pasos.*.DiasEstimados")
     .isLength({ min: 1 })
     .withMessage("Los días estimados deben de tener por lo menos 1 numero")
-    .isInt()
-    .withMessage("Los días estimados deben ser números"),
+    .isInt({ min: 1, max: 10 })
+    .withMessage("Los días estimados deben ser un numero entre 1 y 10"),
   check("Titulo")
     .isLength({ min: 10 })
     .withMessage("El titulo debe de tener por lo menos 10 caracteres"),

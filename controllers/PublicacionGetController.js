@@ -24,21 +24,34 @@ paypal.configure({
     "EP0JlIun8tIoxFQjUjho4CfyPdF-6A042JxLl4EjyjZQIH3g50DuopJcLynP4z4mTDjuxACCye40Hi-p",
 });
 function validateUsuarioResponder(res, mascotas) {
-  res.solicitudesValNumero = false;
+  // res.solicitudesValNumero = true;
   res.arrayMascotasSolicitud = [];
+  let countSolicitudesConsideracion = 0;
   console.log(res.UsuarioSolicitudes[0].Solicitudes);
   if (Array.isArray(res.UsuarioSolicitudes[0].Solicitudes)) {
     res.UsuarioSolicitudes[0].Solicitudes.forEach((UsuarioSolicitud) => {
-      console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAA");
+      // console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAA");
+      if (UsuarioSolicitud.Estado == 0 || UsuarioSolicitud.Estado == 1) {
+        countSolicitudesConsideracion++;
+      }
       mascotas.forEach((m) => {
         console.log(UsuarioSolicitud.ID_Mascota, m.ID);
-        if (UsuarioSolicitud.ID_Mascota == m.ID) {
+        if (
+          UsuarioSolicitud.ID_Mascota == m.ID &&
+          UsuarioSolicitud.Estado >= 0
+        ) {
           res.arrayMascotasSolicitud.push(m.ID);
         }
       });
     });
   }
-  if (res.UsuarioSolicitudes[0].Solicitudes.length < 3) {
+  console.log(
+    "🚀 ~ file: PublicacionGetController.js ~ line 44 ~ mascotas.forEach ~ res.arrayMascotasSolicitud",
+    res.arrayMascotasSolicitud
+  );
+  if (countSolicitudesConsideracion < 3) {
+    res.solicitudesValNumero = false;
+  } else {
     res.solicitudesValNumero = true;
   }
 }
@@ -59,7 +72,7 @@ function getSolicitudes(req, res, next) {
 }
 exports.query = [
   getSolicitudes,
-  (req, res) => {
+  (req, res, next) => {
     Like.query()
       .where("like.ID_Publicacion", "=", req.params.idPublicacion)
 

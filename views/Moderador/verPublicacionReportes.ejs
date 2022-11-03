@@ -326,7 +326,7 @@
                     data-bs-toggle="modal"
                     data-bs-target="#modalActivarPublicacion"
                   >
-                    Acivar publicacion
+                    Activar publicación
                   </button>
                 </div>
                 <div class="row mx-auto text-break" style="width: 80%">
@@ -335,7 +335,7 @@
                     data-bs-toggle="modal"
                     data-bs-target="#modalEliminarPublicacion"
                   >
-                    Eliminar publicación
+                    Desactivar publicación
                   </button>
                 </div>
               </div>
@@ -378,14 +378,16 @@
                 <div class="row">
                   <h1 class="text-center">¿Estas seguro?</h1>
                   <p class="fs-5 text-center">
-                    Al eliminar la publicacion se eliminará todo lo relacionado
+                    <!-- Al eliminar la publicacion se eliminará todo lo relacionado
                     a ella. Esto incluye los procesos activos, archivos de los
-                    procesos activos, mascotas, comentarios, reportes y metas
+                    procesos activos, mascotas, comentarios, reportes y metas -->
+                    Al desactivar la publicación, los usuarios no podrán ver la
+                    publicación
                   </p>
                 </div>
                 <div class="row mb-2 mx-auto text-break" style="width: 50%">
                   <button class="btn btn-danger" id="botonEliminarPublicacion">
-                    Eliminar
+                    Desactivar
                   </button>
                 </div>
               </div>
@@ -634,7 +636,7 @@
         .then((res)=>res.json())
         .then((res)=>{
             if(res=="ok"){
-                Swal.fire("Correcto", "Se ha eliminado la publicación", "success");
+                Swal.fire("Correcto", "Se ha desactivado la publicación", "success");
                 alertPublicacionActiva.classList.add("d-none");
             }else{
                 throw new Error("Algo ha salido mal")

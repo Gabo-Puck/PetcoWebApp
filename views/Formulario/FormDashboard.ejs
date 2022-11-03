@@ -233,7 +233,14 @@ p {
               </tr>
               <tbody>
                 <% for(var i=0; i < Elemento2.length; i++) { %>
-                  
+                  <%let visibilidadControlesProtocolo = ""%>
+                  <%let urlEditar = "/petco/protocolo/editar/"+Elemento2[i].ID%>
+                  <%let urlEliminar = ""%>
+                  <%if(!Elemento2[i].isEditable){%>
+                    <%visibilidadControlesProtocolo = "disabled"%>
+                    <%urlEditar = "/petco/protocolo/ver/"+Elemento2[i].ID;%>
+                    <%urlEliminar = "";%>
+                  <%}%>
                   <tr class="table-default">
                     <td>
                       <%= i+1%>
@@ -244,13 +251,19 @@ p {
                       
                     </td>
                     <td>
-                      <a href="/petco/protocolo/editar/<%= Elemento2[i].ID %>" class="btn btn-warning btn-block">
+                      <%if(visibilidadControlesProtocolo=="disabled"){%>
+                        <a href="<%=urlEditar%>" class="btn btn-info btn-block">
+                          <i class="fa-solid fa-up-right-from-square"></i>
+                        </a>
+                      <%}else{%>
+                      <a href="<%=urlEditar%>" class="btn btn-warning btn-block">
                         <i class="fas fa-edit"></i>
                       </a>
+                      <%}%>
                     </td>
         
                     <td>
-                      <a onclick="confirmar(<%= Elemento2[i].ID %>)" class="btn btn-danger btn-block">
+                      <a onclick="confirmar2(<%= Elemento2[i].ID %>)" class="btn btn-danger btn-block <%=visibilidadControlesProtocolo%>">
                         <i class="fa-solid fa-trash"></i>
                       </a>
                     </td>
@@ -293,8 +306,15 @@ p {
                 <th scope="col"></th>
               </tr>
               <tbody>
-                <% for(var i=0; i < Elemento.length; i++) { %>
-                  
+                <%for(var i=0; i < Elemento.length; i++) { %>
+                  <%let visibilidadControlesFormulario = ""%>
+                  <%let urlEditar = "/petco/formulario/editar/"+Elemento[i].ID%>
+                  <%let urlEliminar = ""%>
+                  <%if(!Elemento[i].isEditable){%>
+                    <%visibilidadControlesFormulario = "disabled";%>
+                    <%urlEditar = "/petco/formulario/ver/"+Elemento[i].ID%>
+                    <%urlEliminar = "";%>
+                  <%}%>
                   <tr class="table-default">
                     <td>
                       <%= i+1%>
@@ -303,13 +323,19 @@ p {
                       <%= Elemento[i].Titulo %>
                     </td>
                     <td>
-                      <a href="/petco/formulario/editar/<%= Elemento[i].ID %>" class="btn btn-warning btn-block">
+                      <%if(visibilidadControlesFormulario=="disabled"){%>
+                        <a href="<%=urlEditar%>" class="btn btn-info btn-block">
+                          <i class="fa-solid fa-up-right-from-square"></i>
+                        </a>
+                      <%}else{%>
+                      <a href="<%=urlEditar%>" class="btn btn-warning btn-block">
                         <i class="fas fa-edit"></i>
                       </a>
+                      <%}%>
                     </td>
         
                     <td>
-                      <a onclick="confirmar(<%= Elemento[i].ID %>)" class="btn btn-danger btn-block">
+                      <a onclick="confirmar(<%= Elemento[i].ID %>)" class="btn btn-danger btn-block <%=visibilidadControlesFormulario%>">
                         <i class="fa-solid fa-trash"></i>
                       </a>
                     </td>
@@ -353,6 +379,21 @@ p {
       }).then((result) => {
         if (result.isConfirmed) {
           window.location = "/petco/formulario/eliminar/" + id;
+        }
+      });
+    }
+    function confirmar2(id) {
+      Swal.fire({
+        title: "¿Seguro que quieres eliminar el protocolo?",
+        icon: "warning",
+        showCancelButton: true,
+        cancelButtonText: "Cancelar",
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Confirmar",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location = "/petco/protocolo/eliminar/" + id;
         }
       });
     }

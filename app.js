@@ -42,7 +42,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // app.use("/inicio", indexRouter);
 app.use("/petco", isLogged, authRequired);
 app.use("/registro", registroRouter);
-app.use("/moderador", authRequiredModerador);
+app.use("/moderador", isLoggedModerador, authRequiredModerador);
 //app.use("/formulario", formulariosRouter);
 app.use("/login", loginRouter);
 // app.use("/protocolo", ProtocoloRouter);
@@ -58,6 +58,18 @@ if (enviroment === "development") {
 
 function isLogged(req, res, next) {
   var IdSession = req.session.IdSession;
+  // IdSession = 2;
+  if (IdSession) {
+    next();
+  } else {
+    if (res.permiso == true) {
+      next();
+    }
+    return res.redirect("/login");
+  }
+}
+function isLoggedModerador(req, res, next) {
+  var IdSession = req.session.isModerador;
   // IdSession = 2;
   if (IdSession) {
     next();

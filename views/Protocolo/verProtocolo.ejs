@@ -6,20 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script>
       const pasos = <%-JSON.stringify(pasos)%>;
+      const protocolo = <%-JSON.stringify(protocolo)%>;
+
       const template = `<%-Response %>`;
       const parse = new DOMParser();
       const templatehtml = parse.parseFromString(template, "text/html");
       const paso = templatehtml.querySelector(".Paso");
     </script>
-        <script
-        src="https://cdn.socket.io/4.5.0/socket.io.min.js"
-        integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k"
-        crossorigin="anonymous"
-      ></script>
     <script
       src="https://kit.fontawesome.com/f0156fc078.js"
       crossorigin="anonymous"
     ></script>
+    <script
+    src="https://cdn.socket.io/4.5.0/socket.io.min.js"
+    integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k"
+    crossorigin="anonymous"
+  ></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
     <link
       rel="stylesheet"
       href="/stylesheets/bootstrap-5.2.0-dist/themes/Lumen/bootstrap.css"
@@ -37,7 +41,7 @@
     ></script>
     <!-- Sweetalert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <title>Crear protocolo</title>
+    <title>Ver protocolo</title>
   </head>
 
   <body class="main">
@@ -56,52 +60,68 @@
       .custom-file-label {
         overflow: hidden;
       }
+      .verArchivo {
+        margin: auto;
+      }
+      .archivoEliminar {
+        margin: auto;
+      }
+      
     </style>
 
-    <div class="container-sm mt-5" style="text-align: center; width: 80%;">
-
-      <h1>Crea un protocolo de adopcion</h1>
-
-      <form class="ProtocoloHeader">
-        <div class="mt-5">
-          
-        <input type="text" class="form-control"  placeholder="Titulo Protocolo" id="Tprotocolo" />
+<div class="container-sm mt-5" style="text-align: center; width: 80%;">
+  <h1>Edita tu protocolo de adopcion</h1>
+    <form class="ProtocoloHeader">
+      <div class="mt-5">
+        <input
+          type="text"
+          class="form-control" 
+          placeholder="Titulo Protocolo"
+          id="Tprotocolo"
+          value="<%-protocolo.Titulo%>"
+        />
       </div>
       <div>
         <input
-        class="form-control mt-3" 
           type="text"
+          class="form-control mt-3" 
           placeholder="Descripcion del Protocolo"
           id="Dprotocolo"
+          value="<%-protocolo.Descripcion%>"
         />
       </div>
-      
+
       <select class="form-select mt-3" id="formU">
         <% for(var i=0; i < formularios.length; i++) { %>
 
-          <option value=" <%=formularios[i].ID %>">
+        <option value=" <%=formularios[i].ID %>">
           <%=formularios[i].Titulo %>
         </option>
 
         <% } %>
       </select>
-
-    </div>
-
-    <div class="container-sm mt-3 pasos" style="text-align: center; max-width: 70%;" >
-      <h4>Especifica los pasos a seguir</h4>
+      
+      
+    <div class="container-sm mt-3 pasos" style="text-align: center; max-width: 70%;" > 
+      <h4>Pasos a seguir</h4>
       <div class="Enviar mt-3 mb-5">
-        <button type="button" class="AddStep btn btn-primary"> 
+
+        <button type="button" class="AddStep btn btn-primary">
           Añadir Paso
         </button>
         <button type="button" class="agregar btn btn-success">Guardar</button>
+
+
       </div>
     </form>
-    
+    </div>
+
+      
+
+
   </div>
-
   <script type="module" src="/javascripts/feed.js"></script>
-
-    <script type="module" src="/javascripts/CrearProtocolo.js"></script>
+  
+    <script type="module" src="/javascripts/verProtocolo.js"></script>
   </body>
 </html>

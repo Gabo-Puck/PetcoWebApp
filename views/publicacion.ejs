@@ -96,7 +96,13 @@
 
     <div class="container mt-5" style="border:1px solid #cecece; text-align:center ;">
         
-
+        <%if(SolicitudesValNumero){%>
+            <div class="alert alert-dismissible alert-info position-fixed bottom-0 end-0 me-4 alertLimite">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <h4 class="alert-heading">¡Aviso!</h4>
+                <p class="mb-0">Haz alcanzado el limite de 3 solicitudes enviadas. Cancela o finaliza solicitudes activas para enviar más</p>
+            </div>
+        <%}%>
 
         
         <div class="row">
@@ -474,7 +480,8 @@
         
                                                                                     </i>
                                                                                 </a>
-                                                                              <%}else if(SolicitudesValNumero){%>
+                                                                              <%}else if(!SolicitudesValNumero){%>
+                                                                                <%if(MascotaRender[i].Estado!=4){%>
                                                                                 <a href="/petco/formulario/responder/m=<%=MascotaRender[i].ID%>"
                                                                                     class="btn btn-warning btn-block">
         
@@ -484,7 +491,9 @@
         
                                                                                     </i>
                                                                                 </a>
-                                                                                <%} else{%>
+                                                                                <%}%>
+                                                                                <%}else{%>
+                                                                                    
                                                                                     <a href="#"
                                                                                     class="btn btn-warning btn-block disabled" tabindex="-1" aria-disabled="true">
             
@@ -739,13 +748,7 @@
 
 <script  type="module" src="/javascripts/PublicacionesGuardadas.js">  </script>
 
-<%if(!SolicitudesValNumero){%>
-    <div class="alert alert-dismissible alert-info position-fixed bottom-0 end-0 me-4 alertLimite" >
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        <h4 class="alert-heading">¡Aviso!</h4>
-        <p class="mb-0">Haz alcanzado el limite de 3 solicitudes enviadas. Cancela o finaliza solicitudes activas para enviar más</p>
-      </div>
-      <%}%>
+
 </body>
 
 </html>

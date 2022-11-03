@@ -17,6 +17,7 @@ router.post(
   formularioController.responder_formulario_post
 );
 router.get("/editar/:idFormulario", formularioController.formulario_edit_get);
+router.get("/ver/:idFormulario", formularioController.formulario_ver);
 router.get("/preguntaTemplate", formularioController.formTest2);
 router.get("/eliminar/:idFormulario", formularioController.EliminarForm);
 router.get(

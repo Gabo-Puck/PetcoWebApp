@@ -20,9 +20,8 @@ router.get(
   "/aceptar/:SolicitudID&:MascotaID",
   solicitudesController.aceptarSolicitud
 );
-router.get(
-  "/denegar/:SolicitudID&:MascotaID",
-  solicitudesController.denegarSolicitud
-);
+router.post("/eliminar", solicitudesController.eliminarSolicitud);
+
+router.get("/verUsuario", solicitudesController.verSolicitudesUsuario);
 
 module.exports = router;

@@ -471,24 +471,78 @@ Date.prototype.addDays = function (days) {
 //     });
 //   });
 
-Pasos_Mascota.query()
-  .withGraphJoined("Mascota.[MascotasSolicitudes]")
-  .findOne({
-    "paso_mascota.ID": 144,
-    "Mascota:MascotasSolicitudes.Estado": 2,
-  })
-  .then((PasoFind) => {
-    console.log(
-      "🚀 ~ file: pruebaContarDonaciones.js ~ line 478 ~ .then ~ PasoFind",
-      PasoFind.Mascota
-    );
-    PasoFind.Mascota.MascotasSolicitudes[0]
-      .$query()
-      .patch({ Estado: 1 })
-      .then(() => {
-        console.log("XD");
-      });
+// Pasos_Mascota.query()
+//   .withGraphJoined("Mascota.[MascotasSolicitudes]")
+//   .findOne({
+//     "paso_mascota.ID": 144,
+//     "Mascota:MascotasSolicitudes.Estado": 1,
+//   })
+//   .then((PasoFind) => {
+//     console.log(
+//       "🚀 ~ file: pruebaContarDonaciones.js ~ line 478 ~ .then ~ PasoFind",
+//       PasoFind.Mascota
+//     );
+//     PasoFind.Mascota.MascotasSolicitudes[0]
+//       .$query()
+//       .patch({ Estado: 2 })
+//       .then(() => {
+//         console.log("XD");
+//       });
+//   });
+
+// Usuario.query()
+//   .withGraphFetched("Solicitudes.Mascota.[MascotasImagenes,MascotasEspecie]")
+//   .findById(4)
+//   .then((UsuarioSolicitudes) => {
+//     console.log(
+//       "🚀 ~ file: pruebaContarDonaciones.js ~ line 497 ~ .then ~ UsuarioSolicitudes",
+//       UsuarioSolicitudes.Solicitudes[0].Mascota
+//     );
+//     // res.render("usuarioVerSolicitudes.ejs", {
+//     //   Tipo: req.session.Tipo,
+//     //   UsuarioSolicitudes: UsuarioSolicitudes,
+//     // });
+//   });
+
+// Usuario.query()
+//   .withGraphJoined("Solicitudes")
+//   .where("usuario.ID", "=", 4)
+//   .andWhere("Solicitudes.Estado", "=", 0)
+//   .orWhere("Solicitudes.Estado", "=", 1)
+//   .then((UsuarioSolicitudes) => {
+//     console.log(UsuarioSolicitudes);
+//   })
+//   .catch((err) => {
+//     console.log(err);
+//   });
+
+Protocolo.query()
+  .withGraphJoined("[FormularioProtocolo,Pasos.[Mascota]]")
+  .where("protocolos.ID_Usuario", "=", 4)
+  .then((Protocolos) => {
+    // res.render("Formulario/FormDashboard.ejs", {
+    //   Elemento: Formularios,
+    //   Elemento2: Protocolos,
+    //   Tipo: req.session.Tipo,
+    // });
+    let Formularios = [];
+    Protocolos.forEach((protocolo) => {
+      console.log(protocolo.Titulo);
+      if (protocolo.Pasos[0].Mascota.length > 0) {
+        console.log("Este protocolo no se puede editar");
+        protocolo.isEditable = false;
+        protocolo.FormularioProtocolo.isEditable = false;
+      } else {
+        console.log("Este protocolo se puede editar");
+        protocolo.isEditable = true;
+        protocolo.FormularioProtocolo.isEditable = true;
+      }
+      Formularios.push(protocolo.FormularioProtocolo);
+      console.log(protocolo);
+      console.log("\n\n");
+    });
   });
+
 // Formulario.query()
 //   .where("formulario.ID_Usuario", "=", 4)
 //   .then((Formularios) => {
