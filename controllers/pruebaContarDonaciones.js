@@ -18,6 +18,7 @@ const {
 const Mascota = require("../models/Mascota");
 const Pasos_Mascota = require("../models/Pasos_Mascota");
 const Notificaciones = require("../models/Notificaciones");
+const Paso = require("../models/Paso");
 
 // // Metas.query()
 // //   .withGraphJoined("[MetasDonaciones,Mascota]")
@@ -678,65 +679,66 @@ Date.prototype.substractMonths = function (months) {
 // }
 
 //Mascotas inactivas
-let hoy = new Date(Date.now());
-let fecha = getDateFormated(hoy);
-let date2 = new Date(fecha);
-date2 = date2.substractMonths(4);
-console.log(
-  date2.toLocaleDateString("es-MX", date2.toLocaleTimeString("es-MX"))
-);
+// let hoy = new Date(Date.now());
+// let fecha = getDateFormated(hoy);
+// let date2 = new Date(fecha);
+// date2 = date2.substractMonths(4);
+// console.log(
+//   date2.toLocaleDateString("es-MX", date2.toLocaleTimeString("es-MX"))
+// );
 
-Mascota.query()
-  .where("Fecha_Ultima_Solicitud", "<", date2)
-  .withGraphJoined("Mascota.[MascotasImagenes,MascotasProceso]")
-  .then((MascotasEliminar) => {
-    console.log(
-      `Mascotas inactivas a borrar a partir de la fecha: ${date2.toLocaleDateString(
-        "es-MX"
-      )} ${date2.toLocaleTimeString("es-MX")}`
-    );
-    let promisesMascotas = [];
-    MascotasEliminar.forEach((mascota) => {
-      promiseMascotas.push(deleteMascotaPromise(mascota));
-    });
-    console.log(`Fecha de ejecución ${fecha}`);
-    Promise.all(promisesMascotas).then(() => {
-      console.log(`Se han eliminado ${MascotasEliminar.length} mascotas`);
-    });
-  });
+// Mascota.query()
+//   .where("Fecha_Ultima_Solicitud", "<", date2)
+//   .withGraphJoined("Mascota.[MascotasImagenes,MascotasProceso]")
+//   .then((MascotasEliminar) => {
+//     console.log(
+//       `Mascotas inactivas a borrar a partir de la fecha: ${date2.toLocaleDateString(
+//         "es-MX"
+//       )} ${date2.toLocaleTimeString("es-MX")}`
+//     );
+//     let promisesMascotas = [];
+//     MascotasEliminar.forEach((mascota) => {
+//       promiseMascotas.push(deleteMascotaPromise(mascota));
+//     });
+//     console.log(`Fecha de ejecución ${fecha}`);
+//     Promise.all(promisesMascotas).then(() => {
+//       console.log(`Se han eliminado ${MascotasEliminar.length} mascotas`);
+//     });
+//   });
 
-function deleteMascotaPromise(mascota) {
-  return new Promise((resolve, reject) => {
-    let req = {};
-    req.deleteFilesPath = [];
-    let arrayImagenesID = [];
-    let mascotasPublicacion = PublicacionUsuario.Mascota;
-    console.log(
-      "🚀 ~ file: pruebaContarDonaciones.js ~ line 115 ~ PublicacionesReportadas.Mascota.forEach ~  mascota.MascotasImagenes",
-      mascota.MascotasImagenes
-    );
-    let arrayImagenes = mascota.MascotasImagenes.map(
-      (x) => "public" + x.Ruta.replaceAll("\\", "/")
-    );
-    let arrayID = mascota.MascotasImagenes.map((x) => x.ID);
-    arrayImagenesID = arrayImagenesID.concat(arrayID);
-    let arrayArchivos = mascota.MascotasProceso.filter(
-      (PasoArchivo) => PasoArchivo.Archivo != null
-    );
-    arrayArchivos = arrayArchivos.map((x) => x.Archivo.replaceAll("\\", "/"));
-    arrayImagenes = arrayImagenes.filter((Ruta) => Ruta != null);
-    req.deleteFilesPath = req.deleteFilesPath.concat(arrayImagenes);
-    req.deleteFilesPath = req.deleteFilesPath.concat(arrayArchivos);
-    mascota
-      .query()
-      .delete()
-      .then(() => {
-        Promise.all(deleteFiles(req)).then(() => {
-          resolve("ok");
-        });
-      });
-  });
-}
+// function deleteMascotaPromise(mascota) {
+//   return new Promise((resolve, reject) => {
+//     let req = {};
+//     req.deleteFilesPath = [];
+//     let arrayImagenesID = [];
+//     let mascotasPublicacion = PublicacionUsuario.Mascota;
+//     console.log(
+//       "🚀 ~ file: pruebaContarDonaciones.js ~ line 115 ~ PublicacionesReportadas.Mascota.forEach ~  mascota.MascotasImagenes",
+//       mascota.MascotasImagenes
+//     );
+//     let arrayImagenes = mascota.MascotasImagenes.map(
+//       (x) => "public" + x.Ruta.replaceAll("\\", "/")
+//     );
+//     let arrayID = mascota.MascotasImagenes.map((x) => x.ID);
+//     arrayImagenesID = arrayImagenesID.concat(arrayID);
+//     let arrayArchivos = mascota.MascotasProceso.filter(
+//       (PasoArchivo) => PasoArchivo.Archivo != null
+//     );
+//     arrayArchivos = arrayArchivos.map((x) => x.Archivo.replaceAll("\\", "/"));
+//     arrayImagenes = arrayImagenes.filter((Ruta) => Ruta != null);
+//     req.deleteFilesPath = req.deleteFilesPath.concat(arrayImagenes);
+//     req.deleteFilesPath = req.deleteFilesPath.concat(arrayArchivos);
+//     mascota
+//       .query()
+//       .delete()
+//       .then(() => {
+//         Promise.all(deleteFiles(req)).then(() => {
+//           resolve("ok");
+//         });
+//       });
+//   });
+// }
+//Pasos proceso fuera de tiempo
 
 function deleteUsuarioPromise(usuarioFind) {
   return new Promise((resolve, reject) => {
@@ -824,6 +826,89 @@ function createPromiseEliminarImagen(id) {
       Imagenes.query()
         .findById(id)
         .delete()
+        .then(() => {})
+    );
+  });
+}
+
+let hoy = new Date(Date.now());
+let fecha = getDateFormated(hoy);
+let date2 = new Date(fecha);
+// date2 = date2.substractMonths(5);
+console.log(
+  date2.toLocaleDateString("es-MX", date2.toLocaleTimeString("es-MX"))
+);
+
+Pasos_Mascota.query()
+  .where("Fecha_Limite", "<", date2)
+  .andWhere("Completado", "<", 3)
+  .andWhere("Mascota:MascotasSolicitudes.Estado", "=", 1)
+  .withGraphJoined("[Mascota.[MascotasSolicitudes]]")
+  .then((PasosIncompletos) => {
+    let promisesPasosIncompletos = [];
+    let promisesEliminarsolicitudes = [];
+    PasosIncompletos.forEach((PasoIncompleto) => {
+      promisesPasosIncompletos.push(createPromisesPasoDefault(PasoIncompleto));
+      promisesEliminarsolicitudes.push(
+        deleteSolicitudPromise(PasoIncompleto.Mascota)
+      );
+    });
+    console.log(PasosIncompletos[0].Mascota);
+  });
+
+function deleteSolicitudPromise(mascota) {
+  return new Promise((resolve, reject) => {
+    resolve(
+      mascota.MascotasSolicitudes[0]
+        .$query()
+        .delete()
+        .then(() => {
+          resolve("ok");
+        })
+    );
+  });
+}
+
+function createPromisesPasoDefault(paso) {
+  return new Promise((resolve, reject) => {
+    Pasos_Mascota.query()
+      .where("ID_Mascota", "=", paso.ID_Mascota)
+      .then((pasos) => {
+        // let arrayArchivos = [];
+        let arrayPromises = [];
+        let req = {};
+        req.deleteFilesPath = [];
+        pasos.forEach((pasoEncontrado) => {
+          if (pasoEncontrado.Archivo != null) {
+            req.deleteFilesPath.push(
+              pasoEncontrado.Archivo.replaceAll("\\", "/")
+            );
+          }
+          arrayPromises.push(patchPasosDefaultPromise(pasoEncontrado));
+        });
+
+        Promise.all(deleteFiles(req)).then(() => {
+          Promise.all(arrayPromises).then(() => {
+            resolve("ok");
+          });
+        });
+      });
+  });
+}
+
+function patchPasosDefaultPromise(PasoProceso) {
+  let valueCompletado = 0;
+  if (PasoProceso.ID_Paso == 1) {
+    valueCompletado = 3;
+  }
+  return new Promise((resolve, reject) => {
+    resolve(
+      PasoProceso.$query()
+        .patch({
+          Completado: valueCompletado,
+          Archivo: null,
+          Fecha_Limite: null,
+        })
         .then(() => {})
     );
   });

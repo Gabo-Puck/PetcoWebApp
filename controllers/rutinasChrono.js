@@ -1,6 +1,7 @@
 const Imagenes = require("../models/Imagenes");
 const Mascota = require("../models/Mascota");
 const Notificaciones = require("../models/Notificaciones");
+const Pasos_Mascota = require("../models/Pasos_Mascota");
 const Registro = require("../models/Registro");
 const Usuario = require("../models/Usuario");
 const { deleteFiles } = require("../utils/multipartRequestHandle");
@@ -136,11 +137,109 @@ exports.deleteMascotasInactivas = (fecha_exec) => {
         promisesMascotas.push(deleteMascotaPromise(mascota));
       });
       console.log(`Fecha de ejecución ${fecha}`);
+      console.log(MascotasEliminar);
       Promise.all(promisesMascotas).then(() => {
         console.log(`Se han eliminado ${MascotasEliminar.length} mascotas`);
       });
     });
 };
+
+exports.deleteProcesoPasoFueraTiempo = (fecha_exec) => {
+  let fecha = getDateFormated(fecha_exec);
+  let date2 = new Date(fecha);
+  // date2 = date2.substractMonths(5);
+  console.log(
+    date2.toLocaleDateString("es-MX", date2.toLocaleTimeString("es-MX"))
+  );
+
+  Pasos_Mascota.query()
+    .where("Fecha_Limite", "<", date2)
+    .andWhere("Completado", "<", 3)
+    .andWhere("Mascota:MascotasSolicitudes.Estado", "=", 1)
+    .withGraphJoined("[Mascota.[MascotasSolicitudes]]")
+    .then((PasosIncompletos) => {
+      console.log(
+        `Pasos fuerea de tiempo a resetear a partir de la fecha: ${date2.toLocaleDateString(
+          "es-MX"
+        )} ${date2.toLocaleTimeString("es-MX")}`
+      );
+      console.log(`Fecha de ejecución ${fecha}`);
+      console.log(PasosIncompletos);
+      let promisesPasosIncompletos = [];
+      let promisesEliminarsolicitudes = [];
+      PasosIncompletos.forEach((PasoIncompleto) => {
+        promisesPasosIncompletos.push(
+          createPromisesPasoDefault(PasoIncompleto)
+        );
+        promisesEliminarsolicitudes.push(
+          deleteSolicitudPromise(PasoIncompleto.Mascota)
+        );
+      });
+      Promise.all(promisesEliminarsolicitudes).then(() => {
+        Promise.all(promisesPasosIncompletos).then(() => {
+          console.log(`Se han reseteado ${PasosIncompletos.length} pasos`);
+        });
+      });
+    });
+};
+
+function deleteSolicitudPromise(mascota) {
+  return new Promise((resolve, reject) => {
+    resolve(
+      mascota.MascotasSolicitudes[0]
+        .$query()
+        .delete()
+        .then(() => {
+          resolve("ok");
+        })
+    );
+  });
+}
+
+function createPromisesPasoDefault(paso) {
+  return new Promise((resolve, reject) => {
+    Pasos_Mascota.query()
+      .where("ID_Mascota", "=", paso.ID_Mascota)
+      .then((pasos) => {
+        // let arrayArchivos = [];
+        let arrayPromises = [];
+        let req = {};
+        req.deleteFilesPath = [];
+        pasos.forEach((pasoEncontrado) => {
+          if (pasoEncontrado.Archivo != null) {
+            req.deleteFilesPath.push(
+              pasoEncontrado.Archivo.replaceAll("\\", "/")
+            );
+          }
+          arrayPromises.push(patchPasosDefaultPromise(pasoEncontrado));
+        });
+
+        Promise.all(deleteFiles(req)).then(() => {
+          Promise.all(arrayPromises).then(() => {
+            resolve("ok");
+          });
+        });
+      });
+  });
+}
+
+function patchPasosDefaultPromise(PasoProceso) {
+  let valueCompletado = 0;
+  if (PasoProceso.ID_Paso == 1) {
+    valueCompletado = 3;
+  }
+  return new Promise((resolve, reject) => {
+    resolve(
+      PasoProceso.$query()
+        .patch({
+          Completado: valueCompletado,
+          Archivo: null,
+          Fecha_Limite: null,
+        })
+        .then(() => {})
+    );
+  });
+}
 
 function deleteMascotaPromise(mascota) {
   return new Promise((resolve, reject) => {
