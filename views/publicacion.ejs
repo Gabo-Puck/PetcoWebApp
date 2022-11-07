@@ -400,6 +400,11 @@
                                                 <br> Se tiene recaudado un <%= progreso%>%
                                         </div>
                                         <% }%>
+
+
+                                      
+
+
                                             <h5><b>Nombre:</b>
                                                 <%= MascotaRender[i].Nombre%>
                                             </h5>
@@ -438,6 +443,14 @@
                                                                         <%=
                                                                             MascotaRender[i].MascotasEspecie.Nombre_Especie%>
                                                                     </h5>
+
+                                                                    <h5><b>Ubicacion:</b>
+                                                                        <%= MascotaRender[0].MP.PublicacionUsuario.UsuarioRegistro.muni.estado.Nombre%>,
+
+                                                                        <%= MascotaRender[0].MP.PublicacionUsuario.UsuarioRegistro.muni.Nombre%>
+                                                                    </h5>
+
+
                                                                     <h5><b>Salud:</b>
                                                                         <%= MascotaRender[i].MascotasSalud.Salud%>
                                                                     </h5>
@@ -459,6 +472,20 @@
                                                                                         <% } %>
                                                                                             <% } %>
                                                                     </h5>
+
+                                                                    <h5><b>Dias estimados para su adopcion:</b>
+                                                                        <!-- Obtener tiempo estimado de adopcion -->
+                                                                        <% var t=0;
+                                                                        for (let k = 0 ; k < MascotaRender[i].MascotasProceso.length; k++)
+                                                                        {
+                                                                            
+                                                                            t = t + MascotaRender[i].MascotasProceso[k].Paso.DiasEstimados
+                                                                        }
+                                
+                                                                            %>
+                                                                          
+                                                                            <%=t%>
+                                                                        </h5>
 
 
                                                                     <h5 style="text-align: center;" class="mt-5">
