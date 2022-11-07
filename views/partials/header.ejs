@@ -5,29 +5,52 @@
   var notificacionesNoLeidasRef = [];
 </script>
 
-
-
-
-<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top" style="text-align: center">
+<nav
+  class="navbar navbar-expand-lg navbar-light bg-light sticky-top"
+  style="text-align: center"
+>
   <div class="container-fluid">
-    <a class="navbar-brand" href="#" style="color:rgba(0, 0, 0, 0.0);" id="perfilUbicacion">
-      <img alt="Qries" id="ImagenUsuario"
-        style="float:left; width: 50px; height:50px ; object-fit:cover; position: relative; border-radius: 50%;" src="">
-
+    <a
+      class="navbar-brand"
+      href="#"
+      style="color: rgba(0, 0, 0, 0)"
+      id="perfilUbicacion"
+    >
+      <img
+        alt="Qries"
+        id="ImagenUsuario"
+        style="
+          float: left;
+          width: 50px;
+          height: 50px;
+          object-fit: cover;
+          position: relative;
+          border-radius: 50%;
+        "
+        src=""
+      />
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor03"
-      aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation">
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarColor03"
+      aria-controls="navbarColor03"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarColor03">
       <ul class="navbar-nav me-auto">
         <li class="nav-item">
-          <a class="nav-link active" href="/petco/inicio">Inicio
+          <a class="nav-link active" href="/petco/inicio"
+            >Inicio
             <span class="visually-hidden">(current)</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/publicacion/crear">Publicar</a>
+          <a class="nav-link" href="/petco/publicacion/crear">Publicar</a>
         </li>
 
         <li class="nav-item">
@@ -35,42 +58,71 @@
         </li>
 
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true"
-            aria-expanded="false"><i class="fa-solid fa-bars fa-lg"></i></a>
+          <a
+            class="nav-link dropdown-toggle"
+            data-bs-toggle="dropdown"
+            href="#"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+            ><i class="fa-solid fa-bars fa-lg"></i
+          ></a>
           <div class="dropdown-menu">
-            <a class="dropdown-item" href="/petco/inicio/PublicacionesGuardadas">Publicaciones Guardadas</a>
+            <a class="dropdown-item" href="/petco/inicio/PublicacionesGuardadas"
+              >Publicaciones Guardadas</a
+            >
             <%if(Tipo==1){%>
             <a class="dropdown-item" href="#" id="VerD">Ver donaciones</a>
-            <%}%>
+            <%}%> <%if(Tipo==1){%>
+            <a class="dropdown-item" href="/petco/dashboard">Dashboard</a>
+            <a class="dropdown-item" href="/petco/solicitudes/verUsuario"
+              >Ver procesos</a
+            >
 
-            <%if(Tipo==1){%>
-              <a class="dropdown-item" href="/petco/dashboard">Dashboard</a>
-              <a class="dropdown-item" href="/petco/solicitudes/verUsuario">Ver procesos</a>
-
-              <!-- Cosas de organizacion -->
+            <!-- Cosas de organizacion -->
+            <%}%> <%if(Tipo==2){%>
+            <!-- Cosas de comun -->
+            <a class="dropdown-item" href="/petco/solicitudes/verUsuario"
+              >Ver procesos</a
+            >
+            <%}%> <%if(Tipo==3){%>
+            <a class="dropdown-item" href="/moderador/registros_pendientes"
+              >Ver registros pendientes</a
+            >
+            <a class="dropdown-item" href="/moderador/verReportesUsuarios"
+              >Ver reportes usuarios</a
+            >
+            <a class="dropdown-item" href="/moderador/verReportes"
+              >Ver reportes publicaciones</a
+            >
             <%}%>
-            <%if(Tipo==2){%>
-                  <!-- Cosas de comun -->
-              <a class="dropdown-item" href="/petco/solicitudes/verUsuario">Ver procesos</a>
-            <%}%>
-            <%if(Tipo==3){%>
-              <a class="dropdown-item" href="/moderador/registros_pendientes">Ver registros pendientes</a>
-              <a class="dropdown-item" href="/moderador/verReportesUsuarios">Ver reportes usuarios</a>
-              <a class="dropdown-item" href="/moderador/verReportes">Ver reportes publicaciones</a>
-            <%}%>
-              <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="/petco/inicio/cerrarsession/" id="logout">Cerrar sesion
-              <i class="fa-solid fa-door-open fa-lg" style="color: #ea2340"></i></a>
+            <div class="dropdown-divider"></div>
+            <a
+              class="dropdown-item"
+              href="/petco/inicio/cerrarsession/"
+              id="logout"
+              >Cerrar sesion
+              <i class="fa-solid fa-door-open fa-lg" style="color: #ea2340"></i
+            ></a>
           </div>
         </li>
       </ul>
 
       <a class="mt-2">
-        <a style="margin-right: 1%" data-bs-toggle="offcanvas" href="#notificacionesOffCanvas" role="button"
-          aria-controls="notificacionesOffCanvas" class="position-relative" id="notificacionesIconNavbar">
+        <a
+          style="margin-right: 1%"
+          data-bs-toggle="offcanvas"
+          href="#notificacionesOffCanvas"
+          role="button"
+          aria-controls="notificacionesOffCanvas"
+          class="position-relative"
+          id="notificacionesIconNavbar"
+        >
           <i class="fa-regular fa-bell fa-lg pe-2"></i>
-          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none"
-            id="notificacionesSinLeerCount">
+          <span
+            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none"
+            id="notificacionesSinLeerCount"
+          >
             <!-- 99+ -->
             <span class="visually-hidden">unread messages</span>
           </span>
@@ -79,8 +131,12 @@
     </div>
   </div>
 </nav>
-<a href="#" target="_blank" class="list-group-item list-group-item-action m-0 notificacionTemplate d-none"
-  style="text-decoration: none">
+<a
+  href="#"
+  target="_blank"
+  class="list-group-item list-group-item-action m-0 notificacionTemplate d-none"
+  style="text-decoration: none"
+>
   <p style="color: black" class="mb-2 ms-0 text-break descripcionNotificacion">
     DescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDescripcion
   </p>
@@ -88,11 +144,22 @@
     Fechaaaaaaaaaaaaaaaaaaaaaaaaaa
   </p>
 </a>
-<div class="offcanvas offcanvas-end" tabindex="-1" id="notificacionesOffCanvas"
-  aria-labelledby="notificacionesOffCanvasLabel" data-bs-scroll="true" data-bs-backdrop="false">
+<div
+  class="offcanvas offcanvas-end"
+  tabindex="-1"
+  id="notificacionesOffCanvas"
+  aria-labelledby="notificacionesOffCanvasLabel"
+  data-bs-scroll="true"
+  data-bs-backdrop="false"
+>
   <div class="offcanvas-header">
     <h5 class="offcanvas-title" id="offcanvasExampleLabel">Notificaciones</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    <button
+      type="button"
+      class="btn-close"
+      data-bs-dismiss="offcanvas"
+      aria-label="Close"
+    ></button>
   </div>
   <div class="offcanvas-body px-0">
     <div class="list-group list-group-flush" id="notificacionesContainer"></div>
@@ -102,10 +169,11 @@
 
 <!-- BUSQUEDA -->
 <script>
-  buscar = document.getElementById('buscarForm').addEventListener("click", myFunction);
+  buscar = document
+    .getElementById("buscarForm")
+    .addEventListener("click", myFunction);
   function myFunction() {
     Swal.fire({
-
       html: `<form action="/petco/busqueda/ingreso" method="post">
     <div class="row container">
 
@@ -201,35 +269,28 @@
     
 </form>`,
 
-      showConfirmButton: false
-    })
+      showConfirmButton: false,
+    });
   }
 </script>
 
-
-
 <script>
-
   imagenUser = document.getElementById("ImagenUsuario");
   donacionesModule = document.getElementById("VerD");
   perfilL = document.getElementById("perfilUbicacion");
 
-  fetch(
-    `/petco/inicio/CurrentUser`
-  )
+  fetch(`/petco/inicio/CurrentUser`)
     .then((res) => res.json())
     .then((res) => {
-
-      console.log("🚀 ~ file: LikeScript.js ~ line 16 ~ .then ~ res", res[0].Foto_Perfil);
+      console.log(
+        "🚀 ~ file: LikeScript.js ~ line 16 ~ .then ~ res",
+        res[0].Foto_Perfil
+      );
       imagenUser.src = res[0].Foto_Perfil;
       perfilL.href = "/petco/perfil/usuario/" + res[0].ID;
-      donacionesModule.href = "/petco/perfil/Dusuario/"+ res[0].ID;
-
+      donacionesModule.href = "/petco/perfil/Dusuario/" + res[0].ID;
     });
-
 </script>
-
-
 
 <script type="module" src="/javascripts/getNotificaciones.js"></script>
 <script type="module" src="/javascripts/headerNavbar.js"></script>

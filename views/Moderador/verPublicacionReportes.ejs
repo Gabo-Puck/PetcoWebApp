@@ -199,7 +199,7 @@
 
       <div class="container mt-2 position-relative">
         <div
-          class="position-absolute top-0 end-0 me-2 mt-0 fs-1 d-none"
+          class="position-absolute top-0 end-0 me-2 mt-0 fs-1"
           id="alertPublicacionActiva"
           data-bs-toggle="modal"
           data-bs-target="#modalActivarEliminarP"
@@ -298,7 +298,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <h1 class="modal-title fs-5" id="staticBackdropLabel">
-                Publicacion desactivada
+                Publicacion información
               </h1>
               <button
                 type="button"
@@ -311,9 +311,10 @@
               <div class="col mx-auto">
                 <div class="row">
                   <h1 class="text-center">Atención</h1>
-                  <p class="fs-5 text-center">
-                    La publicación actual esta desactivada debido a la cantidad
-                    de reportes que ha recibido.
+                  <p class="fs-5 text-center" id="aviso1">
+                    <!-- La publicación actual esta desactivada debido a la cantidad
+                    de reportes que ha recibido o porque ha sido desactivada por
+                    un moderador -->
                   </p>
                   <p class="fs-5 text-center">
                     Te pedimos que revises minuciosamente los reportes así como
@@ -322,6 +323,7 @@
                 </div>
                 <div class="row mb-2 mx-auto text-break" style="width: 80%">
                   <button
+                    id="activarButton"
                     class="btn btn-success"
                     data-bs-toggle="modal"
                     data-bs-target="#modalActivarPublicacion"
@@ -331,6 +333,7 @@
                 </div>
                 <div class="row mx-auto text-break" style="width: 80%">
                   <button
+                    id="desactivarButton"
                     class="btn btn-danger"
                     data-bs-toggle="modal"
                     data-bs-target="#modalEliminarPublicacion"
@@ -364,7 +367,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <h1 class="modal-title fs-5" id="exampleModalLabel">
-                Eliminar publicacion
+                Desactivar publicacion
               </h1>
               <button
                 type="button"
@@ -384,6 +387,15 @@
                     Al desactivar la publicación, los usuarios no podrán ver la
                     publicación
                   </p>
+                  <p>Escribe la razon por la que se ocultará la publicación</p>
+                  <div class="form-floating mb-3">
+                    <textarea
+                      class="form-control"
+                      placeholder="Leave a comment here"
+                      id="razonTextArea"
+                    ></textarea>
+                    <label for="razonTextArea">Razon</label>
+                  </div>
                 </div>
                 <div class="row mb-2 mx-auto text-break" style="width: 50%">
                   <button class="btn btn-danger" id="botonEliminarPublicacion">
@@ -397,6 +409,7 @@
                 type="button"
                 class="btn btn-secondary"
                 data-bs-dismiss="modal"
+                id="cerrarModalDesactivar"
               >
                 Cerrar
               </button>
@@ -445,6 +458,7 @@
                 type="button"
                 class="btn btn-secondary"
                 data-bs-dismiss="modal"
+                id="cerrarModalActivar"
               >
                 Cerrar
               </button>
@@ -588,7 +602,12 @@
       const alertPublicacionActiva = document.querySelector("#alertPublicacionActiva");
       const botonActivarPublicacion = document.querySelector("#botonActivarPublicacion");
       const botonEliminarPublicacion = document.querySelector("#botonEliminarPublicacion");
-
+      const aviso1 = document.querySelector("#aviso1");
+      const activarButton = document.querySelector("#activarButton")
+      const desactivarButton = document.querySelector("#desactivarButton");
+      const cerrarModalDesactivar = document.querySelector("#cerrarModalDesactivar");
+      const cerrarModalActivar = document.querySelector("#cerrarModalActivar");
+      const razonTextArea = document.querySelector("#razonTextArea");
 
       let opcionesMap = new Map();
       opcionesMap.set("Spam","");
@@ -603,10 +622,22 @@
         "#selectorOpcionesReportes"
       );
       const publicacion = <%=Publicacion.ID%>;
-      const publicacionActiva = <%=Publicacion.Activo%>;
-      if(publicacionActiva==0){
-        alertPublicacionActiva.classList.remove("d-none");
+      let publicacionActiva = <%=Publicacion.Activo%>;
+
+
+      function toggleButtonsActivarDesactivar(){
+        if(publicacionActiva==0){
+          aviso1.textContent = "La publicacion está desactivada"
+          desactivarButton.classList.add("d-none")
+          activarButton.classList.remove("d-none")
+        }else{
+          aviso1.textContent = "La publicacion está activa"
+          activarButton.classList.add("d-none")
+          desactivarButton.classList.remove("d-none")
+        }
       }
+
+      toggleButtonsActivarDesactivar();
       const templateRow = document.querySelector("classTablaTemplate");
       const cuerpoTabla = document.querySelector("#cuerpoTabla");
       botonActivarPublicacion.addEventListener("click",(e)=>{
@@ -619,7 +650,10 @@
         .then((res)=>{
             if(res=="ok"){
                 Swal.fire("Correcto", "Se ha activado la publicación", "success");
-                alertPublicacionActiva.classList.add("d-none");
+                publicacionActiva = 1;
+                toggleButtonsActivarDesactivar();
+                cerrarModalActivar.click()
+                // alertPublicacionActiva.classList.add("d-none");
             }else{
                 throw new Error("Algo ha salido mal")
             }
@@ -628,16 +662,26 @@
         })
       })
       botonEliminarPublicacion.addEventListener("click",(e)=>{
+        if(razonTextArea.value.trim().length>8){
+
+        }else{
+          Swal.fire("Atencion", "A razón debe de tener por lo menos 9 caracteres", "error");
+
+          return
+        }
         fetch("/moderador/eliminarPublicacion",
         {method:"POST",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({idPublicacion:publicacion})}
+        body:JSON.stringify({idPublicacion:publicacion,razon:razonTextArea.value})}
         )
         .then((res)=>res.json())
         .then((res)=>{
             if(res=="ok"){
                 Swal.fire("Correcto", "Se ha desactivado la publicación", "success");
-                alertPublicacionActiva.classList.add("d-none");
+                // alertPublicacionActiva.classList.add("d-none");
+                publicacionActiva = 0;
+                toggleButtonsActivarDesactivar();
+                cerrarModalDesactivar.click();
             }else{
                 throw new Error("Algo ha salido mal")
             }

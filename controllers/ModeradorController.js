@@ -6,6 +6,7 @@ const Registro = require("../models/Registro");
 const Reporte_Publicacion = require("../models/Reporte_Publicacion");
 const Usuario = require("../models/Usuario");
 const { deleteFiles } = require("../utils/multipartRequestHandle/index");
+const { sendNotificacion } = require("./NotificacionesController");
 const renderRegistroMiddleware = (req, res, next) => {
   if (res.stuff) {
     console.log("si hay estados");
@@ -376,6 +377,7 @@ exports.eliminarPublicacion = (req, res, next) => {
 };
 
 exports.desactivarPublicacion = (req, res, next) => {
+  console.log(req.body);
   Publicacion.query()
     .findById(req.body.idPublicacion)
     .then((publicacion) => {
@@ -384,6 +386,14 @@ exports.desactivarPublicacion = (req, res, next) => {
           .$query()
           .patch({ Activo: 0 })
           .then(() => {
+            let descripcion = `Tu publicacion "${publicacion.Titulo}" ha sido desactivada con el siguiente mensaje: "${req.body.razon}"`;
+
+            sendNotificacion(
+              descripcion,
+              "#",
+              publicacion.ID_Usuario,
+              req.app.io
+            );
             res.json("ok");
           });
       } else {

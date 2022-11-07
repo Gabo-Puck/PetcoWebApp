@@ -5,11 +5,27 @@ const Pasos_Mascota = require("../models/Pasos_Mascota");
 const Registro = require("../models/Registro");
 const Usuario = require("../models/Usuario");
 const { deleteFiles } = require("../utils/multipartRequestHandle");
-const { getDateFormated } = require("./NotificacionesController");
+const { sendEmailAviso } = require("./email");
+const {
+  getDateFormated,
+  sendNotificacion,
+} = require("./NotificacionesController");
 
 Date.prototype.substractMonths = function (months) {
   var date = new Date(this.valueOf());
   date.setMonth(date.getMonth() - months);
+  return date;
+};
+
+Date.prototype.substractDays = function (days) {
+  var date = new Date(this.valueOf());
+  date.setDate(date.getDate() - days);
+  return date;
+};
+
+Date.prototype.addDays = function (days) {
+  var date = new Date(this.valueOf());
+  date.setDate(date.getDate() + days);
   return date;
 };
 
@@ -77,6 +93,58 @@ exports.deleteUsuarioInactividad = (fecha_exec) => {
     });
 };
 
+exports.notificacionUsuarioInactividad = (fecha_exec, fecha_prev) => {
+  let fecha = getDateFormated(fecha_exec);
+  let fecha2 = getDateFormated(fecha_prev);
+  let fecha_ejecucion = new Date(fecha);
+  let fecha_previa = new Date(fecha2);
+
+  fecha_previa = fecha_previa.substractDays(7);
+  fecha_previa = fecha_previa.substractMonths(12);
+
+  let fecha_notificacion;
+  fecha_ejecucion = fecha_ejecucion.substractMonths(12);
+  fecha_notificacion = fecha_ejecucion.substractDays(7);
+
+  Usuario.query()
+    .withGraphJoined("UsuarioRegistro", { minimize: true })
+    .where("usuario.UltimaConexion", ">", fecha_previa)
+    .andWhere("usuario.UltimaConexion", "<=", fecha_notificacion)
+    .then((usuariosInactivos) => {
+      // console.log(usuariosInactivos);
+      console.log(
+        fecha_previa.toLocaleDateString("es-MX"),
+        fecha_previa.toLocaleTimeString("es-MX")
+      );
+      console.log(
+        fecha_notificacion.toLocaleDateString("es-MX"),
+        fecha_notificacion.toLocaleTimeString("es-MX")
+      );
+      console.log(
+        `Fecha de aviso (Mandado de correos): ${fecha_notificacion.toLocaleDateString(
+          "es-MX"
+        )}`,
+        fecha_notificacion.toLocaleTimeString("es-MX")
+      );
+      console.log(
+        `Usuarios proximos a borrar a partir de la fecha: ${fecha_ejecucion.toLocaleDateString(
+          "es-MX"
+        )} ${fecha_ejecucion.toLocaleTimeString("es-MX")}`
+      );
+      console.log(usuariosInactivos);
+      usuariosInactivos.forEach((usuario) => {
+        sendEmailAviso(
+          "Aviso de inactividad",
+          usuario.UsuarioRegistro.Correo,
+          usuario.UsuarioRegistro.Nombre
+        );
+      });
+      console.log(`Se han mandado ${usuariosInactivos.length} correos`);
+
+      return fecha_previa;
+    });
+};
+
 exports.deleteUsuariosSinValidar = (fecha_exec) => {
   let fecha = getDateFormated(fecha_exec);
   let date2 = new Date(fecha);
@@ -125,6 +193,7 @@ exports.deleteMascotasInactivas = (fecha_exec) => {
 
   Mascota.query()
     .where("Fecha_Ultima_Solicitud", "<", date2)
+    .andWhere("ID_Estado", "!=", 3)
     .withGraphJoined("[MascotasImagenes,MascotasProceso]")
     .then((MascotasEliminar) => {
       console.log(
@@ -140,6 +209,51 @@ exports.deleteMascotasInactivas = (fecha_exec) => {
       console.log(MascotasEliminar);
       Promise.all(promisesMascotas).then(() => {
         console.log(`Se han eliminado ${MascotasEliminar.length} mascotas`);
+      });
+    });
+};
+
+exports.notificacionMascotasInactivas = (fecha_exec, fecha_prev, io) => {
+  let fecha = getDateFormated(fecha_exec);
+  let fecha2 = getDateFormated(fecha_prev);
+  let fecha_ejecucion = new Date(fecha);
+  let fecha_previa = new Date(fecha2);
+
+  fecha_previa = fecha_previa.substractDays(3);
+  fecha_previa = fecha_previa.substractMonths(4);
+
+  let fecha_notificacion;
+  fecha_ejecucion = fecha_ejecucion.substractMonths(4);
+  fecha_notificacion = fecha_ejecucion.substractDays(3);
+  Mascota.query()
+    .where("Fecha_Ultima_Solicitud", ">", fecha_previa)
+    .andWhere("Fecha_Ultima_Solicitud", "<=", fecha_notificacion)
+    .andWhere("ID_Estado", "!=", 3)
+    .withGraphJoined("[MascotasPublicacion.[PublicacionUsuario]]")
+    .then((MascotasNotificacion) => {
+      console.log(
+        `Mascotas proximas a borrar a partir de la fecha: ${fecha_ejecucion.toLocaleDateString(
+          "es-MX"
+        )} ${fecha_ejecucion.toLocaleTimeString("es-MX")}`
+      );
+      console.log(
+        fecha_previa.toLocaleDateString("es-MX"),
+        fecha_previa.toLocaleTimeString("es-MX")
+      );
+      console.log(
+        fecha_notificacion.toLocaleDateString("es-MX"),
+        fecha_notificacion.toLocaleTimeString("es-MX")
+      );
+      MascotasNotificacion.forEach((mascota) => {
+        let descripcion = `Tu mascota ${mascota.Nombre} no ha recibido solicitudes en un largo tiempo. Su publicación se eliminará en 3 días por inactividad, si no recibe una solicitud`;
+        let usuario = mascota.MascotasPublicacion.PublicacionUsuario.ID;
+        sendNotificacion(
+          descripcion,
+          `/petco/publicacion/adopciones/${mascota.MascotasPublicacion.PublicacionUsuario.ID}`,
+          usuario,
+          io
+        );
+        console.log(mascota);
       });
     });
 };
@@ -179,6 +293,64 @@ exports.deleteProcesoPasoFueraTiempo = (fecha_exec) => {
         Promise.all(promisesPasosIncompletos).then(() => {
           console.log(`Se han reseteado ${PasosIncompletos.length} pasos`);
         });
+      });
+    });
+};
+
+exports.notificacionProcesoPasoFueraTiempo = (fecha_exec, fecha_prev, io) => {
+  let fecha = getDateFormated(fecha_exec);
+  let fecha2 = getDateFormated(fecha_prev);
+  let fecha_ejecucion = new Date(fecha);
+  fecha_ejecucion = fecha_ejecucion.addDays(1);
+  let fecha_previa = new Date(fecha2);
+  fecha_previa = fecha_previa.addDays(1);
+  Pasos_Mascota.query()
+    .where("Fecha_Limite", ">", fecha_previa)
+    .andWhere("Fecha_Limite", "<=", fecha_ejecucion)
+    .andWhere("Completado", "<", 3)
+    .andWhere("Mascota:MascotasSolicitudes.Estado", "=", 1)
+    .withGraphJoined("[Paso,Mascota.[MascotasSolicitudes,MascotasPublicacion]]")
+    .then((PasosIncompletos) => {
+      console.log(
+        fecha_previa.toLocaleDateString("es-MX"),
+        fecha_previa.toLocaleTimeString("es-MX")
+      );
+      console.log(
+        fecha_ejecucion.toLocaleDateString("es-MX"),
+        fecha_ejecucion.toLocaleTimeString("es-MX")
+      );
+      console.log(
+        `Pasos fuerea de tiempo a resetear a partir de la fecha: ${fecha_ejecucion.toLocaleDateString(
+          "es-MX"
+        )} ${fecha_ejecucion.toLocaleTimeString("es-MX")}`
+      );
+      // console.log(PasosIncompletos);
+      PasosIncompletos.forEach((paso) => {
+        console.log(paso.Paso);
+        let descripcion = `Falta poco para que el paso "${paso.Paso.Titulo_Paso}" alcance su fecha limite para la mascota "${paso.Mascota.Nombre}". Si no se completa en tiempo el proceso se cancelará.`;
+        let usuarioDueno = paso.Mascota.MascotasPublicacion.ID_Usuario;
+        console.log(
+          "🚀 ~ file: rutinasChrono.js ~ line 332 ~ PasosIncompletos.forEach ~ usuarioDueno",
+          usuarioDueno
+        );
+        let usuarioAdoptante = paso.Mascota.MascotasSolicitudes[0].ID_Usuario;
+        console.log(
+          "🚀 ~ file: rutinasChrono.js ~ line 334 ~ PasosIncompletos.forEach ~ usuarioAdoptante",
+          usuarioAdoptante
+        );
+        console.log(descripcion);
+        sendNotificacion(
+          descripcion,
+          `/petco/proceso/ver/${paso.Mascota.ID}`,
+          usuarioDueno,
+          io
+        );
+        sendNotificacion(
+          descripcion,
+          `/petco/proceso/ver/${paso.Mascota.ID}`,
+          usuarioAdoptante,
+          io
+        );
       });
     });
 };

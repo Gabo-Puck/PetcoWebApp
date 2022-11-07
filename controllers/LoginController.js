@@ -145,7 +145,7 @@ exports.CheckDB = (req, res, next) => {
         res.render("login.ejs", {
           alert: true,
           alertTitle: "¡Ups!",
-          alertMessage: "Aún no cuentas un usuario valido para ingresar",
+          alertMessage: "Tu cuenta aún no ha sido validada",
           alertIcon: "warning",
           showCofirmButton: true,
           timer: false,

@@ -47,7 +47,10 @@ const getMascotaTemplate = (req, res, next) => {
     .then((UsuarioFind) => {
       res.render(
         "Publicacion/mascotaTemplate",
-        { AceptaDonaciones: UsuarioFind.AceptaDonaciones },
+        {
+          AceptaDonaciones: UsuarioFind.AceptaDonaciones,
+          Tipo: req.session.Tipo,
+        },
         (error, html) => {
           if (error) {
             next(error);

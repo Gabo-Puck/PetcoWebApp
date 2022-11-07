@@ -108,9 +108,10 @@ $(window).on("load", () => {
     });
     pasoCount = newPaso.pasoCount;
   });
-  document.querySelectorAll("input").forEach((element) => {
+  document.querySelectorAll("input,textarea").forEach((element) => {
     element.readOnly = true;
   });
+
   document.querySelectorAll("input[type='checkbox']").forEach((element) => {
     element.disabled = true;
   });

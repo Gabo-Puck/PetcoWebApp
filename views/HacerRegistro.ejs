@@ -220,7 +220,7 @@
                   <div class="col-md">
                     <label for="Contrasena">Confirmar Contraseña</label>
                     <input
-                      id="Contrasena"
+                      id="Contrasena2"
                       class="form-control"
                       type="password"
                       placeholder="123456789"
@@ -236,7 +236,8 @@
                     >
                     <div class="input-group has-validation">
                       <span class="input-group-text">Estado</span>
-                      <select class="custom-select" id="Estado">
+                      <select class="custom-select" id="Estado" name="Estado">
+                        <option value="-1">Selecciona una opción</option>
                         <%let selectedEstado = ""%>
                         <% if(EstadosMunicipios)%> <%
                         EstadosMunicipios.forEach(estado=>{%>
@@ -260,23 +261,25 @@
                     <div class="input-group">
                       <span class="input-group-text">Municipio</span>
                       <select class="custom-select" name="Municipio" id="Municipio">
+                        <option value="-1">Selecciona una opción</option>
                         <%let selectedMunicipio = ""%>
                         <%let estadoID = 0%>
                         <%if(RegistroPrevio){%>
                           <%estadoID = RegistroPrevio.muni.ID_Estado-1%>
+                          <% if(EstadosMunicipios)%> <%
+                            EstadosMunicipios[estadoID].municipios.forEach(municipio=>{ %>
+                              <%if(RegistroPrevio!=null&&selectedMunicipio==""){%>
+                                <%if(RegistroPrevio.Municipio==municipio.ID){%>
+                                  <%selectedMunicipio = "selected"%>
+                                <%}%>
+                              <%}%>
+                            <option value="<%=municipio.ID%>" <%=selectedMunicipio%>>
+                              <%=municipio.Nombre%>
+                            </option>
+                            <%selectedMunicipio = ""%>
+                            <%})%>
                         <%}%>
-                        <% if(EstadosMunicipios)%> <%
-                        EstadosMunicipios[estadoID].municipios.forEach(municipio=>{ %>
-                          <%if(RegistroPrevio!=null&&selectedMunicipio==""){%>
-                            <%if(RegistroPrevio.Municipio==municipio.ID){%>
-                              <%selectedMunicipio = "selected"%>
-                            <%}%>
-                          <%}%>
-                        <option value="<%=municipio.ID%>" <%=selectedMunicipio%>>
-                          <%=municipio.Nombre%>
-                        </option>
-                        <%selectedMunicipio = ""%>
-                        <%})%>
+                        
                       </select>
                     </div>
                   </div>
@@ -544,7 +547,7 @@
       Swal.fire(
         {
           title: 'Listo!',
-          text: `Registro completado correctamente, ${document.querySelector('#Nombre').value}`,
+          html: `<p>Registro completado correctamente, ${document.querySelector('#Nombre').value}</p><p>Un moderador validará tu registro. Al validarse tu registro te llegará un aviso a través de correo y podrás ingresar a la página</p>`,
           icon: 'success',
           confirmButtonText: "Siguiente"
         }
@@ -586,6 +589,7 @@
       let formData = new FormData();//Crear FormData para almacenar los datos a mandar en la request
       var inputRadio = document.querySelector("input:checked");//Obtenemos los radio checked
       var inputSelector = document.querySelector("#Municipio");
+      var inputSelectorEstado = document.querySelector("#Estado");
 
       var inputText = document.querySelectorAll(
         'input:not(input[type="file"]):not(input[type="radio"])'
@@ -596,6 +600,7 @@
         inputSelector.name,
         inputSelector.selectedOptions[0].value
       );
+      formData.append(inputSelectorEstado.name,inputSelector.selectedOptions[0].value);
       chargeInputToFormData(formData, inputText);//Cargamos al formData todos los datos del input text
       var data = [];//Array que almacena la extensión de los archivos que se suben
       let isValid = true;
@@ -649,7 +654,7 @@ document.querySelectorAll(".invalid-feedback").forEach(feedBackElement=>{
             console.log(JSON.stringify(xhr.response));
             var errors = JSON.parse(xhr.response).errors;//Obtenemos los errores que devuelva el server. Si no hay errores errors == undefined
             var correctFields = JSON.parse(xhr.response).correct;
-            if (errors) {//Si es undfined se cierra la pantalla de carga y se renderizan los errores obtenidos
+            if (errors.length>0) {//Si es undfined se cierra la pantalla de carga y se renderizan los errores obtenidos
               loadingScreen.close();
               renderMessages(errors,correctFields);
             } else {//Si no es undefined se manda a llamar "sendData", que manda todos los datos
@@ -738,6 +743,9 @@ document.querySelectorAll(".invalid-feedback").forEach(feedBackElement=>{
         correctFields.forEach(element => {
           var IsValidDiv = document.createElement("div");
           var input = document.querySelector(`input[name='${element}']:not(input[type="radio"])`);
+          if(input==null){
+            input = document.querySelector(`select[name='${element}']`)
+          }
           // var selector = document.querySelector(`select[name='${element}'`);
           IsValidDiv.classList.add("valid-feedback");
           IsValidDiv.classList.add("d-block");
@@ -762,11 +770,12 @@ document.querySelectorAll(".invalid-feedback").forEach(feedBackElement=>{
           IsInvalidDiv.classList.add("d-block");
           IsInvalidDiv.innerHTML = element.msg;
           var InvalidInput = document.querySelector(`input[name='${element.formName}']`);
+          if(InvalidInput==null){
+            InvalidInput = document.querySelector(`select[name='${element.formName}']`)
+          }
           insertAfter(InvalidInput,IsInvalidDiv);
         }
-        document.querySelector(//Cambiamos el color del input asociado al error
-          `input[name='${element.formName}']`
-        ).classList.add("is-invalid");
+        InvalidInput.classList.add("is-invalid");
       });
      
     }
@@ -815,7 +824,7 @@ document.querySelectorAll(".invalid-feedback").forEach(feedBackElement=>{
             console.log(JSON.stringify(xhr.response));
             var errors = JSON.parse(xhr.response).errors;
             var correctFields = JSON.parse(xhr.response).correct;
-            if (errors) {
+            if (errors.length>0) {
               renderMessages(errors,correctFields);
             } else {
               document.querySelectorAll("input[type='file']").forEach((inputElement)=>inputElement.classList.remove('is-valid'))
@@ -873,6 +882,7 @@ document.querySelectorAll(".invalid-feedback").forEach(feedBackElement=>{
       addListeners(xhr,loadingScreen,renderNext);//Agregamos listeners al xhr
       var inputRadio = document.querySelector("input:checked");//Obtenemos los input que estan checked
       var inputSelector = document.querySelector("#Municipio");//Obtenemos la id del municipio
+      var inputSelectorEstado = document.querySelector("#Estado");//Obtenemos la id del municipio
 
       var inputText = document.querySelectorAll(
         'input:not(input[type="file"]):not(input[type="radio"])'
@@ -882,6 +892,10 @@ document.querySelectorAll(".invalid-feedback").forEach(feedBackElement=>{
       formData.append(
         inputSelector.name,
         inputSelector.selectedOptions[0].value
+      );
+      formData.append(
+        inputSelectorEstado.name,
+        inputSelectorEstado.selectedOptions[0].value
       );
       chargeInputToFormData(formData, inputText);
       let urlVerificar = "<%=urlVerificarReq%>"
@@ -974,6 +988,14 @@ document.querySelectorAll(".invalid-feedback").forEach(feedBackElement=>{
     EstadoSelector.addEventListener("change", (event) => {
       //Vaciamos el selector de Municipio para poder agregar los correspondientes al estado seleccionado
       $("#Municipio").empty();
+      let option = document.createElement("option");
+      option.value = "-1";
+      option.innerHTML = "Selecciona una opción";
+      MunicipioSelector.appendChild(option);
+      if(event.target.value=="-1")
+      {
+        return;
+      }
       //Serializamos el objeto EstadosMunicipios de la respuesta que recibimos del server al cargar el archivo html inicialmente
       var EstadosMunicipiosSerialized = <%-JSON.stringify(EstadosMunicipios)%>;
       //Iteramos con un for para agregar los municipios correspondientes a MunicipioSelector

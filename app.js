@@ -31,6 +31,9 @@ const {
   deleteUsuariosSinValidar,
   deleteMascotasInactivas,
   deleteProcesoPasoFueraTiempo,
+  notificacionUsuarioInactividad,
+  notificacionMascotasInactivas,
+  notificacionProcesoPasoFueraTiempo,
 } = require("./controllers/rutinasChrono");
 
 app.use(sessionMiddleware);
@@ -88,7 +91,7 @@ function isLoggedModerador(req, res, next) {
     return res.redirect("/login");
   }
 }
-
+let previous = new Date(Date.now());
 const job = schedule.scheduleJob("*/5 * * * *", function (dated) {
   console.log(dated);
   console.log("1 minuto");
@@ -97,6 +100,10 @@ const job = schedule.scheduleJob("*/5 * * * *", function (dated) {
   deleteUsuariosSinValidar(dated);
   deleteMascotasInactivas(dated);
   deleteProcesoPasoFueraTiempo(dated);
+  notificacionUsuarioInactividad(dated, previous);
+  notificacionMascotasInactivas(dated, previous, app.io);
+  notificacionProcesoPasoFueraTiempo(dated, previous, app.io);
+  previous = dated;
 });
 
 // catch 404 and forward to error handler
