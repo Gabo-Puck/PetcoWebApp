@@ -95,7 +95,7 @@ module.exports.validateRequestFiles = (folder) => {
           console.log("estamos en el fileFilter");
           // console.log(req.body);
           console.log(file);
-          var acceptedTypes = [".png", ".jpg", ".bmp", ".jpeg"];
+          var acceptedTypes = [".png", ".jpg", ".jpeg"];
           var ext = path.extname(file.originalname);
           // next();
           if (acceptedTypes.indexOf(ext) === -1) {

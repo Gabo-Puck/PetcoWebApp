@@ -27,6 +27,8 @@ var swiper = new Swiper(".mySwiper", {
 
 $(window).on("load", () => {
   // alert("Cargado");
+  document.querySelector(".addCardButton").click();
+  document.querySelector(".addCardButton").parentNode.remove();
 });
 
 document.querySelector(".addCardButton").addEventListener("click", () => {

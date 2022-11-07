@@ -69,7 +69,7 @@ const RegistroSchema = checkSchema({
     in: "body",
     custom: {
       options: (value, { req, location, path }) => {
-        if (value == req.body.Contrasena && value.length > 8) {
+        if (value == req.body.Contrasena && value.length >= 8) {
           return true;
         }
         throw new Error(" ");
@@ -87,55 +87,93 @@ const RegistroSchema = checkSchema({
       errorMessage: "El telefono debe tener 10 digitos",
     },
   },
+  Municipio: {
+    in: "body",
+    isNumeric: {
+      errorMessage: "Municipio en formato incorrecto",
+    },
+    custom: {
+      options: (value, { req, location, path }) => {
+        if (value == -1) {
+          throw new Error("Por favor, seleccione un municipio");
+        }
+        return true;
+      },
+    },
+  },
+  Estado: {
+    in: "body",
+    isNumeric: {
+      errorMessage: "Estado en formato incorrecto",
+    },
+    custom: {
+      options: (value, { req, location, path }) => {
+        if (value == -1) {
+          throw new Error("Por favor, seleccione un estado");
+        }
+        return true;
+      },
+    },
+  },
+
   Nombre: {
     in: "body",
     trim: true,
     isLength: {
-      options: { min: 1 },
-      errorMessage: "El campo de nombre es obligatorio",
+      options: { min: 3 },
+      errorMessage:
+        "El campo de nombre es debe ser de por lo menos 3 caracteres",
+    },
+
+    custom: {
+      options: (value, { req, location, path }) => {
+        // return value + req.body.foo + location + path;
+        if (!isAlpha(value)) {
+          throw new Error("El nombre solo debe contener letras");
+        }
+        let checkValue = value.replaceAll(" ", "").trim();
+        if (checkValue.length < 3) {
+          throw new Error("El nombre debe tener por lo menos 3 letras");
+        }
+        return true;
+      },
     },
   },
   ApellidoP: {
     in: "body",
-    // isLength: {
-    //   options: { min: 1 },
-    //   errorMessage: "El campo de Apellido Paterno es obligatorio",
-    // },
     custom: {
-      options: (val, { req, location, path }) => {
-        if (val == null) {
-          return true;
-          // throw new Error("EEEEE");
+      options: (value, { req, location, path }) => {
+        // return value + req.body.foo + location + path;
+        if (!isAlpha(value)) {
+          throw new Error("El apellido paterno solo debe contener letras");
         }
-
-        val = val.trim();
-
-        if (val.length <= 1) {
-          throw new Error("El apellido paterno es un campo obligatorio");
+        let checkValue = value.replaceAll(" ", "").trim();
+        if (checkValue.length < 3) {
+          throw new Error(
+            "El apellido paterno debe tener por lo menos 3 caracteres"
+          );
         }
-        return "a";
+        return true;
       },
     },
-    trim: true,
   },
   ApellidoM: {
     in: "body",
     custom: {
-      options: (val, { req, location, path }) => {
-        if (val == null) {
-          return true;
-          // throw new Error("EEEEE");
+      options: (value, { req, location, path }) => {
+        // return value + req.body.foo + location + path;
+        if (!isAlpha(value)) {
+          throw new Error("El apellido materno solo debe contener letras");
         }
-
-        val = val.trim();
-
-        if (val.length <= 1) {
-          throw new Error("El apellido materno es un campo obligatorio");
+        let checkValue = value.replaceAll(" ", "").trim();
+        if (checkValue.length < 3) {
+          throw new Error(
+            "El apellido materno debe tener por lo menos 3 caracteres"
+          );
         }
-        return "a";
+        return true;
       },
     },
-    trim: true,
   },
 });
 
@@ -189,7 +227,7 @@ const RegistroSchemaEditar = checkSchema({
     in: "body",
     custom: {
       options: (value, { req, location, path }) => {
-        if (value == req.body.Contrasena && value.length > 8) {
+        if (value == req.body.Contrasena && value.length >= 8) {
           return true;
         }
         throw new Error(" ");
@@ -211,51 +249,60 @@ const RegistroSchemaEditar = checkSchema({
     in: "body",
     trim: true,
     isLength: {
-      options: { min: 1 },
-      errorMessage: "El campo de nombre es obligatorio",
+      options: { min: 3 },
+      errorMessage:
+        "El campo de nombre es debe ser de por lo menos 3 caracteres",
+    },
+
+    custom: {
+      options: (value, { req, location, path }) => {
+        // return value + req.body.foo + location + path;
+        if (!isAlpha(value)) {
+          throw new Error("El nombre solo debe contener letras");
+        }
+        let checkValue = value.replaceAll(" ", "").trim();
+        if (checkValue.length < 3) {
+          throw new Error("El nombre debe tener por lo menos 3 letras");
+        }
+        return true;
+      },
     },
   },
   ApellidoP: {
     in: "body",
-    // isLength: {
-    //   options: { min: 1 },
-    //   errorMessage: "El campo de Apellido Paterno es obligatorio",
-    // },
     custom: {
-      options: (val, { req, location, path }) => {
-        if (val == null) {
-          return true;
-          // throw new Error("EEEEE");
+      options: (value, { req, location, path }) => {
+        // return value + req.body.foo + location + path;
+        if (!isAlpha(value)) {
+          throw new Error("El apellido paterno solo debe contener letras");
         }
-
-        val = val.trim();
-
-        if (val.length <= 1) {
-          throw new Error("El apellido paterno es un campo obligatorio");
+        let checkValue = value.replaceAll(" ", "").trim();
+        if (checkValue.length < 3) {
+          throw new Error(
+            "El apellido paterno debe tener por lo menos 3 caracteres"
+          );
         }
-        return "a";
+        return true;
       },
     },
-    trim: true,
   },
   ApellidoM: {
     in: "body",
     custom: {
-      options: (val, { req, location, path }) => {
-        if (val == null) {
-          return true;
-          // throw new Error("EEEEE");
+      options: (value, { req, location, path }) => {
+        // return value + req.body.foo + location + path;
+        if (!isAlpha(value)) {
+          throw new Error("El apellido paterno solo debe contener letras");
         }
-
-        val = val.trim();
-
-        if (val.length <= 1) {
-          throw new Error("El apellido materno es un campo obligatorio");
+        let checkValue = value.replaceAll(" ", "").trim();
+        if (checkValue.length < 3) {
+          throw new Error(
+            "El apellido paterno debe tener por lo menos 3 caracteres"
+          );
         }
-        return "a";
+        return true;
       },
     },
-    trim: true,
   },
 });
 const encryptIdRegistro = (req, res, next) => {
@@ -519,7 +566,7 @@ exports.registro_crear_post = [
     console.log("im in registro controller");
     console.log(res.errors);
     console.log(req.body.Nombre);
-    if (res.errors) {
+    if (res.errors && res.errors.length > 0) {
       console.log("si se paso we");
       return res.json({ errors: res.errors });
     } else {
@@ -627,21 +674,21 @@ exports.registro_redirect = (req, res) => {
 var getTextFields = multer();
 module.exports.registro_verify = [
   getTextFields.none(),
-  validateFilesExtension([".png", ".jpg", ".bmp", ".jpeg"]),
+  validateFilesExtension([".png", ".jpg", ".jpeg"]),
   RegistroSchema,
   validateRequest,
   (req, res) => {
     if (res.errors) {
       return res.json({ errors: res.errors, correct: res.correctFields });
     } else {
-      return res.json({ res: "ok" });
+      return res.json({ errors: [], res: "ok" });
     }
   },
 ];
 
 module.exports.registro_verify_editar = [
   getTextFields.none(),
-  validateFilesExtension([".png", ".jpg", ".bmp", ".jpeg"]),
+  validateFilesExtension([".png", ".jpg", ".jpeg"]),
   decryptIdRegistro,
   RegistroSchemaEditar,
   validateRequest,
@@ -649,7 +696,7 @@ module.exports.registro_verify_editar = [
     if (res.errors) {
       return res.json({ errors: res.errors, correct: res.correctFields });
     } else {
-      return res.json({ res: "ok" });
+      return res.json({ errors: [], res: "ok" });
     }
   },
 ];
@@ -707,3 +754,9 @@ exports.registros_pendientes_list = (req, res, next) => {
       next(err);
     });
 };
+
+function isAlpha(str) {
+  let regex = /[^a-zñÑáÁéÉíÍóÓúÚüÜ]/i;
+  let stringCheck = str.replaceAll(" ", "");
+  return !regex.test(stringCheck);
+}

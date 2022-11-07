@@ -361,8 +361,8 @@ exports.ProtocoloCrear = [
   check("Pasos.*.DiasEstimados")
     .isLength({ min: 1 })
     .withMessage("Los días estimados deben de tener por lo menos 1 numero")
-    .isInt({ min: 1, max: 10 })
-    .withMessage("Los días estimados deben ser un numero entre 1 y 10"),
+    .isInt({ min: 2, max: 10 })
+    .withMessage("Los días estimados deben ser un numero entre 2 y 10"),
   check("Titulo")
     .isLength({ min: 10 })
     .withMessage("El titulo debe de tener por lo menos 10 caracteres"),
@@ -593,8 +593,8 @@ exports.ProtocoloEditarPost = [
   check("Pasos.*.DiasEstimados")
     .isLength({ min: 1 })
     .withMessage("Los días estimados deben de tener por lo menos 1 numero")
-    .isInt({ min: 1, max: 10 })
-    .withMessage("Los días estimados deben ser un numero entre 1 y 10"),
+    .isInt({ min: 2, max: 10 })
+    .withMessage("Los días estimados deben ser un numero entre 2 y 10"),
   check("Titulo")
     .isLength({ min: 10 })
     .withMessage("El titulo debe de tener por lo menos 10 caracteres"),

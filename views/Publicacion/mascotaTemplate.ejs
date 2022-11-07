@@ -133,11 +133,15 @@
             class="form-control mascotaDescripcion"
           ></textarea>
         </div>
-        <label for="">Protocolo para esta mascota</label>
+        <%let visibility = "d-none"%>
+        <%if(Tipo==1){%>
+          <%visibility = ""%>
+        <%}%>
+        <label for="" class="<%=visibility%>">Protocolo para esta mascota</label>
         <select
           name=""
           id=""
-          class="form-select w-50 mx-auto mb-3 protocoloSelector"
+          class="form-select w-50 mx-auto mb-3 protocoloSelector <%=visibility%>"
           style="text-align: center"
         ></select>
       </div>

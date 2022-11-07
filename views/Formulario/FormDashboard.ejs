@@ -12,13 +12,18 @@
   integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k"
   crossorigin="anonymous"
 ></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="/stylesheets/bootstrap-5.2.0-dist/js/bootstrap.bundle.min.js"></script>
 
+<script
+  src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+  integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+  crossorigin="anonymous"
+></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"
     integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
     <style>
       .tab-wrap {
   transition: 0.3s box-shadow ease;
@@ -219,7 +224,7 @@ p {
         <div class="tab__content">
 
           
-          <div class="container mt-5">
+          <div class="container mt-5 table-responsive">
             <table class="table table-hover table-borderless">
               <thead class="table-info">
                 
@@ -228,6 +233,7 @@ p {
               <tr class="table table-danger">
                 <th scope="col">Numero.</th>
                 <th scope="col">Titulo</th>
+                <th scope="col"></th>
                 <th scope="col"></th>
                 <th scope="col"></th>
               </tr>
@@ -251,27 +257,55 @@ p {
                       
                     </td>
                     <td>
-                      <%if(visibilidadControlesProtocolo=="disabled"){%>
-                        <a href="<%=urlEditar%>" class="btn btn-info btn-block">
-                          <i class="fa-solid fa-up-right-from-square"></i>
-                        </a>
-                      <%}else{%>
-                      <a href="<%=urlEditar%>" class="btn btn-warning btn-block">
-                        <i class="fas fa-edit"></i>
+                      <a href="/petco/protocolo/ver/<%=Elemento2[i].ID%>" class="btn btn-info btn-block">
+                        <i class="fa-solid fa-up-right-from-square"></i>
                       </a>
-                      <%}%>
+                    </td>
+                    <td>
+                      <%if(visibilidadControlesProtocolo=="disabled"){%>
+                        <span
+                        data-bs-toggle="popover" data-bs-placement="right"
+                        data-bs-custom-class="custom-popover"
+                        data-bs-title="En uso"
+                        data-bs-content="Una mascota esta usando este protocolo. No se puede editar"
+                        data-bs-trigger="hover focus click"
+                        tabindex="0">
+                        <a href="<%=urlEditar%>" class="btn btn-warning btn-block <%=visibilidadControlesProtocolo%>">
+                          <i class="fas fa-edit"></i>
+                        </a>
+                        </span>
+                      <%}else{%>
+                        <a href="<%=urlEditar%>" class="btn btn-warning btn-block <%=visibilidadControlesProtocolo%>">
+                          <i class="fas fa-edit"></i>
+                        </a>
+                        <%}%>
                     </td>
         
                     <td>
-                      <a onclick="confirmar2(<%= Elemento2[i].ID %>)" class="btn btn-danger btn-block <%=visibilidadControlesProtocolo%>">
-                        <i class="fa-solid fa-trash"></i>
-                      </a>
+                      <%if(visibilidadControlesProtocolo=="disabled"){%>
+                        <span
+                        data-bs-toggle="popover" data-bs-placement="right"
+                        data-bs-custom-class="custom-popover"
+                        data-bs-title="En uso"
+                        data-bs-content="Una mascota esta usando este protocolo. No se puede eliminar"
+                        data-bs-trigger="hover focus click"
+                        tabindex="0"
+                        >
+                          <a class="btn btn-danger btn-block <%=visibilidadControlesProtocolo%>">
+                            <i class="fa-solid fa-trash"></i>
+                          </a>
+                        </span>
+                      <%}else{%>
+                        <a onclick="confirmar2(<%= Elemento2[i].ID %>)" class="btn btn-danger btn-block <%=visibilidadControlesProtocolo%>">
+                          <i class="fa-solid fa-trash"></i>
+                        </a>
+                        <%}%>
                     </td>
                   </tr>
                   <% } %>
         
                     <tr>
-                      <th colspan="4" style="text-align: center">
+                      <th colspan="5" style="text-align: center">
                         <a href="/petco/protocolo/" class="btn btn-primary btn-block">
                           <i class="fas fa-plus"></i>
                         </a>
@@ -293,7 +327,7 @@ p {
     
         <div class="tab__content">
 
-          <div class="container mt-5">
+          <div class="container mt-5 table-responsive">
             <table class="table table-hover table-borderless">
               <thead class="table-info">
                 
@@ -304,46 +338,84 @@ p {
                 <th scope="col">Titulo</th>
                 <th scope="col"></th>
                 <th scope="col"></th>
+                <th scope="col"></th>
               </tr>
               <tbody>
                 <%for(var i=0; i < Elemento.length; i++) { %>
                   <%let visibilidadControlesFormulario = ""%>
                   <%let urlEditar = "/petco/formulario/editar/"+Elemento[i].ID%>
-                  <%let urlEliminar = ""%>
                   <%if(!Elemento[i].isEditable){%>
                     <%visibilidadControlesFormulario = "disabled";%>
-                    <%urlEditar = "/petco/formulario/ver/"+Elemento[i].ID%>
-                    <%urlEliminar = "";%>
+                    <%urlEditar = ""%>
                   <%}%>
                   <tr class="table-default">
                     <td>
                       <%= i+1%>
                     </td>
                     <td>
+                      <p class="ellipsis">
                       <%= Elemento[i].Titulo %>
+
+                      </p>
                     </td>
                     <td>
-                      <%if(visibilidadControlesFormulario=="disabled"){%>
-                        <a href="<%=urlEditar%>" class="btn btn-info btn-block">
+                      <span>
+                        <a href="/petco/formulario/ver/<%=Elemento[i].ID%>" class="btn btn-info btn-block">
                           <i class="fa-solid fa-up-right-from-square"></i>
                         </a>
+                      </span>
+                        
+                    </td>
+
+                    <td>
+                      <%if(visibilidadControlesFormulario=="disabled"){%>
+                        <span
+                        data-bs-toggle="popover" data-bs-placement="right"
+                        data-bs-custom-class="custom-popover"
+                        data-bs-title="En uso"
+                        data-bs-content="Una mascota esta usando este formulario. No se puede editar"
+                        data-bs-trigger="hover focus click"
+                        tabindex="0"
+                        >
+                        <a href="<%=urlEditar%>" class="btn btn-warning btn-block <%=visibilidadControlesFormulario%>">
+                          <i class="fas fa-edit"></i>
+                        </a>                      
+                        </span>
+                        
                       <%}else{%>
-                      <a href="<%=urlEditar%>" class="btn btn-warning btn-block">
-                        <i class="fas fa-edit"></i>
-                      </a>
+                        <a href="<%=urlEditar%>" class="btn btn-warning btn-block <%=visibilidadControlesFormulario%>">
+                          <i class="fas fa-edit"></i>
+                        </a> 
                       <%}%>
                     </td>
         
+                    
                     <td>
-                      <a onclick="confirmar(<%= Elemento[i].ID %>)" class="btn btn-danger btn-block <%=visibilidadControlesFormulario%>">
-                        <i class="fa-solid fa-trash"></i>
-                      </a>
+                      <%if(visibilidadControlesFormulario=="disabled"){%>
+                        <span
+                        data-bs-toggle="popover" data-bs-placement="right"
+                          data-bs-custom-class="custom-popover"
+                          data-bs-title="En uso"
+                          data-bs-content="Una mascota esta usando este formulario. No se puede eliminar"
+                          data-bs-trigger="hover focus click"
+                          tabindex="0"
+                        >
+                        <a class="btn btn-danger btn-block <%=visibilidadControlesFormulario%>">
+                          <i class="fa-solid fa-trash"></i>
+                        </a>
+                        </span>
+                      <%}else{%>
+                        <a onclick="confirmar(<%= Elemento[i].ID %>)" class="btn btn-danger btn-block <%=visibilidadControlesFormulario%>">
+                          <i class="fa-solid fa-trash"></i>
+                        </a>
+                      <%}%>
+
                     </td>
                   </tr>
                   <% } %>
         
                     <tr>
-                      <th colspan="4" style="text-align: center">
+                      <th colspan="5" style="text-align: center">
                         <a href="/petco/formulario/crear/" class="btn btn-primary btn-block">
                           <i class="fas fa-plus"></i>
                         </a>
@@ -367,6 +439,8 @@ p {
   
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
   <script>
+    const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl,{trigger:'focus'}))
     function confirmar(id) {
       Swal.fire({
         title: "¿Seguro que quieres eliminar el formulario?",

@@ -3,7 +3,7 @@
 
 const Registro = require("../models/Registro");
 const { decrypt, encrypt } = require("../utils/cryptoUtils/randomId");
-const { sendMail } = require("../controllers/email");
+const { sendMail, sendEmailAviso } = require("../controllers/email");
 const Reporte_Publicacion = require("../models/Reporte_Publicacion");
 const Publicacion = require("../models/Publicacion");
 const Usuario = require("../models/Usuario");
@@ -19,7 +19,7 @@ const Mascota = require("../models/Mascota");
 const Pasos_Mascota = require("../models/Pasos_Mascota");
 const Notificaciones = require("../models/Notificaciones");
 const Paso = require("../models/Paso");
-
+const { validationResult, checkSchema, check } = require("express-validator");
 // // Metas.query()
 // //   .withGraphJoined("[MetasDonaciones,Mascota]")
 // //   .findById(34)
@@ -740,179 +740,191 @@ Date.prototype.substractMonths = function (months) {
 // }
 //Pasos proceso fuera de tiempo
 
-function deleteUsuarioPromise(usuarioFind) {
-  return new Promise((resolve, reject) => {
-    let registroID = usuarioFind.FK_Registro;
-    console.log(
-      "🚀 ~ file: pruebaContarDonaciones.js ~ line 229 ~ .then ~ PublicacionesReportadas.Publicaciones[1]",
-      usuarioFind
-    );
-    let req = {};
-    req.deleteFilesPath = [];
-    let arrayImagenesID = [];
+// function deleteUsuarioPromise(usuarioFind) {
+//   return new Promise((resolve, reject) => {
+//     let registroID = usuarioFind.FK_Registro;
+//     console.log(
+//       "🚀 ~ file: pruebaContarDonaciones.js ~ line 229 ~ .then ~ PublicacionesReportadas.Publicaciones[1]",
+//       usuarioFind
+//     );
+//     let req = {};
+//     req.deleteFilesPath = [];
+//     let arrayImagenesID = [];
 
-    usuarioFind.Publicaciones.forEach((PublicacionUsuario) => {
-      if (PublicacionUsuario.Mascota.length != 0) {
-        let mascotasPublicacion = PublicacionUsuario.Mascota;
-        mascotasPublicacion.forEach((mascota) => {
-          console.log(
-            "🚀 ~ file: pruebaContarDonaciones.js ~ line 115 ~ PublicacionesReportadas.Mascota.forEach ~  mascota.MascotasImagenes",
-            mascota.MascotasImagenes
-          );
-          let arrayImagenes = mascota.MascotasImagenes.map(
-            (x) => "public" + x.Ruta.replaceAll("\\", "/")
-          );
-          let arrayID = mascota.MascotasImagenes.map((x) => x.ID);
-          arrayImagenesID = arrayImagenesID.concat(arrayID);
-          let arrayArchivos = mascota.MascotasProceso.filter(
-            (PasoArchivo) => PasoArchivo.Archivo != null
-          );
-          arrayArchivos = arrayArchivos.map((x) =>
-            x.Archivo.replaceAll("\\", "/")
-          );
-          arrayImagenes = arrayImagenes.filter((Ruta) => Ruta != null);
-          req.deleteFilesPath = req.deleteFilesPath.concat(arrayImagenes);
-          req.deleteFilesPath = req.deleteFilesPath.concat(arrayArchivos);
-        });
-      }
-    });
-    if (usuarioFind.Protocolos.length != 0) {
-      let ProtocolosUsuario = usuarioFind.Protocolos;
-      ProtocolosUsuario.forEach((protocolo) => {
-        let arrayArchivos = protocolo.Pasos.map((x) =>
-          x.Archivo.replaceAll("\\", "/")
-        );
-        arrayArchivos = arrayArchivos.filter((Archivo) => Archivo != null);
-        req.deleteFilesPath = req.deleteFilesPath.concat(arrayArchivos);
-      });
-    }
-    if (
-      usuarioFind.Foto_Perfil != "/images/ImagenesPerfilUsuario/default.png"
-    ) {
-      req.deleteFilesPath.push(usuarioFind.Foto_Perfil);
-    }
+//     usuarioFind.Publicaciones.forEach((PublicacionUsuario) => {
+//       if (PublicacionUsuario.Mascota.length != 0) {
+//         let mascotasPublicacion = PublicacionUsuario.Mascota;
+//         mascotasPublicacion.forEach((mascota) => {
+//           console.log(
+//             "🚀 ~ file: pruebaContarDonaciones.js ~ line 115 ~ PublicacionesReportadas.Mascota.forEach ~  mascota.MascotasImagenes",
+//             mascota.MascotasImagenes
+//           );
+//           let arrayImagenes = mascota.MascotasImagenes.map(
+//             (x) => "public" + x.Ruta.replaceAll("\\", "/")
+//           );
+//           let arrayID = mascota.MascotasImagenes.map((x) => x.ID);
+//           arrayImagenesID = arrayImagenesID.concat(arrayID);
+//           let arrayArchivos = mascota.MascotasProceso.filter(
+//             (PasoArchivo) => PasoArchivo.Archivo != null
+//           );
+//           arrayArchivos = arrayArchivos.map((x) =>
+//             x.Archivo.replaceAll("\\", "/")
+//           );
+//           arrayImagenes = arrayImagenes.filter((Ruta) => Ruta != null);
+//           req.deleteFilesPath = req.deleteFilesPath.concat(arrayImagenes);
+//           req.deleteFilesPath = req.deleteFilesPath.concat(arrayArchivos);
+//         });
+//       }
+//     });
+//     if (usuarioFind.Protocolos.length != 0) {
+//       let ProtocolosUsuario = usuarioFind.Protocolos;
+//       ProtocolosUsuario.forEach((protocolo) => {
+//         let arrayArchivos = protocolo.Pasos.map((x) =>
+//           x.Archivo.replaceAll("\\", "/")
+//         );
+//         arrayArchivos = arrayArchivos.filter((Archivo) => Archivo != null);
+//         req.deleteFilesPath = req.deleteFilesPath.concat(arrayArchivos);
+//       });
+//     }
+//     if (
+//       usuarioFind.Foto_Perfil != "/images/ImagenesPerfilUsuario/default.png"
+//     ) {
+//       req.deleteFilesPath.push(usuarioFind.Foto_Perfil);
+//     }
 
-    usuarioFind
-      .$query()
-      .delete()
-      .then(() => {
-        let arrayPromises = [];
-        arrayImagenesID.forEach((idImagen) => {
-          arrayPromises.push(createPromiseEliminarImagen(idImagen));
-        });
-        let borrarArchivosPromises = deleteFiles(req);
-        Promise.all(arrayPromises).then(() => {
-          Promise.all(borrarArchivosPromises).then(() => {
-            Registro.query()
-              .deleteById(registroID)
-              .then(() => {
-                console.log("Todo correcto");
-                // res.json("ok");
-                resolve("ok");
-              });
-          });
-        });
-      });
-  });
-}
+//     usuarioFind
+//       .$query()
+//       .delete()
+//       .then(() => {
+//         let arrayPromises = [];
+//         arrayImagenesID.forEach((idImagen) => {
+//           arrayPromises.push(createPromiseEliminarImagen(idImagen));
+//         });
+//         let borrarArchivosPromises = deleteFiles(req);
+//         Promise.all(arrayPromises).then(() => {
+//           Promise.all(borrarArchivosPromises).then(() => {
+//             Registro.query()
+//               .deleteById(registroID)
+//               .then(() => {
+//                 console.log("Todo correcto");
+//                 // res.json("ok");
+//                 resolve("ok");
+//               });
+//           });
+//         });
+//       });
+//   });
+// }
 
-function createPromiseEliminarImagen(id) {
-  // console.log(
-  //   "🚀 ~ file: ModeradorController.js ~ line 222 ~ createPromiseReporte ~ reporte",
-  //   reporte
-  // );
-  return new Promise((resolve, reject) => {
-    resolve(
-      Imagenes.query()
-        .findById(id)
-        .delete()
-        .then(() => {})
-    );
-  });
-}
+// function createPromiseEliminarImagen(id) {
+//   // console.log(
+//   //   "🚀 ~ file: ModeradorController.js ~ line 222 ~ createPromiseReporte ~ reporte",
+//   //   reporte
+//   // );
+//   return new Promise((resolve, reject) => {
+//     resolve(
+//       Imagenes.query()
+//         .findById(id)
+//         .delete()
+//         .then(() => {})
+//     );
+//   });
+// }
 
-let hoy = new Date(Date.now());
-let fecha = getDateFormated(hoy);
-let date2 = new Date(fecha);
-// date2 = date2.substractMonths(5);
-console.log(
-  date2.toLocaleDateString("es-MX", date2.toLocaleTimeString("es-MX"))
-);
+// let hoy = new Date(Date.now());
+// let fecha = getDateFormated(hoy);
+// let date2 = new Date(fecha);
+// // date2 = date2.substractMonths(5);
+// console.log(
+//   date2.toLocaleDateString("es-MX", date2.toLocaleTimeString("es-MX"))
+// );
 
-Pasos_Mascota.query()
-  .where("Fecha_Limite", "<", date2)
-  .andWhere("Completado", "<", 3)
-  .andWhere("Mascota:MascotasSolicitudes.Estado", "=", 1)
-  .withGraphJoined("[Mascota.[MascotasSolicitudes]]")
-  .then((PasosIncompletos) => {
-    let promisesPasosIncompletos = [];
-    let promisesEliminarsolicitudes = [];
-    PasosIncompletos.forEach((PasoIncompleto) => {
-      promisesPasosIncompletos.push(createPromisesPasoDefault(PasoIncompleto));
-      promisesEliminarsolicitudes.push(
-        deleteSolicitudPromise(PasoIncompleto.Mascota)
-      );
-    });
-    console.log(PasosIncompletos[0].Mascota);
-  });
+// Pasos_Mascota.query()
+//   .where("Fecha_Limite", "<", date2)
+//   .andWhere("Completado", "<", 3)
+//   .andWhere("Mascota:MascotasSolicitudes.Estado", "=", 1)
+//   .withGraphJoined("[Mascota.[MascotasSolicitudes]]")
+//   .then((PasosIncompletos) => {
+//     let promisesPasosIncompletos = [];
+//     let promisesEliminarsolicitudes = [];
+//     PasosIncompletos.forEach((PasoIncompleto) => {
+//       promisesPasosIncompletos.push(createPromisesPasoDefault(PasoIncompleto));
+//       promisesEliminarsolicitudes.push(
+//         deleteSolicitudPromise(PasoIncompleto.Mascota)
+//       );
+//     });
+//     console.log(PasosIncompletos[0].Mascota);
+//   });
 
-function deleteSolicitudPromise(mascota) {
-  return new Promise((resolve, reject) => {
-    resolve(
-      mascota.MascotasSolicitudes[0]
-        .$query()
-        .delete()
-        .then(() => {
-          resolve("ok");
-        })
-    );
-  });
-}
+// function deleteSolicitudPromise(mascota) {
+//   return new Promise((resolve, reject) => {
+//     resolve(
+//       mascota.MascotasSolicitudes[0]
+//         .$query()
+//         .delete()
+//         .then(() => {
+//           resolve("ok");
+//         })
+//     );
+//   });
+// }
 
-function createPromisesPasoDefault(paso) {
-  return new Promise((resolve, reject) => {
-    Pasos_Mascota.query()
-      .where("ID_Mascota", "=", paso.ID_Mascota)
-      .then((pasos) => {
-        // let arrayArchivos = [];
-        let arrayPromises = [];
-        let req = {};
-        req.deleteFilesPath = [];
-        pasos.forEach((pasoEncontrado) => {
-          if (pasoEncontrado.Archivo != null) {
-            req.deleteFilesPath.push(
-              pasoEncontrado.Archivo.replaceAll("\\", "/")
-            );
-          }
-          arrayPromises.push(patchPasosDefaultPromise(pasoEncontrado));
-        });
+// function createPromisesPasoDefault(paso) {
+//   return new Promise((resolve, reject) => {
+//     Pasos_Mascota.query()
+//       .where("ID_Mascota", "=", paso.ID_Mascota)
+//       .then((pasos) => {
+//         // let arrayArchivos = [];
+//         let arrayPromises = [];
+//         let req = {};
+//         req.deleteFilesPath = [];
+//         pasos.forEach((pasoEncontrado) => {
+//           if (pasoEncontrado.Archivo != null) {
+//             req.deleteFilesPath.push(
+//               pasoEncontrado.Archivo.replaceAll("\\", "/")
+//             );
+//           }
+//           arrayPromises.push(patchPasosDefaultPromise(pasoEncontrado));
+//         });
 
-        Promise.all(deleteFiles(req)).then(() => {
-          Promise.all(arrayPromises).then(() => {
-            resolve("ok");
-          });
-        });
-      });
-  });
-}
+//         Promise.all(deleteFiles(req)).then(() => {
+//           Promise.all(arrayPromises).then(() => {
+//             resolve("ok");
+//           });
+//         });
+//       });
+//   });
+// }
 
-function patchPasosDefaultPromise(PasoProceso) {
-  let valueCompletado = 0;
-  if (PasoProceso.ID_Paso == 1) {
-    valueCompletado = 3;
-  }
-  return new Promise((resolve, reject) => {
-    resolve(
-      PasoProceso.$query()
-        .patch({
-          Completado: valueCompletado,
-          Archivo: null,
-          Fecha_Limite: null,
-        })
-        .then(() => {})
-    );
-  });
-}
+// function patchPasosDefaultPromise(PasoProceso) {
+//   let valueCompletado = 0;
+//   if (PasoProceso.ID_Paso == 1) {
+//     valueCompletado = 3;
+//   }
+//   return new Promise((resolve, reject) => {
+//     resolve(
+//       PasoProceso.$query()
+//         .patch({
+//           Completado: valueCompletado,
+//           Archivo: null,
+//           Fecha_Limite: null,
+//         })
+//         .then(() => {})
+//     );
+//   });
+// }
+
+// let string1 = "Juan Peréz".replaceAll(" ", "");
+// let string2 = "Juancho".replaceAll(" ", "");
+// let string3 = "Juan/!a".replaceAll(" ", "");
+// let string4 = "Ju4n 4lenj4ndro3".replaceAll(" ", "");
+
+// // check().isAlpha("es-ES")
+// let regex = /[^a-zñÑáÁéÉíÍóÓúÚüÜ]/i;
+// console.log(string1, " : ", !regex.test(string1));
+// console.log(string2, " : ", !regex.test(string2));
+// console.log(string3, " : ", !regex.test(string3));
+// console.log(string4, " : ", !regex.test(string4));
 // function getNotificacionesMeses(fecha_exec) {
 //   // Notificaciones.query().where()
 // }
@@ -943,3 +955,53 @@ function patchPasosDefaultPromise(PasoProceso) {
 //         );
 //       });
 //   });
+
+Date.prototype.substractDays = function (days) {
+  var date = new Date(this.valueOf());
+  date.setDate(date.getDate() - days);
+  return date;
+};
+
+let fecha_exec = new Date(Date.now());
+let fecha = getDateFormated(fecha_exec);
+let date2 = new Date(fecha);
+let date3;
+date2 = date2.substractMonths(12);
+date3 = date2.substractDays(7);
+console.log(
+  date2.toLocaleDateString("es-MX", date2.toLocaleTimeString("es-MX"))
+);
+
+Usuario.query()
+  .withGraphJoined("UsuarioRegistro", { minimize: true })
+  .where("usuario.UltimaConexion", "=", date3)
+  .then((usuariosEliminar) => {
+    // console.log(usuariosEliminar);
+    console.log(
+      `Fecha de aviso (Mandado de correos): ${date3.toLocaleDateString(
+        "es-MX"
+      )}`
+    );
+    console.log(
+      `Usuarios a proximos a borrar a partir de la fecha: ${date2.toLocaleDateString(
+        "es-MX"
+      )} ${date2.toLocaleTimeString("es-MX")}`
+    );
+    console.log(`Fecha de ejecución ${fecha}`);
+    console.log(`Fecha de ejecución ${fecha}`);
+    console.log(usuariosEliminar);
+    let usuariosPromises = [];
+    usuariosEliminar.forEach((usuario) => {
+      sendEmailAviso(
+        "Aviso de inactividad",
+        usuario.UsuarioRegistro.Correo,
+        usuario.UsuarioRegistro.Nombre
+      );
+    });
+    // usuariosEliminar.forEach((usuario) => {
+    //   usuariosPromises.push(deleteUsuarioPromise(usuario));
+    // });
+    // Promise.all(usuariosPromises).then(() => {
+    //   console.log(`Se han eliminado ${usuariosEliminar.length} usuarios`);
+    // });
+  });
