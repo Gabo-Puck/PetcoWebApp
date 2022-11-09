@@ -12,6 +12,7 @@ const Like = require("../models/Like");
 const Publicacion_Guardada = require("../models/Publicacion_Guardada");
 const Reporte_Publicacion = require("../models/Reporte_Publicacion");
 const Usuario_Bloqueado = require("../models/Usuario_Bloqueado");
+const { sendNotificacion } = require("./NotificacionesController");
 
 paypal.configure({
   mode: "sandbox", //sandbox or live
