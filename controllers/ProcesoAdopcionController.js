@@ -127,63 +127,64 @@ function getUsuario(req, res, next) {
 }
 
 exports.uploadFile = [
-  fetchInput(acceptedTypes, "./public/archivosPasos"),
+  fetchInput(acceptedTypes, "archivosPasos"),
   isAdoptante,
   (req, res, next) => {
     if (res.isAdoptante) {
       if (res.errors.length >= 1) {
         return res.json({ errors: res.errors });
       }
-      uploadFiles(res);
-      Pasos_Mascota.query()
-        .findOne({
-          ID_Mascota: req.body.MascotaID,
-          ID_Paso: req.body.PasoID,
-        })
-        .then((PasoMascotaFound) => {
-          return new Promise((resolve, reject) => {
-            let archivo = PasoMascotaFound.Archivo;
-            req.deleteFilesPath = [];
-            req.deleteFilesPath.push(archivo);
-            console.log("archivoPASO", req.body.archivoPaso);
-            if (
-              req.body.archivoPaso != "" &&
-              req.body.archivoPaso != null &&
-              req.body.archivoPaso != "undefined"
-            ) {
-              if (archivo != null) {
-                let deletePromises = deleteFiles(req);
-                Promise.all(deletePromises).then(() => {
+      Promise.all(uploadFiles(res, req.app.storageFirebase)).then(() => {
+        Pasos_Mascota.query()
+          .findOne({
+            ID_Mascota: req.body.MascotaID,
+            ID_Paso: req.body.PasoID,
+          })
+          .then((PasoMascotaFound) => {
+            return new Promise((resolve, reject) => {
+              let archivo = PasoMascotaFound.Archivo;
+              req.deleteFilesPath = [];
+              req.deleteFilesPath.push(archivo);
+              console.log("archivoPASO", req.body.archivoPaso);
+              if (
+                req.body.archivoPaso != "" &&
+                req.body.archivoPaso != null &&
+                req.body.archivoPaso != "undefined"
+              ) {
+                if (archivo != null) {
+                  let deletePromises = deleteFiles(req);
+                  Promise.all(deletePromises).then(() => {
+                    PasoMascotaFound.$query()
+                      .patch({ Archivo: req.body.archivoPaso })
+                      .then((resultFetch) => {
+                        resolve(resultFetch);
+                      });
+                  });
+                } else {
                   PasoMascotaFound.$query()
                     .patch({ Archivo: req.body.archivoPaso })
                     .then((resultFetch) => {
                       resolve(resultFetch);
                     });
-                });
+                }
               } else {
-                PasoMascotaFound.$query()
-                  .patch({ Archivo: req.body.archivoPaso })
-                  .then((resultFetch) => {
-                    resolve(resultFetch);
-                  });
+                resolve(1);
+                req.body.archivoPaso = archivo;
               }
+            });
+          })
+          .then((resultFetch) => {
+            console.log(resultFetch);
+            if (resultFetch > 0) {
+              res.json({ state: "ok", path: req.body.archivoPaso });
             } else {
-              resolve(1);
-              req.body.archivoPaso = archivo;
+              res.json({ state: "notOk" });
+              console.log(
+                "Something wrong happened: No se hizo el cambio en la bd"
+              );
             }
           });
-        })
-        .then((resultFetch) => {
-          console.log(resultFetch);
-          if (resultFetch > 0) {
-            res.json({ state: "ok", path: req.body.archivoPaso });
-          } else {
-            res.json({ state: "notOk" });
-            console.log(
-              "Something wrong happened: No se hizo el cambio en la bd"
-            );
-          }
-        });
+      });
     } else {
       console.log("Something wrong happened: No es adoptante");
 

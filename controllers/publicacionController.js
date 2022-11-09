@@ -144,7 +144,7 @@ exports.crearPublicacion = [
 ];
 
 exports.crearPublicacionGuardar = [
-  fetchInput(acceptedTypes, "./public/images/ImagenesMascotas"),
+  fetchInput(acceptedTypes, "images/ImagenesMascotas"),
   check("Titulo")
     .isLength({ min: 10, max: 50 })
     .withMessage("El título debe tener entre 10 y 50 caracteres"),
@@ -258,7 +258,7 @@ exports.crearPublicacionGuardar = [
         // console.log(response);
       })
       .then((promises) => Promise.all(promises))
-      .then(() => uploadFiles(res))
+      .then(() => Promise.all(uploadFiles(res, req.app.storageFirebase)))
       .then(() => res.json("ok"))
       .catch((err) => {
         console.log(err);

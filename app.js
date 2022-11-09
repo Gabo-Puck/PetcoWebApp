@@ -24,6 +24,22 @@ const sessionMiddleware = session({
   saveUninitialized: true,
 });
 const cors = require("cors");
+
+const { initializeApp } = require("firebase/app");
+const { getAnalytics } = require("firebase/analytics");
+const { getStorage, ref } = require("firebase/storage");
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBcAG6ACQFse724F5gn5kYdqnLo7IWRHFE",
+  authDomain: "proyecto-webapp-a556f.firebaseapp.com",
+  projectId: "proyecto-webapp-a556f",
+  storageBucket: "proyecto-webapp-a556f.appspot.com",
+  messagingSenderId: "992284754831",
+  appId: "1:992284754831:web:268760ea7dced3a82b41fa",
+  measurementId: "G-JWTPE0Q3WB",
+  storageBucket: "gs://proyecto-webapp-a556f.appspot.com/",
+};
+
 const { ValidationError } = require("./utils/ValidationError");
 const {
   deleteNotificacionesMeses,
@@ -61,6 +77,10 @@ app.use("/login", loginRouter);
 app.use("/publicacion", publicacionget);
 app.use("/videollamada", require("./routes/videollamada"));
 app.use("/solicitudes", require("./routes/SolicitudesRouter"));
+
+app.appFirebase = initializeApp(firebaseConfig);
+// app.analyticsFirebase = getAnalytics(app.appFirebase);
+app.storageFirebase = getStorage(app.appFirebase);
 
 var enviroment = process.env.NODE_ENV || "development";
 if (enviroment === "development") {
