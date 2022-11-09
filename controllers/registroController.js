@@ -12,6 +12,8 @@ const {
   validateFilesExtension,
 } = require("./requestValidator");
 
+const { getStorage, ref, getDownloadURL } = require("firebase/storage");
+
 const { encrypt, decrypt } = require("../utils/cryptoUtils/randomId");
 
 const { sendMail } = require("./email");
@@ -742,17 +744,98 @@ exports.registros_pendientes_list = (req, res, next) => {
     // .whereNot("RegistroUsuario.ID", ">", "0")
     .andWhere("registro.Pendiente", "=", "1")
     .then((registrosPendientes) => {
-      res.render("listaRegistros", {
-        registros: registrosPendientes,
-        Tipo: req.session.Tipo,
-      });
-      // res.json(Result);
-    })
-    .catch((err) => {
-      console.log("Algo ha salido mal en registros_pendientes_list");
-      console.log(err);
-      next(err);
+      let promises = [];
+      for (let index = 0; index < registrosPendientes.length; index++) {
+        const element = registrosPendientes[index];
+        promises.push(
+          createPromisesImagenesRegistro2(element, req.app.storageFirebase)
+        );
+      }
+      Promise.all(promises)
+        .then(() => {
+          res.render("listaRegistros", {
+            registros: registrosPendientes,
+            Tipo: req.session.Tipo,
+          });
+          // res.json(Result);
+        })
+        .catch((err) => {
+          console.log("Algo ha salido mal en registros_pendientes_list");
+          console.log(err);
+          next(err);
+        });
     });
+};
+
+const createPromisesImagenesRegistro2 = (registro, storage) => {
+  let promises = [];
+  return new Promise((resolve, reject) => {
+    let array = registro.Documento_Identidad.split(";");
+    for (let index = 0; index < array.length; index++) {
+      const element = array[index];
+      if (element != "" && element != null) {
+        promises.push(
+          createPromisesImagenesRegistro(array, element, storage, index)
+        );
+      }
+    }
+    Promise.all(promises).then(() => {
+      registro.Documento_Identidad = "";
+      for (let index = 0; index < array.length; index++) {
+        const element = array[index];
+        if (element != "" && element != null) {
+          // promises.push(createPromisesImagenesRegistro(array,element,storage,index))
+          registro.Documento_Identidad = registro.Documento_Identidad.concat(
+            element,
+            ";"
+          );
+        }
+        resolve("ok");
+      }
+    });
+  });
+};
+
+const createPromisesImagenesRegistro = (array, path, storage, index) => {
+  return new Promise((resolve, reject) => {
+    let fullPath = path;
+    let fragmentedPath = fullPath.split("/");
+    let fileName = fragmentedPath.pop();
+    let referencePath = fullPath.replace(fileName, "");
+    let storageRef = ref(storage);
+    fragmentedPath.forEach((route) => {
+      storageRef = ref(storageRef, route);
+    });
+    storageRef = ref(storageRef, fileName);
+    getDownloadURL(storageRef)
+      .then((url) => {
+        array[index] = url;
+        resolve("ok");
+      })
+      .catch((error) => {
+        // A full list of error codes is available at
+        // https://firebase.google.com/docs/storage/web/handle-errors
+        resolve("xd");
+        switch (error.code) {
+          case "storage/object-not-found":
+            // File doesn't exist
+            break;
+          case "storage/unauthorized":
+            // User doesn't have permission to access the object
+            break;
+          case "storage/canceled":
+            // User canceled the upload
+            break;
+
+          // ...
+
+          case "storage/unknown":
+            // Unknown error occurred, inspect the server response
+            break;
+        }
+      });
+    // getDownloadURL()
+  });
 };
 
 function isAlpha(str) {

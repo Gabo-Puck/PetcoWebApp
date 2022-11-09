@@ -15,6 +15,7 @@ const {
 } = require("../utils/procesoAdopcionUtils");
 const Solicitudes = require("../models/Solicitudes");
 const { sendNotificacion } = require("./NotificacionesController");
+const { getDownloadURL, ref } = require("firebase/storage");
 
 var acceptedTypes = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -42,16 +43,39 @@ exports.getProceso = [
           console.log("ESTOA QUI");
           let tipoUsuario = res.isAdoptante ? 2 : 1; //Si existe res.isAdoptante el usuario será adoptante (2), si no existe entonces será dueño (1)
           let ROOM_ID = encrypt(req.params.MascotaID);
-          res.render("procesoAdopcion", {
-            PasosProceso: PasosProceso[0].MascotasPasos,
-            tipo: tipoUsuario,
-            MascotaID: req.params.MascotaID,
-            Usuario: res.usuarioProceso,
-            UsuarioPeer: res.PeerProceso,
-            SolicitudID: res.SolicitudID,
-            Mensajes: res.MensajesSolicitud,
-            ROOM_ID: ROOM_ID,
-            Tipo: req.session.Tipo,
+          let promises = [];
+
+          console.log(
+            "🚀 ~ file: ProcesoAdopcionController.js ~ line 56 ~ PasosProceso[0].MascotasPasos.forEach ~ PasosProceso[0]",
+            PasosProceso[0]
+          );
+          PasosProceso[0].MascotasPasos.forEach((paso_proceso) => {
+            console.log(
+              "🚀 ~ file: ProcesoAdopcionController.js ~ line 56 ~ PasosProceso[0].MascotasPasos.forEach ~ paso_proceso.PasoProceso[0]",
+              paso_proceso.PasoProceso[0]
+            );
+            if (paso_proceso.PasoProceso[0].Archivo !== null) {
+              promises.push(
+                getArchivoUrl(
+                  paso_proceso.PasoProceso[0],
+                  paso_proceso.PasoProceso[0].Archivo,
+                  req.app.storageFirebase
+                )
+              );
+            }
+          });
+          Promise.all(promises).then(() => {
+            res.render("procesoAdopcion", {
+              PasosProceso: PasosProceso[0].MascotasPasos,
+              tipo: tipoUsuario,
+              MascotaID: req.params.MascotaID,
+              Usuario: res.usuarioProceso,
+              UsuarioPeer: res.PeerProceso,
+              SolicitudID: res.SolicitudID,
+              Mensajes: res.MensajesSolicitud,
+              ROOM_ID: ROOM_ID,
+              Tipo: req.session.Tipo,
+            });
           });
         });
     } else {
@@ -125,6 +149,47 @@ function getUsuario(req, res, next) {
       next(err);
     });
 }
+
+const getArchivoUrl = (paso_mascota, path, storage) => {
+  return new Promise((resolve, reject) => {
+    let fullPath = path;
+    let fragmentedPath = fullPath.split("/");
+    let fileName = fragmentedPath.pop();
+    let referencePath = fullPath.replace(fileName, "");
+    let storageRef = ref(storage);
+    fragmentedPath.forEach((route) => {
+      storageRef = ref(storageRef, route);
+    });
+    storageRef = ref(storageRef, fileName);
+    getDownloadURL(storageRef)
+      .then((url) => {
+        paso_mascota.Archivo = url;
+        resolve("ok");
+      })
+      .catch((error) => {
+        // A full list of error codes is available at
+        // https://firebase.google.com/docs/storage/web/handle-errors
+        resolve("xd");
+        switch (error.code) {
+          case "storage/object-not-found":
+            // File doesn't exist
+            break;
+          case "storage/unauthorized":
+            // User doesn't have permission to access the object
+            break;
+          case "storage/canceled":
+            // User canceled the upload
+            break;
+
+          // ...
+
+          case "storage/unknown":
+            // Unknown error occurred, inspect the server response
+            break;
+        }
+      });
+  });
+};
 
 exports.uploadFile = [
   fetchInput(acceptedTypes, "archivosPasos"),

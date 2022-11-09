@@ -10,6 +10,7 @@ const {
 } = require("../controllers/NotificacionesController");
 const Mascota = require("../models/Mascota");
 const Usuario = require("../models/Usuario");
+const { createPromisesImagenesMascotas } = require("./InicioController");
 
 Date.prototype.addDays = function (days) {
   var date = new Date(this.valueOf());
@@ -30,15 +31,37 @@ exports.getListaSolicitudesPublicacion = (req, res, next) => {
       })
       // .where("publicacion.ID", "=", req.params.PublicacionID)
       // .andWhere("publicacion.ID_Usuario", "=", req.session.IdSession)
+
       .then((result) => {
-        // return res.json(result);
-        console.log(result.Mascota);
-        // console.log(result.Mascota);
-        console.log(result);
-        res.render("listaSolicitudes", {
-          Mascotas: result.Mascota,
-          PublicacionNombre: result.Titulo,
-          Tipo: req.session.Tipo,
+        let promises = [];
+        for (let index = 0; index < result.Mascota.length; index++) {
+          const mascota = result.Mascota[index];
+          for (
+            let indexImagen = 0;
+            indexImagen < mascota.MascotasImagenes.length;
+            indexImagen++
+          ) {
+            const imagenRuta = mascota.MascotasImagenes[indexImagen];
+            promises.push(
+              createPromisesImagenesMascotas(
+                mascota,
+                imagenRuta.Ruta,
+                req.app.storageFirebase,
+                indexImagen
+              )
+            );
+          }
+        }
+        Promise.all(promises).then(() => {
+          // return res.json(result);
+          console.log(result.Mascota);
+          // console.log(result.Mascota);
+          console.log(result);
+          res.render("listaSolicitudes", {
+            Mascotas: result.Mascota,
+            PublicacionNombre: result.Titulo,
+            Tipo: req.session.Tipo,
+          });
         });
       });
   } else res.redirect("/login");

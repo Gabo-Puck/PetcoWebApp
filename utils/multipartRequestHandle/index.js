@@ -7,7 +7,12 @@ var fs = require("fs");
 var os = require("os");
 const { resolve } = require("path");
 const { ValidationError } = require("../ValidationError");
-const { getStorage, ref, uploadBytes } = require("firebase/storage");
+const {
+  getStorage,
+  ref,
+  uploadBytes,
+  deleteObject,
+} = require("firebase/storage");
 /**
  * Función middleware que se puede añadir al flujo de una request. Permite hacer lo siguiente:
  * - Añadir al req.body los valores de la request del usuario.
@@ -211,10 +216,31 @@ function createPromisesSubirArchivos(storage, path, fileArray) {
   });
 }
 
-function createDelete(path) {
+function createDelete(storage, path, fileArray) {
   return new Promise((resolve, reject) => {
-    resolve(fs.promises.rm(path, { force: true }));
-  }).catch();
+    // resolve(fs.promises.rm(path, { force: true }));
+    let fullPath = path;
+    let fragmentedPath = fullPath.split("/");
+    let fileName = fragmentedPath.pop();
+    let referencePath = fullPath.replace(fileName, "");
+    console.log(
+      "🚀 ~ file: index.js ~ line 187 ~ returnnewPromise ~ referencePath",
+      referencePath
+    );
+    // console.log()
+    let storageRef = ref(storage);
+    fragmentedPath.forEach((route) => {
+      storageRef = ref(storageRef, route);
+    });
+    storageRef = ref(storageRef, fileName);
+    deleteObject(storageRef, fileArray).then((snapshot) => {
+      console.log("Arhcivo subido correctamente a la nube");
+      resolve("ok");
+    });
+  }).catch((err) => {
+    console.log(err);
+    resolve("notok");
+  });
 }
 
 exports.deleteFiles = (req) => {
