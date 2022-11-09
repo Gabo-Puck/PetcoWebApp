@@ -15,7 +15,8 @@ var os = require("os");
 const Paso = require("../models/Paso");
 const { resolve } = require("path");
 const { fetchInput, uploadFiles } = require("../utils/multipartRequestHandle");
-
+const { getDownloadURL, ref } = require("firebase/storage");
+const { getStorage, uploadBytes, deleteObject } = require("firebase/storage");
 /**
  * Esta función middleware obtiene el template de paso.
  * @param {*} req Es el objeto que representa la request al servidor
@@ -397,18 +398,74 @@ exports.ProtocoloEditarGet = [
         "protocolos.ID_Usuario": req.session.IdSession,
         "protocolos.ID": req.params.idProtocolo,
       })
-      .then((protocolo) =>
-        res.render("Protocolo/EditarProtocolo", {
-          formularios: res.formularios,
-          protocolo: protocolo,
-          pasos: res.pasos,
-          Response: req.htmlTemplate,
-          Tipo: req.session.Tipo,
-        })
-      );
+      .then((protocolo) => {
+        let promises = [];
+
+        protocolo.Pasos.forEach((paso) => {
+          if (paso.Archivo != null && paso.Archivo != "") {
+            promises.push(
+              createPromisesArchivos(
+                paso,
+                paso.Archivo,
+                req.app.storageFirebase
+              )
+            );
+          }
+        });
+        Promise.all(promises).then(() => {
+          res.render("Protocolo/EditarProtocolo", {
+            formularios: res.formularios,
+            protocolo: protocolo,
+            pasos: res.pasos,
+            Response: req.htmlTemplate,
+            Tipo: req.session.Tipo,
+          });
+        });
+      });
     // res.render("Protocolo/EditarProtocolo");
   },
 ];
+
+function createPromisesArchivos(paso, path, storage) {
+  return new Promise((resolve, reject) => {
+    let fullPath = path;
+    let fragmentedPath = fullPath.split("/");
+    let fileName = fragmentedPath.pop();
+    let referencePath = fullPath.replace(fileName, "");
+    let storageRef = ref(storage);
+    fragmentedPath.forEach((route) => {
+      storageRef = ref(storageRef, route);
+    });
+    storageRef = ref(storageRef, fileName);
+    getDownloadURL(storageRef)
+      .then((url) => {
+        paso.Archivo = url;
+        resolve("ok");
+      })
+      .catch((error) => {
+        // A full list of error codes is available at
+        // https://firebase.google.com/docs/storage/web/handle-errors
+        resolve("xd");
+        switch (error.code) {
+          case "storage/object-not-found":
+            // File doesn't exist
+            break;
+          case "storage/unauthorized":
+            // User doesn't have permission to access the object
+            break;
+          case "storage/canceled":
+            // User canceled the upload
+            break;
+
+          // ...
+
+          case "storage/unknown":
+            // Unknown error occurred, inspect the server response
+            break;
+        }
+      });
+  });
+}
 
 exports.ProtocoloVer = [
   loadTemplate,
@@ -565,8 +622,29 @@ function getPromisesUpsert(req, res, idProtocolo) {
 
 function createDelete(path) {
   return new Promise((resolve, reject) => {
-    resolve(fs.promises.rm(path, { force: true }));
-  }).catch();
+    // resolve(fs.promises.rm(path, { force: true }));
+    let fullPath = path;
+    let fragmentedPath = fullPath.split("/");
+    let fileName = fragmentedPath.pop();
+    let referencePath = fullPath.replace(fileName, "");
+    console.log(
+      "🚀 ~ file: index.js ~ line 187 ~ returnnewPromise ~ referencePath",
+      referencePath
+    );
+    // console.log()
+    let storageRef = ref(storage);
+    fragmentedPath.forEach((route) => {
+      storageRef = ref(storageRef, route);
+    });
+    storageRef = ref(storageRef, fileName);
+    deleteObject(storageRef).then((snapshot) => {
+      console.log("Arhcivo subido correctamente a la nube");
+      resolve("ok");
+    });
+  }).catch((err) => {
+    console.log(err);
+    resolve("notok");
+  });
 }
 
 function deleteFiles(req) {
@@ -576,7 +654,9 @@ function deleteFiles(req) {
     console.log(req.deleteFilesPath);
     if (req.deleteFilesPath.length > 0) {
       req.deleteFilesPath.forEach((filePath) => {
-        deleteFilesPromises.push(createDelete(filePath));
+        deleteFilesPromises.push(
+          createDelete(req.app.storageFirebase, filePath)
+        );
       });
     }
   }

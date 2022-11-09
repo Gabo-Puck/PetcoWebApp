@@ -50,7 +50,7 @@ exports.verPublicacionesReportadasGet = (req, res, next) => {
     .then((PublicacionesReportadas) => {
       // console.log(PublicacionesReportadas);
       res.render("Moderador/verPublicacionesReportadas.ejs", {
-        Tipo: req.session.IdSession,
+        Tipo: req.session.Tipo,
         PublicacionesReportadas: PublicacionesReportadas,
       });
       // resolve(countLikes);
@@ -544,7 +544,7 @@ exports.verUsuariosReportadosGet = (req, res, next) => {
     .then((UsuariosReportados) => {
       console.log(UsuariosReportados);
       res.render("Moderador/verUsuariosReportados.ejs", {
-        Tipo: req.session.IdSession,
+        Tipo: req.session.Tipo,
         UsuariosReportados: UsuariosReportados,
       });
       // resolve(countLikes);

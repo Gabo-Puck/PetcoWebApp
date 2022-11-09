@@ -216,7 +216,7 @@ function createPromisesSubirArchivos(storage, path, fileArray) {
   });
 }
 
-function createDelete(storage, path, fileArray) {
+function createDelete(storage, path) {
   return new Promise((resolve, reject) => {
     // resolve(fs.promises.rm(path, { force: true }));
     let fullPath = path;
@@ -233,7 +233,7 @@ function createDelete(storage, path, fileArray) {
       storageRef = ref(storageRef, route);
     });
     storageRef = ref(storageRef, fileName);
-    deleteObject(storageRef, fileArray).then((snapshot) => {
+    deleteObject(storageRef).then((snapshot) => {
       console.log("Arhcivo subido correctamente a la nube");
       resolve("ok");
     });
@@ -250,7 +250,9 @@ exports.deleteFiles = (req) => {
     console.log(req.deleteFilesPath);
     if (req.deleteFilesPath.length > 0) {
       req.deleteFilesPath.forEach((filePath) => {
-        deleteFilesPromises.push(createDelete(filePath));
+        deleteFilesPromises.push(
+          createDelete(req.app.storageFirebase, filePath)
+        );
       });
     }
   }

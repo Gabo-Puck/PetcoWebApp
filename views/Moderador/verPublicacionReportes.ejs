@@ -36,6 +36,13 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>Lista publicaciones reportadas</title>
     <style>
+      .publicacionActiva {
+        color: rgb(170, 242, 146);
+      }
+
+      .publicacionInactiva {
+        color: rgb(242, 109, 109);
+      }
       .openMenuMascotas {
         transform: rotate(270deg);
         display: inline-block;
@@ -628,12 +635,16 @@
       function toggleButtonsActivarDesactivar(){
         if(publicacionActiva==0){
           aviso1.textContent = "La publicacion está desactivada"
+          alertPublicacionActiva.querySelector("i").classList.remove("publicacionActiva");
+          alertPublicacionActiva.querySelector("i").classList.add("publicacionInactiva");
           desactivarButton.classList.add("d-none")
           activarButton.classList.remove("d-none")
         }else{
           aviso1.textContent = "La publicacion está activa"
           activarButton.classList.add("d-none")
           desactivarButton.classList.remove("d-none")
+          alertPublicacionActiva.querySelector("i").classList.add("publicacionActiva");
+          alertPublicacionActiva.querySelector("i").classList.remove("publicacionInactiva");
         }
       }
 
@@ -698,6 +709,20 @@
         fetch(
           `/moderador/obtenerReportesPublicacion/${publicacion}/${selectorValue}`
         ).then((res)=>res.json()).then((res)=>{
+          if(selectorValue==0 && res.length==0 && publicacionActiva==1){
+            Swal.fire({
+              title: "¡Aviso!",
+              icon: "warning",
+              html: `<p>Esta publicación no tiene más reportes y esta activa</p>`,
+              allowOutsideClick: false,
+              allowEscapeKey: false,
+            }).then((result) => {
+              if (result.isConfirmed) {
+                window.open("/moderador/verReportes", "_self");
+              }
+            });
+            return;
+          }
             res.forEach((reporte)=>{
                 if(!opcionesMap.has(reporte.Razon)){
                     reporte.Peso = 0;
@@ -706,7 +731,7 @@
             renderReportes(res)
         });
       });
-
+      buttonBuscarReportes.click();
       botonValidarSeleccionados.forEach((boton)=>{
           boton.addEventListener("click",(e)=>{
               let checkItemSelectArray = document.querySelectorAll("input:checked");
