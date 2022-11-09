@@ -222,7 +222,7 @@ exports.paysuccess = (req, res) => {
         .findOne({ "usuario.ID": req.session.IdSession })
         .then((usuarioFind) => {
           let descripcion = `¡${usuarioFind.UsuarioRegistro.Nombre} te ha donado ${aporte}!`;
-          let origen = "aquí va la url de donde se ven las donaciones";
+          let origen = "/petco/perfil/Dusuario/"+idOrganizacion;
           sendNotificacion(descripcion, origen, idOrganizacion, req.app.io);
         });
       console.log(registroCreado);
