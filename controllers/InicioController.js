@@ -33,7 +33,7 @@ exports.Inicio = (req, res, next) => {
 
                   Publicacion.query()
                     .where("publicacion.Activo", "=", 1)
-
+                    .andWhere("publicacion.ID_Usuario", "!=", req.session.IdSession)
                     .select(
                       "publicacion.*",
                       Publicacion.relatedQuery("PublicacionLike")
@@ -146,8 +146,10 @@ exports.SessionInfo = (req, res, next) => {
 exports.SeleccionarIntereses = (req, res, next) => {
   Especie.query()
     .then((Result) => {
+      console.log(req.session)
       res.render("SeleccionarIntereses.ejs", {
         Animales: Result,
+        TUser: req.session.Tipo
       });
 
       console.log(Result);
@@ -195,7 +197,7 @@ exports.Pguardadas = (req, res, next) => {
       .then((usuariosB) => {
   Publicacion.query()
     .where("publicacion.Activo", "=", 1)
-
+    .andWhere("publicacion.ID_Usuario", "!=", req.session.IdSession)
     .select(
       "publicacion.*",
       Publicacion.relatedQuery("PublicacionLike").count().as("numberOfLikes")

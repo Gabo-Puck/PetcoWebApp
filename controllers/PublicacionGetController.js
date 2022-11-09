@@ -84,7 +84,7 @@ exports.query = [
           .orderBy("Fecha_Envio", "desc")
           .then((result) => {
             Mascota.query()
-              .withGraphJoined("MP.PublicacionUsuario.[UsuarioRegistro]")
+              .withGraphJoined("MP.PublicacionUsuario.[UsuarioRegistro.muni.estado]")
               .withGraphJoined("MascotasCastrado")
               .withGraphJoined("MascotasTamano")
               .withGraphJoined("MascotasEspecie")
@@ -92,6 +92,7 @@ exports.query = [
               .withGraphJoined("MascotasSalud")
               .withGraphJoined("MascotasEstado")
               .withGraphJoined("MascotasImagenes")
+              .withGraphJoined("MascotasProceso.Paso")
               .withGraphJoined("MascotasMetas.MetasDonaciones")
               .where("mascota.ID_Publicacion", "=", req.params.idPublicacion)
               .then((MascotaP) => {

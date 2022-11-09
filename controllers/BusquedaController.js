@@ -58,6 +58,7 @@ exports.pagina = (req, res) => {
   Usuario_Bloqueado.query().then((usuariosB) => {
     Publicacion.query()
       .where("publicacion.Activo", "=", 1)
+      .andWhere("publicacion.ID_Usuario", "!=", req.session.IdSession)
       .select(
         "publicacion.*",
         Publicacion.relatedQuery("PublicacionLike").count().as("numberOfLikes")
