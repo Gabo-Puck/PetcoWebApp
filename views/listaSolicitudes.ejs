@@ -58,6 +58,7 @@
         padding: 1em 0;
         width: 100%;
         border-top: 1px solid black;
+        z-index: 50;
         /* border-bottom: -1px solid black; */
       }
 
@@ -138,6 +139,47 @@
     </script>
   </head>
   <body>
+    <div>
+      <!--  -->
+      <div
+        class="offcanvas offcanvas-start"
+        tabindex="-1"
+        id="offcanvasScrolling"
+        aria-labelledby="offcanvasScrollingLabel"
+        style="z-index: 4000"
+        data-bs-scroll="true"
+        data-bs-backdrop="false"
+      >
+        <!-- Cabecera de menu offcanvas mascotas -->
+        <div class="offcanvas-header">
+          <!-- Titulo de menu (Nombre publicación) -->
+          <div>
+            <h5><%=PublicacionNombre%></h5>
+            <br />
+            <h5 class="offcanvas-title" id="offcanvasScrollingLabel">
+              Mascotas:
+            </h5>
+          </div>
+          <!-- Titulo de menu (Nombre publicación) -->
+
+          <!-- Boton para cerrar menu offcanvas -->
+          <button
+            type="button"
+            class="closeMenuMascotas btnMenuMascota align-self-start"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close"
+          >
+            <i class="fa-solid fa-chevron-down openMenuMascotas fs-5"></i>
+          </button>
+          <!-- Boton para cerrar menu offcanvas -->
+        </div>
+        <!-- Cabecera de menu offcanvas mascotas -->
+
+        <!-- Cuerpo menu offcanvas -->
+        <div class="offcanvas-body p-0" id="offcanvasBodyMascotas"></div>
+        <!-- Cuerpo menu offcanvas -->
+      </div>
+    </div>
     <%- include ("partials/header") %>
 
     <div class="preguntaTemplateFormularioSolicitud card d-none mb-3">
@@ -220,45 +262,7 @@
         <!-- Botón para abrir Offcanvas de mascotas -->
 
         <!-- Menu de mascotas (Offcanvas Bootsrap) -->
-        <div>
-          <!--  -->
-          <div
-            class="offcanvas offcanvas-start mt-5"
-            data-bs-scroll="true"
-            tabindex="-1"
-            id="offcanvasScrolling"
-            aria-labelledby="offcanvasScrollingLabel"
-          >
-            <!-- Cabecera de menu offcanvas mascotas -->
-            <div class="offcanvas-header">
-              <!-- Titulo de menu (Nombre publicación) -->
-              <div>
-                <h5><%=PublicacionNombre%></h5>
-                <br />
-                <h5 class="offcanvas-title" id="offcanvasScrollingLabel">
-                  Mascotas:
-                </h5>
-              </div>
-              <!-- Titulo de menu (Nombre publicación) -->
 
-              <!-- Boton para cerrar menu offcanvas -->
-              <button
-                type="button"
-                class="closeMenuMascotas btnMenuMascota align-self-start"
-                data-bs-dismiss="offcanvas"
-                aria-label="Close"
-              >
-                <i class="fa-solid fa-chevron-down openMenuMascotas fs-5"></i>
-              </button>
-              <!-- Boton para cerrar menu offcanvas -->
-            </div>
-            <!-- Cabecera de menu offcanvas mascotas -->
-
-            <!-- Cuerpo menu offcanvas -->
-            <div class="offcanvas-body p-0" id="offcanvasBodyMascotas"></div>
-            <!-- Cuerpo menu offcanvas -->
-          </div>
-        </div>
         <!-- Menu de mascotas (Offcanvas Bootsrap) -->
       </div>
     </div>
@@ -363,5 +367,10 @@
     <script type="module" src="/javascripts/feed.js"></script>
 
     <script type="module" src="/javascripts/Solicitudes.js"></script>
+    <!-- <script>
+      document
+        .querySelector("nav")
+        .appendChild(document.querySelector("#offcanvasScrolling"));
+    </script> -->
   </body>
 </html>

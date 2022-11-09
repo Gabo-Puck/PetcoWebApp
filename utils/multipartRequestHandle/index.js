@@ -7,7 +7,12 @@ var fs = require("fs");
 var os = require("os");
 const { resolve } = require("path");
 const { ValidationError } = require("../ValidationError");
-
+const {
+  getStorage,
+  ref,
+  uploadBytes,
+  deleteObject,
+} = require("firebase/storage");
 /**
  * Función middleware que se puede añadir al flujo de una request. Permite hacer lo siguiente:
  * - Añadir al req.body los valores de la request del usuario.
@@ -57,7 +62,7 @@ exports.fetchInput = (acceptedTypes, folderPath) => {
       //   file.pipe(fs.createWriteStream(saveTo));
       // });
       busboy.on("file", function (fieldname, file, fileData) {
-        console.log(fieldname);
+        console.log(file);
         // console.log(fieldname);
         //Usamos el listener del archivo encontrado. Este listener se activará su el archivo supera el limite que se establece en limits
         file.on("limit", function (data) {
@@ -115,18 +120,24 @@ exports.fetchInput = (acceptedTypes, folderPath) => {
           //Le agregamos la extensión
           const pathFile = `${uniqueSuffix}.${type}`;
           //De acuerdo a la carpeta "folderPath", concatenamos la ruta de la carpeta y el nombre del archivo
-          var saveTo = path.join(folderPath, pathFile);
+          var saveTo = folderPath + "/" + pathFile;
           //Añadimos al array de fileRedeableStream, el stream del archivo y la dirección.
           //creamos un stream de lectura donde se guardarán los buffer del archivo
           var readable = new Readable();
+          const dataList = [];
           readable._read = (size) => {};
           file.on("data", (data) => {
-            // console.log(data);
+            console.log(data);
             readable.push(data);
+            dataList.push(data);
           });
           file.on("end", () => {
             readable.push(null);
-            res.fileReadableStream.push({ path: saveTo, stream: readable });
+            res.fileReadableStream.push({
+              path: saveTo,
+              stream: readable,
+              byteArray: Buffer.concat(dataList),
+            });
             req.body[fieldname] = saveTo;
           });
         }
@@ -164,19 +175,72 @@ function isJson(string) {
  * Esta función permite escribir archivos al servidor. Los stream encargados de escribir archivos deben estar dentro de un array en la propiedad "res.fileReadableStream"
  * @param {*} res El objeto que representa la respuesta al cliente
  */
-exports.uploadFiles = (res) => {
+exports.uploadFiles = (res, storage) => {
   //Revisamos si fileReadableStream no esta vacio.
+  let arrayProm = [];
   if (res.fileReadableStream.length > 0) {
     res.fileReadableStream.forEach((fileArray) => {
-      fileArray.stream.pipe(fs.createWriteStream(fileArray.path));
+      // fileArray.stream.pipe(fs.createWriteStream(fileArray.path));
+      arrayProm.push(
+        createPromisesSubirArchivos(
+          storage,
+          fileArray.path,
+          fileArray.byteArray
+        )
+      );
     });
   }
+  return arrayProm;
 };
 
-function createDelete(path) {
+function createPromisesSubirArchivos(storage, path, fileArray) {
   return new Promise((resolve, reject) => {
-    resolve(fs.promises.rm(path, { force: true }));
-  }).catch();
+    let fullPath = path;
+    let fragmentedPath = fullPath.split("/");
+    let fileName = fragmentedPath.pop();
+    let referencePath = fullPath.replace(fileName, "");
+    console.log(
+      "🚀 ~ file: index.js ~ line 187 ~ returnnewPromise ~ referencePath",
+      referencePath
+    );
+    // console.log()
+    let storageRef = ref(storage);
+    fragmentedPath.forEach((route) => {
+      storageRef = ref(storageRef, route);
+    });
+    storageRef = ref(storageRef, fileName);
+    uploadBytes(storageRef, fileArray).then((snapshot) => {
+      console.log("Arhcivo subido correctamente a la nube");
+      resolve("ok");
+    });
+  });
+}
+
+function createDelete(storage, path) {
+  return new Promise((resolve, reject) => {
+    // resolve(fs.promises.rm(path, { force: true }));
+    let fullPath = path;
+    let fragmentedPath = fullPath.split("/");
+    let fileName = fragmentedPath.pop();
+    let referencePath = fullPath.replace(fileName, "");
+    console.log(
+      "🚀 ~ file: index.js ~ line 187 ~ returnnewPromise ~ referencePath",
+      referencePath
+    );
+    // console.log()
+    let storageRef = ref(storage);
+    fragmentedPath.forEach((route) => {
+      storageRef = ref(storageRef, route);
+    });
+    storageRef = ref(storageRef, fileName);
+    deleteObject(storageRef).then((snapshot) => {
+      console.log("Arhcivo subido correctamente a la nube");
+      resolve("ok");
+    });
+  }).catch((err) => {
+    console.log(err);
+    resolve("notok");
+  });
 }
 
 exports.deleteFiles = (req) => {
@@ -186,7 +250,9 @@ exports.deleteFiles = (req) => {
     console.log(req.deleteFilesPath);
     if (req.deleteFilesPath.length > 0) {
       req.deleteFilesPath.forEach((filePath) => {
-        deleteFilesPromises.push(createDelete(filePath));
+        deleteFilesPromises.push(
+          createDelete(req.app.storageFirebase, filePath)
+        );
       });
     }
   }

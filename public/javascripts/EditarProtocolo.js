@@ -76,6 +76,7 @@ $(window).on("load", () => {
           archivosEliminados.push({ ID: paso.ID, path: paso.Archivo });
           // archivosEliminados[`f-${paso.ID}`] = paso.Archivo;
           pasoDOM.querySelector("a").remove();
+          ArchivoEliminarButton.remove();
         }
         console.log(archivosEliminados);
       });

@@ -962,46 +962,53 @@ Date.prototype.substractDays = function (days) {
   return date;
 };
 
-let fecha_exec = new Date(Date.now());
-let fecha = getDateFormated(fecha_exec);
-let date2 = new Date(fecha);
-let date3;
-date2 = date2.substractMonths(12);
-date3 = date2.substractDays(7);
-console.log(
-  date2.toLocaleDateString("es-MX", date2.toLocaleTimeString("es-MX"))
-);
+// let fecha_exec = new Date(Date.now());
+// let fecha = getDateFormated(fecha_exec);
+// let date2 = new Date(fecha);
+// let date3;
+// date2 = date2.substractMonths(12);
+// date3 = date2.substractDays(7);
+// console.log(
+//   date2.toLocaleDateString("es-MX", date2.toLocaleTimeString("es-MX"))
+// );
 
-Usuario.query()
-  .withGraphJoined("UsuarioRegistro", { minimize: true })
-  .where("usuario.UltimaConexion", "=", date3)
-  .then((usuariosEliminar) => {
-    // console.log(usuariosEliminar);
-    console.log(
-      `Fecha de aviso (Mandado de correos): ${date3.toLocaleDateString(
-        "es-MX"
-      )}`
-    );
-    console.log(
-      `Usuarios a proximos a borrar a partir de la fecha: ${date2.toLocaleDateString(
-        "es-MX"
-      )} ${date2.toLocaleTimeString("es-MX")}`
-    );
-    console.log(`Fecha de ejecución ${fecha}`);
-    console.log(`Fecha de ejecución ${fecha}`);
-    console.log(usuariosEliminar);
-    let usuariosPromises = [];
-    usuariosEliminar.forEach((usuario) => {
-      sendEmailAviso(
-        "Aviso de inactividad",
-        usuario.UsuarioRegistro.Correo,
-        usuario.UsuarioRegistro.Nombre
-      );
-    });
-    // usuariosEliminar.forEach((usuario) => {
-    //   usuariosPromises.push(deleteUsuarioPromise(usuario));
-    // });
-    // Promise.all(usuariosPromises).then(() => {
-    //   console.log(`Se han eliminado ${usuariosEliminar.length} usuarios`);
-    // });
-  });
+// Usuario.query()
+//   .withGraphJoined("UsuarioRegistro", { minimize: true })
+//   .where("usuario.UltimaConexion", ">", date3)
+//   .then((usuariosEliminar) => {
+//     // console.log(usuariosEliminar);
+//     console.log(
+//       `Fecha de aviso (Mandado de correos): ${date3.toLocaleDateString(
+//         "es-MX"
+//       )}`
+//     );
+//     console.log(
+//       `Usuarios a proximos a borrar a partir de la fecha: ${date2.toLocaleDateString(
+//         "es-MX"
+//       )} ${date2.toLocaleTimeString("es-MX")}`
+//     );
+//     console.log(`Fecha de ejecución ${fecha}`);
+//     console.log(`Fecha de ejecución ${fecha}`);
+//     console.log(usuariosEliminar);
+//     let usuariosPromises = [];
+//     usuariosEliminar.forEach((usuario) => {
+//       sendEmailAviso(
+//         "Aviso de inactividad",
+//         usuario.UsuarioRegistro.Correo,
+//         usuario.UsuarioRegistro.Nombre
+//       );
+//     });
+//     // usuariosEliminar.forEach((usuario) => {
+//     //   usuariosPromises.push(deleteUsuarioPromise(usuario));
+//     // });
+//     // Promise.all(usuariosPromises).then(() => {
+//     //   console.log(`Se han eliminado ${usuariosEliminar.length} usuarios`);
+//     // });
+//   });
+
+let a = "images/ImagenesMascotas/imagen.png";
+let b = a.split("/");
+let c = b.pop();
+console.log(a.replace(c, ""));
+console.log(b);
+console.log(c);

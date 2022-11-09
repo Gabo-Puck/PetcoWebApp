@@ -1,6 +1,7 @@
 const multer = require("multer");
 var path = require("path");
 const { validationResult, Result } = require("express-validator");
+const { uploadFiles } = require("../utils/multipartRequestHandle");
 
 class requestError {
   constructor(message, formName) {
@@ -72,22 +73,8 @@ module.exports.validateRequestFiles = (folder) => {
   return (req, res, next) => {
     console.log("Estoy en uploadFile");
     // console.log(req.body);
-    const storage = multer.diskStorage({
-      destination: function (req, file, cb) {
-        cb(null, `./public/${folder}`);
-      },
-      filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-        cb(
-          null,
-          file.fieldname +
-            "-" +
-            uniqueSuffix +
-            "." +
-            file.mimetype.split("/")[1]
-        );
-      },
-    });
+    let arrayBuffer = [];
+    const storage = multer.memoryStorage();
     try {
       const upload = multer({
         storage: storage,
@@ -119,22 +106,39 @@ module.exports.validateRequestFiles = (folder) => {
           console.log("No se subieron archivos");
           addErrors(res, "No se subieron los archivos solicitados", null);
         } else {
-          req.body.pathFilesSaved = req.files[0].path + ";";
-          for (let indexFile = 1; indexFile < req.files.length; indexFile++) {
+          let fileN =
+            Date.now() +
+            "-" +
+            Math.round(Math.random() * 1e9) +
+            "." +
+            req.files[0].mimetype.split("/")[1];
+          req.body.pathFilesSaved = "";
+          let res = {
+            fileReadableStream: [],
+          };
+          for (let indexFile = 0; indexFile < req.files.length; indexFile++) {
+            let fileN2 =
+              Date.now() +
+              "-" +
+              Math.round(Math.random() * 1e9) +
+              "." +
+              req.files[indexFile].mimetype.split("/")[1];
+            res.fileReadableStream.push({
+              path: folder + "/" + fileN2,
+              byteArray: req.files[indexFile].buffer,
+            });
             req.body.pathFilesSaved =
-              req.body.pathFilesSaved + req.files[indexFile].path + ";";
+              req.body.pathFilesSaved + folder + "/" + fileN2 + ";";
           }
-          req.body.pathFilesSaved = req.body.pathFilesSaved.replaceAll(
-            /public/g,
-            ""
-          );
-          req.body.pathFilesSaved = req.body.pathFilesSaved.replaceAll(
-            "\\",
-            "/"
-          );
-          console.log(req.body.pathFilesSaved);
+          Promise.all(uploadFiles(res, req.app.storageFirebase))
+            .then(() => {
+              console.log(req.body.pathFilesSaved);
+              next();
+            })
+            .catch((err) => {
+              console.log(err);
+            });
         }
-        next();
       });
     } catch (error) {
       console.log(`Falle al ejecutar algo: ${error}`);

@@ -120,15 +120,15 @@
         width: 100%;
       }
 
-      #alertPublicacionActiva {
+      #alertEliminarUsuario {
         color: #737373;
         transition: color, 0.5s;
         cursor: pointer;
       }
 
-      #alertPublicacionActiva:hover,
-      #alertPublicacionActiva:active {
-        color: #939393;
+      #alertEliminarUsuario i:hover,
+      #alertEliminarUsuario i:active {
+        color: #c49494;
       }
 
       @media (max-width: 767px) {
@@ -204,7 +204,10 @@
           data-bs-toggle="modal"
           data-bs-target="#modalEliminarUsuario"
         >
-          <i class="fa-solid fa-circle-exclamation"></i>
+          <i
+            class="fa-solid fa-user-xmark"
+            style="color: rgb(242, 109, 109)"
+          ></i>
         </div>
         <br />
         <div>
@@ -608,7 +611,18 @@
         .then((res)=>res.json())
         .then((res)=>{
             if(res=="ok"){
-                Swal.fire("Correcto", "Se ha eliminado la publicación", "success");
+                Swal.fire({
+                  title: "¡Correcto!",
+                  icon: "success",
+                  html: `<p>Se ha eliminado este usuario</p>`,
+                  allowOutsideClick: false,
+                  allowEscapeKey: false,
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    window.open("/moderador/verReportesUsuarios", "_self");
+                  }
+                });
+                return;
                 // alertPublicacionActiva.classList.add("d-none");
             }else{
                 throw new Error("Algo ha salido mal")
@@ -626,6 +640,20 @@
         fetch(
           `/moderador/obtenerReportesUsuario/${publicacion}/${selectorValue}`
         ).then((res)=>res.json()).then((res)=>{
+          if(selectorValue==0 && res.length==0){
+            Swal.fire({
+              title: "¡Aviso!",
+              icon: "warning",
+              html: `<p>Este usuario no tiene más reportes</p>`,
+              allowOutsideClick: false,
+              allowEscapeKey: false,
+            }).then((result) => {
+              if (result.isConfirmed) {
+                window.open("/moderador/verReportesUsuarios", "_self");
+              }
+            });
+            return;
+          }
             res.forEach((reporte)=>{
                 if(!opcionesMap.has(reporte.Razon)){
                     reporte.Peso = 0;
@@ -634,6 +662,8 @@
             renderReportes(res)
         });
       });
+
+      buttonBuscarReportes.click();
 
       botonValidarSeleccionados.forEach((boton)=>{
           boton.addEventListener("click",(e)=>{
@@ -821,7 +851,7 @@
                     let id = `reporte-${reporte.ID}`;
                     document.querySelector(`#${id}`).remove();
                 })
-                Swal.fire("Correcto", "Reportes invalidados correctamente", "success");
+                Swal.fire("Correcto", "Reportes validados correctamente", "success");
             }else{
                 Swal.fire("Error", "Algo ha salido mal, intenta más tarde", "error");
                 throw new Error("Algo ha salido mal");

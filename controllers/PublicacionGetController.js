@@ -15,6 +15,7 @@ const Publicacion_Guardada = require("../models/Publicacion_Guardada");
 const Reporte_Publicacion = require("../models/Reporte_Publicacion");
 const { sendNotificacion } = require("./NotificacionesController");
 const { forEach } = require("lodash");
+const { createPromisesImagenesMascotas } = require("./InicioController");
 
 paypal.configure({
   mode: "sandbox", //sandbox or live
@@ -84,7 +85,9 @@ exports.query = [
           .orderBy("Fecha_Envio", "desc")
           .then((result) => {
             Mascota.query()
-              .withGraphJoined("MP.PublicacionUsuario.[UsuarioRegistro.muni.estado]")
+              .withGraphJoined(
+                "MP.PublicacionUsuario.[UsuarioRegistro.muni.estado]"
+              )
               .withGraphJoined("MascotasCastrado")
               .withGraphJoined("MascotasTamano")
               .withGraphJoined("MascotasEspecie")
@@ -111,28 +114,49 @@ exports.query = [
                 console.log("BBBBBBBBBBBBBBBBBB");
                 console.log(res.solicitudesValNumero);
                 console.log(res.arrayMascotasSolicitud);
-
-                let publicacionID = MascotaP[0].MP.ID;
-                Registro.query()
-                  .withGraphJoined("RegistroUsuario")
-                  .where("RegistroUsuario.ID", "=", req.session.IdSession)
-                  .then((resultados) => {
-                    res.render("publicacion.ejs", {
-                      MascotaRender: MascotaP,
-                      usuario: resultados,
-                      comentarios: result,
-                      likesp: LikesP,
-                      isDueno: isDueno,
-                      publicacionID: publicacionID,
-                      Tipo: req.session.Tipo,
-                      SolicitudesValNumero: res.solicitudesValNumero,
-                      arrayMascotasSolicitud: res.arrayMascotasSolicitud,
-                    });
+                let promises = [];
+                for (let index = 0; index < MascotaP.length; index++) {
+                  const mascota = MascotaP[index];
+                  for (
+                    let indexImagen = 0;
+                    indexImagen < mascota.MascotasImagenes.length;
+                    indexImagen++
+                  ) {
+                    const imagenRuta = mascota.MascotasImagenes[indexImagen];
+                    promises.push(
+                      createPromisesImagenesMascotas(
+                        mascota,
+                        imagenRuta.Ruta,
+                        req.app.storageFirebase,
+                        indexImagen
+                      )
+                    );
+                  }
+                }
+                Promise.all(promises)
+                  .then(() => {
+                    let publicacionID = MascotaP[0].MP.ID;
+                    Registro.query()
+                      .withGraphJoined("RegistroUsuario")
+                      .where("RegistroUsuario.ID", "=", req.session.IdSession)
+                      .then((resultados) => {
+                        res.render("publicacion.ejs", {
+                          MascotaRender: MascotaP,
+                          usuario: resultados,
+                          comentarios: result,
+                          likesp: LikesP,
+                          isDueno: isDueno,
+                          publicacionID: publicacionID,
+                          Tipo: req.session.Tipo,
+                          SolicitudesValNumero: res.solicitudesValNumero,
+                          arrayMascotasSolicitud: res.arrayMascotasSolicitud,
+                        });
+                      });
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                    next(err);
                   });
-              })
-              .catch((err) => {
-                console.log(err);
-                next(err);
               });
           });
       });
