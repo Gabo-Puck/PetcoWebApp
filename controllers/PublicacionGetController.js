@@ -449,7 +449,7 @@ exports.paysuccess = (req, res) => {
         throw error;
       } else {
         console.log(JSON.stringify(payment));
-        res.send("Success");
+        res.redirect("/petco")
       }
     }
   );
@@ -478,7 +478,7 @@ exports.paysuccess = (req, res) => {
         .findOne({ "usuario.ID": req.session.IdSession })
         .then((usuarioFind) => {
           let descripcion = `¡${usuarioFind.UsuarioRegistro.Nombre} ha aportado a una meta!`;
-          let origen = "aquí va la url de donde se ven las metas";
+          let origen = "/petco/perfil/Dusuario/"+idOrganizacion;
           sendNotificacion(descripcion, origen, idOrganizacion, req.app.io);
           isCompletadoMeta(meta, req.app.io);
         });
@@ -495,7 +495,7 @@ exports.paysuccess = (req, res) => {
 // })
 function isCompletadoMeta(idMeta, io) {
   Metas.query()
-    .withGraphJoined("[MetasDonaciones,Mascota]")
+    .withGraphJoined("[MetasDonaciones,Mascota.[MascotasPublicacion]]")
     .findById(idMeta)
     .then((Meta) => {
       // console.log(Meta);
@@ -511,7 +511,7 @@ function isCompletadoMeta(idMeta, io) {
           .patch({ Completado: 1 })
           .then(() => {
             let descripcion = `¡Felicidades! la meta de la mascota: "${Meta.Mascota.Nombre} se ha completado"`;
-            let origen = "aqui va la url de las metas";
+            let origen = "/petco/publicacion/adopciones/"+Meta.Mascota.MascotasPublicacion.ID;
             let usuario = Meta.MetasDonaciones[0].ID_Organizacion;
             sendNotificacion(descripcion, origen, usuario, io);
           });

@@ -12,6 +12,7 @@ const Like = require("../models/Like");
 const Publicacion_Guardada = require("../models/Publicacion_Guardada");
 const Reporte_Publicacion = require("../models/Reporte_Publicacion");
 const Usuario_Bloqueado = require("../models/Usuario_Bloqueado");
+const { sendNotificacion } = require("./NotificacionesController");
 
 paypal.configure({
   mode: "sandbox", //sandbox or live
@@ -169,8 +170,8 @@ exports.pay = (req, res) => {
         },
 
         redirect_urls: {
-          return_url: "http://localhost:3000/petco/perfil/successP",
-          cancel_url: "http://localhost:3000/petco/perfil/cancelP",
+          return_url: process.env.SERVER_DOMAIN+"/petco/perfil/successP",
+          cancel_url: process.env.SERVER_DOMAIN+"/petco/perfil/cancelP",
         },
         transactions: [
           {
@@ -222,7 +223,7 @@ exports.paysuccess = (req, res) => {
         .findOne({ "usuario.ID": req.session.IdSession })
         .then((usuarioFind) => {
           let descripcion = `¡${usuarioFind.UsuarioRegistro.Nombre} te ha donado ${aporte}!`;
-          let origen = "aquí va la url de donde se ven las donaciones";
+          let origen = "/petco/perfil/Dusuario/"+idOrganizacion;
           sendNotificacion(descripcion, origen, idOrganizacion, req.app.io);
         });
       console.log(registroCreado);
@@ -252,7 +253,8 @@ exports.paysuccess = (req, res) => {
         throw error;
       } else {
         console.log(JSON.stringify(payment));
-        res.send("Success");
+        console.log("Success")
+        res.redirect("/petco/perfil/usuario/" +idOrganizacion )
       }
     }
   );
