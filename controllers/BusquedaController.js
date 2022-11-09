@@ -2,35 +2,22 @@ const Mascota = require("../models/Mascota");
 const Publicacion = require("../models/Publicacion");
 const Usuario_Bloqueado = require("../models/Usuario_Bloqueado");
 
+function containsWord(string, word) {
+    return new RegExp('(?:[^.\w]|^|^\\W+)' + word + '(?:[^.\w]|\\W(?=\\W+|$)|$)').test(string);
+}
+
+
 exports.pagina = (req, res) => {
+  console.log("Increible");
   let mascotasfiltradas = new Array();
   let contador = 0;
-
-  const indicador = ["=", "=", "=", "=", "=", "<"];
-  var orden;
 
   if (req.params.orden == 0) {
     orden = "publicacion.ID";
   } else {
     orden = "numberOfLikes";
   }
-
-  if (req.params.tamano == 0) {
-    indicador[1] = ">=";
-  }
-
-  if (req.params.castrado == 0) {
-    indicador[2] = ">=";
-  }
-
-  if (req.params.salud == 0) {
-    indicador[3] = ">=";
-  }
-
-  if (req.params.estado == 0) {
-    indicador[4] = ">=";
-  }
-
+  
   // Mascota.query()
   //     .withGraphJoined("MascotasPublicacion")
   //     .withGraphJoined("MascotasEstado")
@@ -67,34 +54,35 @@ exports.pagina = (req, res) => {
       .withGraphJoined("Mascota.MascotasPublicacion")
       .withGraphJoined("Mascota.MascotasEstado")
       .withGraphJoined("Mascota.MascotasImagenes")
-      .andWhere("Mascota.ID_Especie", "=", req.params.especie)
-      .andWhere("Mascota.ID_Tamano", indicador[1], req.params.tamano)
-      .andWhere("Mascota.ID_Castrado", indicador[2], req.params.castrado)
-      .andWhere("Mascota.ID_Salud", indicador[3], req.params.salud)
-      .andWhere("Mascota.ID_Estado", indicador[4], req.params.estado)
-      .andWhere("Mascota.Edad", indicador[5], req.params.edad)
-
       .then((result) => {
-        for (let i = 0; i < result.length; i++) {
-          for (let j = 0; j < result[i].Mascota.length; j++) {
-            mascotasfiltradas[contador] = result[i].Mascota[j];
+        var buscar = req.params.search.toString();
+        const words = buscar.split(' ');
 
-            contador++;
+        for (let i = 0; i < result.length; i++) {
+    
+          for (let j = 0; j < result[i].Mascota.length; j++) {
+
+            for (let k = 0; k < words.length; k++) {
+              if ( containsWord(result[i].Mascota[j].MascotasPublicacion.Titulo , words[k]) == true)
+              {
+                mascotasfiltradas[contador] = result[i].Mascota[j];
+                contador++;
+              }
+            }
           }
         }
 
-        for (let i = 0; i < mascotasfiltradas.length; i++) {
-          for (let k = 0; k < usuariosB.length; k++) {
-            console.log(
-              "a " +
-                mascotasfiltradas[i].MascotasPublicacion.ID_Usuario +
-                " d " +
-                mascotasfiltradas[i].MascotasPublicacion.ID +
-                " b " +
-                usuariosB[k].ID_Usuario +
-                " c " +
-                usuariosB[k].ID_Bloqueado
-            );
+
+        console.log(mascotasfiltradas)
+
+        if (mascotasfiltradas.length !=0)
+        {
+
+          //Filtrar mascotas bloqueadas
+          for (let i = 0; i < mascotasfiltradas.length; i++) {
+            
+            for (let k = 0; k < usuariosB.length; k++) {
+         
             if (
               (mascotasfiltradas[i].MascotasPublicacion.ID_Usuario ==
                 usuariosB[k].ID_Usuario &&
@@ -105,19 +93,25 @@ exports.pagina = (req, res) => {
             ) {
               mascotasfiltradas.splice(i, 1);
               i = 0;
+              if(mascotasfiltradas.length == 0)
+              {
+                break;
+              }
             }
           }
         }
+        
+      }
 
-        console.log(mascotasfiltradas);
+        //Filtrar mascotas por texto
+       
+        for (let index = 0; index < words.length; index++) {
+        console.log( "OJO aqui es"+ words[index])
+        }
+
+        //console.log(mascotasfiltradas);
         res.render("busqueda.ejs", {
-          Iespecie: req.params.especie,
-          Itamano: req.params.tamano,
-          Icastrado: req.params.castrado,
-          Isalud: req.params.salud,
-          Iestado: req.params.estado,
-          Iedad: req.params.edad,
-          Iorden: req.params.orden,
+          Iorden:req.params.orden,
           MascotaRender: mascotasfiltradas,
           Tipo: req.session.Tipo,
         });
@@ -126,9 +120,9 @@ exports.pagina = (req, res) => {
 };
 
 exports.form = (req, res) => {
-  console.log(req.body);
+  //console.log(req.body);
 
   res.redirect(
-    `/petco/busqueda/coincidencias/${req.body.BEspecie}/${req.body.BTamano}/${req.body.BCastrado}/${req.body.BSalud}/${req.body.BEstado}/${req.body.Bedad}/${req.body.Borden}`
+    `/petco/busqueda/coincidencias/${req.body.Btexto}/${req.body.Borden}`
   );
 };
