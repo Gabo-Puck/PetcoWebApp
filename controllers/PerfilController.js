@@ -169,8 +169,8 @@ exports.pay = (req, res) => {
         },
 
         redirect_urls: {
-          return_url: "http://localhost:3000/petco/perfil/successP",
-          cancel_url: "http://localhost:3000/petco/perfil/cancelP",
+          return_url: process.env.SERVER_DOMAIN+"/petco/perfil/successP",
+          cancel_url: process.env.SERVER_DOMAIN+"/petco/perfil/cancelP",
         },
         transactions: [
           {
@@ -252,7 +252,8 @@ exports.paysuccess = (req, res) => {
         throw error;
       } else {
         console.log(JSON.stringify(payment));
-        res.send("Success");
+        console.log("Success")
+        res.redirect("/petco/perfil/usuario/" +idOrganizacion )
       }
     }
   );

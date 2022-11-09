@@ -449,7 +449,7 @@ exports.paysuccess = (req, res) => {
         throw error;
       } else {
         console.log(JSON.stringify(payment));
-        res.send("Success");
+        res.redirect("/petco")
       }
     }
   );
