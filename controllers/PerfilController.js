@@ -3,6 +3,7 @@ var Usuario = require("../models/Usuario");
 var Municipio = require("../models/Municipio");
 var objection = require("objection");
 const Publicacion = require("../models/Publicacion");
+var probe = require("probe-image-size");
 
 //Configuracion de paypal
 const paypal = require("paypal-rest-sdk");
@@ -279,7 +280,7 @@ exports.paycancel = (req, res) => {
 const checkImagepfp = (req, res, next) => {
   if (res.fileReadableStream) {
     var min = 100,
-      max = 1100;
+      max = 10000;
     probe(res.fileReadableStream[0].stream).then((data) => {
       if (
         data.width < min ||
@@ -290,7 +291,7 @@ const checkImagepfp = (req, res, next) => {
         res.json({
           errors: [
             {
-              msg: `<p>Las imagenes deben de tener una resolución:</p> <p>Mínima de ${min}px por ${min}px <p>Máxima de ${max}px por ${max}px</p>`,
+              msg: `<p>La imagen de perfil debe de tener una resolución:</p> <p>Mínima de ${min}px por ${min}px <p>Máxima de ${max}px por ${max}px</p>`,
             },
           ],
         });
@@ -312,7 +313,7 @@ exports.cambiarpfp = [
   checkImagepfp,
   (req, res, next) => {
     if (res.errors.length > 0) {
-      res.json(res.errors);
+      res.json({ errors: res.errors });
     } else {
       Promise.all(uploadFiles(res, req.app.storageFirebase)).then(() => {
         Usuario.query()
