@@ -918,7 +918,9 @@
                     let id = `reporte-${reporte.ID}`;
                     document.querySelector(`#${id}`).remove();
                 })
-                Swal.fire("Correcto", "Reportes invalidados correctamente", "success");
+                Swal.fire("Correcto", "Reportes validados correctamente", "success");
+                // selectorOpciones.value = 0;
+                // buttonBuscarReportes.click();
             }else{
                 Swal.fire("Error", "Algo ha salido mal, intenta más tarde", "error");
                 throw new Error("Algo ha salido mal");
