@@ -115,6 +115,9 @@ $(window).on("load", () => {
   document.querySelectorAll("input[type='checkbox']").forEach((element) => {
     element.disabled = true;
   });
+  document.querySelectorAll("input[type='file']").forEach((element) => {
+    element.remove();
+  });
   document.querySelectorAll(".btn-danger").forEach((element) => {
     element.remove();
   });

@@ -479,15 +479,30 @@ exports.ProtocoloVer = [
         "protocolos.ID_Usuario": req.session.IdSession,
         "protocolos.ID": req.params.idProtocolo,
       })
-      .then((protocolo) =>
-        res.render("Protocolo/verProtocolo", {
-          formularios: res.formularios,
-          protocolo: protocolo,
-          pasos: res.pasos,
-          Response: req.htmlTemplate,
-          Tipo: req.session.Tipo,
-        })
-      );
+      .then((protocolo) => {
+        let promises = [];
+
+        protocolo.Pasos.forEach((paso) => {
+          if (paso.Archivo != null && paso.Archivo != "") {
+            promises.push(
+              createPromisesArchivos(
+                paso,
+                paso.Archivo,
+                req.app.storageFirebase
+              )
+            );
+          }
+        });
+        Promise.all(promises).then(() => {
+          res.render("Protocolo/verProtocolo", {
+            formularios: res.formularios,
+            protocolo: protocolo,
+            pasos: res.pasos,
+            Response: req.htmlTemplate,
+            Tipo: req.session.Tipo,
+          });
+        });
+      });
     // res.render("Protocolo/EditarProtocolo");
   },
 ];

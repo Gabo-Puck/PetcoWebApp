@@ -415,6 +415,15 @@
                                             <h5><b>Descripcion:</b>
                                                 <%= MascotaRender[i].Descripcion%>
                                             </h5>
+                                            <%if(isDueno&&Tipo==1){%>
+                                            <h5><b>Protocolo:</b>
+                                                <%let urlVer= "href= "+"/petco/protocolo/ver/"+MascotaRender[i].MascotasProceso[2].Paso.Proto.ID%>
+                                                <%if(MascotaRender[i].MascotasProceso[2].Paso.Proto.ID==1){%>
+                                                    <%urlVer = ""%>
+                                                <%}%>
+                                                <a <%=urlVer%>><%= MascotaRender[i].MascotasProceso[2].Paso.Proto.Titulo%></a>
+                                            </h5>
+                                            <%}%>
                                             <% if(MascotaRender[i].MascotasEstado.ID==2 ||
                                                 MascotaRender[i].MascotasEstado.ID==3){ %>
                                                 <h5 class="text-warning"><b>Estado:</b>

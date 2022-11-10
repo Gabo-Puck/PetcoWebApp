@@ -96,7 +96,7 @@ exports.query = [
               .withGraphJoined("MascotasSalud")
               .withGraphJoined("MascotasEstado")
               .withGraphJoined("MascotasImagenes")
-              .withGraphJoined("MascotasProceso.Paso")
+              .withGraphJoined("MascotasProceso.[Paso.[Proto]]")
               .withGraphJoined("MascotasMetas.MetasDonaciones")
               .where("mascota.ID_Publicacion", "=", req.params.idPublicacion)
               .then((MascotaP) => {
