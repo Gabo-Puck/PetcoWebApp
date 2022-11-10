@@ -449,7 +449,7 @@ const crearUsuarioPromise = (registro, res) => {
     let Fecha_Generacion = getTodayDateFormated();
     resolve(
       Usuario.query().insertAndFetch({
-        Foto_Perfil: "/images/ImagenesPerfilUsuario/default.png",
+        Foto_Perfil: "images/ImagenesPerfilUsuario/default.png",
         FK_Registro: registro.ID,
         Reputacion: 0,
         UltimaConexion: Fecha_Generacion,

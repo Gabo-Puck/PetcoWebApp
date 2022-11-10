@@ -60,33 +60,6 @@ exports.verPublicacionesReportadasGet = (req, res, next) => {
     });
 };
 
-// exports.verUsuariosReportadosGet = (req, res, next) => {
-//   Publicacion.query()
-//     // .where("publicacion.ID", "=", req.params.idP)
-//     .select(
-//       "publicacion.*",
-//       Publicacion.relatedQuery("PublicacionReporte")
-//         .count()
-//         .as("numeroReportes")
-//     )
-//     .having("numeroReportes", ">", 0)
-//     // .where("numeroReportes", ">", 0)
-//     .orderBy("numeroReportes", "DESC")
-//     .debug()
-//     // .whereNot("numeroReportes", "=", 0)
-//     .then((PublicacionesReportadas) => {
-//       // console.log(PublicacionesReportadas);
-//       res.render("Moderador/verPublicacionesReportadas.ejs", {
-//         Tipo: req.session.IdSession,
-//         PublicacionesReportadas: PublicacionesReportadas,
-//       });
-//       // resolve(countLikes);
-//     })
-//     .catch((err) => {
-//       console.log(err);
-//     });
-// };
-
 exports.verReportesPublicacionGet = (req, res, next) => {
   Publicacion.query()
     .findById(req.params.idPublicacion)
@@ -260,32 +233,6 @@ exports.activarPublicacion = (req, res, next) => {
 };
 
 exports.eliminarPublicacion = (req, res, next) => {
-  // Publicacion.query()
-  //   .withGraphJoined("Mascota.[MascotasImagenes,MascotasProceso]")
-  //   .findById(req.body.idPublicacion)
-  //   .then((publicacion) => {
-  //     if (publicacion) {
-  //       console.log(
-  //         "🚀 ~ file: ModeradorController.js ~ line 241 ~ .then ~ p",
-  //         publicacion
-  //       );
-  //       console.log(
-  //         "🚀 ~ file: ModeradorController.js ~ line 242 ~ .then ~ p",
-  //         publicacion.Mascota
-  //       );
-  //       console.log(
-  //         "🚀 ~ file: ModeradorController.js ~ line 243 ~ .then ~ p",
-  //         publicacion.Mascoa.MascotaImagenes
-  //       );
-  //       console.log(
-  //         "🚀 ~ file: ModeradorController.js ~ line 244 ~ .then ~ p",
-  //         publicacion.Mascoa.MascotasProceso
-  //       );
-  //       res.json("ok");
-  //     } else {
-  //       res.json("not found");
-  //     }
-  //   });
   console.log(
     "🚀 ~ file: ModeradorController.js ~ line 265 ~ req.body.idPublicacion",
     req.body.idPublicacion
@@ -787,74 +734,7 @@ exports.eliminarUsuario = (req, res, next) => {
       "[Publicaciones.[Mascota.[MascotasImagenes,MascotasProceso]],Protocolos.[Pasos]]",
       { minimize: true }
     )
-    // .modifyGraph("Mascota", (builder) => {
-    //   builder.select("mascota.ID");
-    // })
-    // .modifyGraph("Mascota.[MascotasImagenes]", (builder) => {
-    //   builder.select("Ruta", "ID");
-    // })
-    // .modifyGraph("Mascota.[MascotasProceso]", (builder) => {
-    //   builder.select("Archivo");
-    // })
     .then((usuarioFind) => {
-      // console.log(
-      //   "🚀 ~ file: pruebaContarDonaciones.js ~ line 108 ~ .then ~ PublicacionesReportadas.Mascota[0].MascotaImagenes",
-      //   PublicacionesReportadas
-      // );
-      // PublicacionesReportadas.Publicaciones[1];
-      // Asi se accede a los pasos_mascota
-      // let archivos = [];
-      // // archivos.push("1.jpg");
-      // archivos.push("2.jpg");
-      // archivos.push("3.jpg");
-      // archivos.push("4.jpg");
-      // archivos.push("5.jpg");
-      // archivos.push("6.pdf");
-      // archivos.push("7.jpg");
-      // archivos.push("8.jpg");
-      // archivos.push("9.jpg");
-      // archivos.push("10.jpg");
-      // archivos.push("11.jpg");
-      // archivos.push("12.png");
-      // archivos.push("13.jpg");
-      // archivos.push("14.jpg");
-      // archivos.push("15.png");
-      // archivos.push("16.pdf");
-      // archivos.push("17.jpg");
-      // archivos.push("18.png");
-      // archivos.push("19.png");
-      // archivos.push("20.jpg");
-      // archivos.push("21.jpg");
-      // archivos.push("22.jpg");
-      // archivos.push("23.jpg");
-      // archivos.push("24.jpg");
-      // archivos.push("25.jpg");
-      // archivos.push("26.jpg");
-      // archivos.push("27.jpg");
-      // archivos.push("28.jpg");
-      // archivos.push("29.jpg");
-      // archivos.push("30.docx");
-      // archivos.push("31.pdf");
-      // archivos.push("32.docx");
-      // archivos.push("33.jpg");
-      // archivos.push("34.pdf");
-      // archivos.push("35.pdf");
-      // archivos.push("36.pdf");
-      // archivos.push("37.pdf");
-      // archivos.push("38.pdf");
-
-      // archivos = archivos.map((x) => "public\\prueba\\" + x);
-      // let req = {
-      //   deleteFilesPath: [],
-      // };
-      // req.deleteFilesPath = archivos;
-
-      // let promises = deleteFiles(req);
-
-      // console.log(promises);
-
-      // console.log(archivos);
-      // Promise.all(promises).then(() => console.log("ok"));
       //aqui empieza el codigo
       let registroID = usuarioFind.FK_Registro;
       console.log(
