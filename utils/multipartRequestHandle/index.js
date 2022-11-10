@@ -210,7 +210,7 @@ function createPromisesSubirArchivos(storage, path, fileArray) {
     });
     storageRef = ref(storageRef, fileName);
     uploadBytes(storageRef, fileArray).then((snapshot) => {
-      console.log("Arhcivo subido correctamente a la nube");
+      console.log("Archivo subido correctamente");
       resolve("ok");
     });
   });
@@ -233,13 +233,19 @@ function createDelete(storage, path) {
       storageRef = ref(storageRef, route);
     });
     storageRef = ref(storageRef, fileName);
-    deleteObject(storageRef).then((snapshot) => {
-      console.log("Arhcivo subido correctamente a la nube");
-      resolve("ok");
-    });
+    deleteObject(storageRef)
+      .then((snapshot) => {
+        console.log("Archivo eliminado correctamente");
+        resolve("ok");
+      })
+      .catch((err) => {
+        console.log("notok: " + err);
+        resolve("notok");
+      });
   }).catch((err) => {
+    console.log("path->" + path);
     console.log(err);
-    resolve("notok");
+    resolve("notok: " + err);
   });
 }
 

@@ -439,6 +439,7 @@ function createPromisesArchivos(paso, path, storage) {
     storageRef = ref(storageRef, fileName);
     getDownloadURL(storageRef)
       .then((url) => {
+        paso.ArchivoRel = paso.Archivo;
         paso.Archivo = url;
         resolve("ok");
       })
@@ -620,7 +621,7 @@ function getPromisesUpsert(req, res, idProtocolo) {
   return PromisesUpsert;
 }
 
-function createDelete(path) {
+function createDelete(storage, path) {
   return new Promise((resolve, reject) => {
     // resolve(fs.promises.rm(path, { force: true }));
     let fullPath = path;

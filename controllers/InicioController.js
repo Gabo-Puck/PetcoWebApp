@@ -6,6 +6,7 @@ const Publicacion_Guardada = require("../models/Publicacion_Guardada");
 const Usuario = require("../models/Usuario");
 const Usuario_Bloqueado = require("../models/Usuario_Bloqueado");
 const { getDownloadURL, ref } = require("firebase/storage");
+const { createPromiseGetPfp } = require("./PerfilController");
 
 exports.Inicio = (req, res, next) => {
   console.log(req.session);
@@ -208,7 +209,12 @@ exports.SessionInfo = (req, res, next) => {
   Usuario.query()
     .where("usuario.ID", "=", req.session.IdSession)
     .then((result) => {
-      res.json(result);
+      createPromiseGetPfp(result[0].Foto_Perfil, req.app.storageFirebase).then(
+        (url) => {
+          result[0].Foto_Perfil = url;
+          res.json(result);
+        }
+      );
     });
 };
 
@@ -287,7 +293,7 @@ exports.Pguardadas = (req, res, next) => {
         //console.log(resultado);
 
         let contador = 0;
-
+        let promises = [];
         for (let i = 0; i < resultado.length; i++) {
           for (let j = 0; j < resultado[i].PublicacionGuardada.length; j++) {
             for (let k = 0; k < resultado[i].Mascota.length; k++) {
@@ -330,12 +336,34 @@ exports.Pguardadas = (req, res, next) => {
             }
           }
         }
-
-        res.render("feed.ejs", {
-          MascotaRender: prueba,
-          Tipo: req.session.Tipo,
+        for (let y = 0; y < prueba.length; y++) {
+          const mascota = prueba[y];
+          for (
+            let index = 0;
+            index < mascota.MascotasImagenes.length;
+            index++
+          ) {
+            promises.push(
+              createPromisesImagenesMascotas(
+                mascota,
+                mascota.MascotasImagenes[index].Ruta,
+                req.app.storageFirebase,
+                index
+              )
+            );
+          }
+        }
+        Promise.all(promises).then(() => {
+          res.render("feed.ejs", {
+            MascotaRender: prueba,
+            Tipo: req.session.Tipo,
+          });
         });
         //console.log(prueba);
+      })
+      .catch((err) => {
+        console.log(err);
+        next(err);
       });
   });
 

@@ -241,7 +241,12 @@ exports.uploadFile = [
           .then((resultFetch) => {
             console.log(resultFetch);
             if (resultFetch > 0) {
-              res.json({ state: "ok", path: req.body.archivoPaso });
+              createPromisesArchivos(
+                req.body.archivoPaso,
+                req.app.storageFirebase
+              ).then((url) => {
+                res.json({ state: "ok", path: url });
+              });
             } else {
               res.json({ state: "notOk" });
               console.log(
@@ -460,3 +465,42 @@ function patchPasoProceso(mascotaID, isAdoptante, peer, next, io, usuario) {
 // exports.isAdoptante = isAdoptante;
 
 // exports.isDuenoMascota = isAdoptante;
+function createPromisesArchivos(path, storage) {
+  return new Promise((resolve, reject) => {
+    let fullPath = path;
+    let fragmentedPath = fullPath.split("/");
+    let fileName = fragmentedPath.pop();
+    let referencePath = fullPath.replace(fileName, "");
+    let storageRef = ref(storage);
+    fragmentedPath.forEach((route) => {
+      storageRef = ref(storageRef, route);
+    });
+    storageRef = ref(storageRef, fileName);
+    getDownloadURL(storageRef)
+      .then((url) => {
+        resolve(url);
+      })
+      .catch((error) => {
+        // A full list of error codes is available at
+        // https://firebase.google.com/docs/storage/web/handle-errors
+        resolve("");
+        switch (error.code) {
+          case "storage/object-not-found":
+            // File doesn't exist
+            break;
+          case "storage/unauthorized":
+            // User doesn't have permission to access the object
+            break;
+          case "storage/canceled":
+            // User canceled the upload
+            break;
+
+          // ...
+
+          case "storage/unknown":
+            // Unknown error occurred, inspect the server response
+            break;
+        }
+      });
+  });
+}

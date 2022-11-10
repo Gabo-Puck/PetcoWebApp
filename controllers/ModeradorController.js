@@ -863,6 +863,7 @@ exports.eliminarUsuario = (req, res, next) => {
       );
       // let req = {};
       req.deleteFilesPath = [];
+
       let arrayImagenesID = [];
 
       usuarioFind.Publicaciones.forEach((PublicacionUsuario) => {
@@ -873,8 +874,8 @@ exports.eliminarUsuario = (req, res, next) => {
               "🚀 ~ file: pruebaContarDonaciones.js ~ line 115 ~ PublicacionesReportadas.Mascota.forEach ~  mascota.MascotasImagenes",
               mascota.MascotasImagenes
             );
-            let arrayImagenes = mascota.MascotasImagenes.map(
-              (x) => "public" + x.Ruta.replaceAll("\\", "/")
+            let arrayImagenes = mascota.MascotasImagenes.map((x) =>
+              x.Ruta.replaceAll("\\", "/")
             );
             let arrayID = mascota.MascotasImagenes.map((x) => x.ID);
             arrayImagenesID = arrayImagenesID.concat(arrayID);
@@ -901,7 +902,7 @@ exports.eliminarUsuario = (req, res, next) => {
         });
       }
       if (
-        usuarioFind.Foto_Perfil != "/images/ImagenesPerfilUsuario/default.png"
+        usuarioFind.Foto_Perfil != "images/ImagenesPerfilUsuario/default.png"
       ) {
         req.deleteFilesPath.push(usuarioFind.Foto_Perfil);
       }

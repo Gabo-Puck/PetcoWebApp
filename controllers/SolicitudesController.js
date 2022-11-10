@@ -352,13 +352,38 @@ exports.verSolicitudesUsuario = (req, res, next) => {
     .withGraphFetched("Solicitudes.Mascota.[MascotasImagenes,MascotasEspecie]")
     .findById(req.session.IdSession)
     .then((UsuarioSolicitudes) => {
+      let promises = [];
+      for (
+        let index = 0;
+        index < UsuarioSolicitudes.Solicitudes.length;
+        index++
+      ) {
+        const mascota = UsuarioSolicitudes.Solicitudes[index].Mascota;
+        for (
+          let indexImagen = 0;
+          indexImagen < mascota.MascotasImagenes.length;
+          indexImagen++
+        ) {
+          const imagenRuta = mascota.MascotasImagenes[indexImagen];
+          promises.push(
+            createPromisesImagenesMascotas(
+              mascota,
+              imagenRuta.Ruta,
+              req.app.storageFirebase,
+              indexImagen
+            )
+          );
+        }
+      }
       console.log(
         "🚀 ~ file: pruebaContarDonaciones.js ~ line 497 ~ .then ~ UsuarioSolicitudes",
         UsuarioSolicitudes
       );
-      res.render("usuarioVerSolicitudes.ejs", {
-        Tipo: req.session.Tipo,
-        UsuarioSolicitudes: UsuarioSolicitudes,
+      Promise.all(promises).then(() => {
+        res.render("usuarioVerSolicitudes.ejs", {
+          Tipo: req.session.Tipo,
+          UsuarioSolicitudes: UsuarioSolicitudes,
+        });
       });
     });
 };
