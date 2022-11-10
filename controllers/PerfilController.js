@@ -288,7 +288,11 @@ const checkImagepfp = (req, res, next) => {
         data.height > max
       ) {
         res.json({
-          warning: `<p>Las imagenes deben de tener una resolución:</p> <p>Mínima de ${min}px por ${min}px <p>Máxima de ${max}px por ${max}px</p>`,
+          errors: [
+            {
+              msg: `<p>Las imagenes deben de tener una resolución:</p> <p>Mínima de ${min}px por ${min}px <p>Máxima de ${max}px por ${max}px</p>`,
+            },
+          ],
         });
       } else {
         next();

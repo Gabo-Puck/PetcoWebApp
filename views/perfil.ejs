@@ -974,6 +974,15 @@
             body: formData,
         }).then((res)=>res.json()).then((res)=>{
             loadingScreen.close();
+            if(res.errors){
+                Swal.fire({
+                title: 'Atención',
+                html: 
+                `
+                    <p style="color:black">${res.errors[0].msg}</p>
+                `,
+                icon: 'warning',
+            })
             if(res=="error"){
                 Swal.fire({
                 title: 'Atención',

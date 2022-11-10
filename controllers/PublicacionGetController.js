@@ -16,6 +16,7 @@ const Reporte_Publicacion = require("../models/Reporte_Publicacion");
 const { sendNotificacion } = require("./NotificacionesController");
 const { forEach } = require("lodash");
 const { createPromisesImagenesMascotas } = require("./InicioController");
+const { createPromiseGetPfp } = require("./PerfilController");
 
 paypal.configure({
   mode: "sandbox", //sandbox or live
@@ -133,6 +134,22 @@ exports.query = [
                     );
                   }
                 }
+                result.forEach((comentarioPublicacion) => {
+                  promises.push(
+                    createPromiseUsuarioComentario(
+                      comentarioPublicacion,
+                      req.app.storageFirebase
+                    )
+                  );
+                });
+                promises.push(
+                  createPromiseGetPfp(
+                    MascotaP[0].MP.PublicacionUsuario.Foto_Perfil,
+                    req.app.storageFirebase
+                  ).then((url) => {
+                    MascotaP[0].MP.PublicacionUsuario.Foto_Perfil = url;
+                  })
+                );
                 Promise.all(promises)
                   .then(() => {
                     let publicacionID = MascotaP[0].MP.ID;
@@ -539,6 +556,16 @@ function isCompletadoMeta(idMeta, io) {
           });
       }
     });
+}
+
+function createPromiseUsuarioComentario(comentario, storage) {
+  return new Promise((resolve, reject) => {
+    resolve(
+      createPromiseGetPfp(comentario.ComentariosUsuario.Foto_Perfil, storage)
+    );
+  }).then((url) => {
+    comentario.ComentariosUsuario.Foto_Perfil = url;
+  });
 }
 exports.paycancel = (req, res) => {
   res.send("Cancelled");
