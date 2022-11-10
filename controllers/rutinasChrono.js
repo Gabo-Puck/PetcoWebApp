@@ -60,7 +60,7 @@ function promisesBorrarNotificacion(notificacion) {
   });
 }
 
-exports.deleteUsuarioInactividad = (fecha_exec) => {
+exports.deleteUsuarioInactividad = (fecha_exec, storage) => {
   let fecha = getDateFormated(fecha_exec);
   let date2 = new Date(fecha);
   date2 = date2.substractMonths(12);
@@ -85,7 +85,7 @@ exports.deleteUsuarioInactividad = (fecha_exec) => {
       console.log(usuariosEliminar);
       let usuariosPromises = [];
       usuariosEliminar.forEach((usuario) => {
-        usuariosPromises.push(deleteUsuarioPromise(usuario));
+        usuariosPromises.push(deleteUsuarioPromise(usuario, storage));
       });
       Promise.all(usuariosPromises).then(() => {
         console.log(`Se han eliminado ${usuariosEliminar.length} usuarios`);
@@ -145,7 +145,7 @@ exports.notificacionUsuarioInactividad = (fecha_exec, fecha_prev) => {
     });
 };
 
-exports.deleteUsuariosSinValidar = (fecha_exec) => {
+exports.deleteUsuariosSinValidar = (fecha_exec, storage) => {
   let fecha = getDateFormated(fecha_exec);
   let date2 = new Date(fecha);
   date2 = date2.substractMonths(5);
@@ -175,7 +175,7 @@ exports.deleteUsuariosSinValidar = (fecha_exec) => {
       console.log(usuariosEliminarArray);
       let registrosPromises = [];
       registrosEliminar.forEach((registro) => {
-        registrosPromises.push(deleteRegistroPromise(registro));
+        registrosPromises.push(deleteRegistroPromise(registro, storage));
       });
       Promise.all(registrosPromises).then(() => {
         console.log(`Se han eliminado ${registrosEliminar.length} usuarios`);
@@ -183,7 +183,7 @@ exports.deleteUsuariosSinValidar = (fecha_exec) => {
     });
 };
 
-exports.deleteMascotasInactivas = (fecha_exec) => {
+exports.deleteMascotasInactivas = (fecha_exec, storage) => {
   let fecha = getDateFormated(fecha_exec);
   let date2 = new Date(fecha);
   date2 = date2.substractMonths(4);
@@ -203,7 +203,7 @@ exports.deleteMascotasInactivas = (fecha_exec) => {
       );
       let promisesMascotas = [];
       MascotasEliminar.forEach((mascota) => {
-        promisesMascotas.push(deleteMascotaPromise(mascota));
+        promisesMascotas.push(deleteMascotaPromise(mascota, storage));
       });
       console.log(`Fecha de ejecución ${fecha}`);
       console.log(MascotasEliminar);
@@ -258,7 +258,7 @@ exports.notificacionMascotasInactivas = (fecha_exec, fecha_prev, io) => {
     });
 };
 
-exports.deleteProcesoPasoFueraTiempo = (fecha_exec) => {
+exports.deleteProcesoPasoFueraTiempo = (fecha_exec, storage) => {
   let fecha = getDateFormated(fecha_exec);
   let date2 = new Date(fecha);
   // date2 = date2.substractMonths(5);
@@ -283,7 +283,7 @@ exports.deleteProcesoPasoFueraTiempo = (fecha_exec) => {
       let promisesEliminarsolicitudes = [];
       PasosIncompletos.forEach((PasoIncompleto) => {
         promisesPasosIncompletos.push(
-          createPromisesPasoDefault(PasoIncompleto)
+          createPromisesPasoDefault(PasoIncompleto, storage)
         );
         promisesEliminarsolicitudes.push(
           deleteSolicitudPromise(PasoIncompleto.Mascota)
@@ -368,7 +368,7 @@ function deleteSolicitudPromise(mascota) {
   });
 }
 
-function createPromisesPasoDefault(paso) {
+function createPromisesPasoDefault(paso, storage) {
   return new Promise((resolve, reject) => {
     Pasos_Mascota.query()
       .where("ID_Mascota", "=", paso.ID_Mascota)
@@ -377,6 +377,9 @@ function createPromisesPasoDefault(paso) {
         let arrayPromises = [];
         let req = {};
         req.deleteFilesPath = [];
+        req.app = {
+          storageFirebase: storage,
+        };
         pasos.forEach((pasoEncontrado) => {
           if (pasoEncontrado.Archivo != null) {
             req.deleteFilesPath.push(
@@ -413,17 +416,20 @@ function patchPasosDefaultPromise(PasoProceso) {
   });
 }
 
-function deleteMascotaPromise(mascota) {
+function deleteMascotaPromise(mascota, storage) {
   return new Promise((resolve, reject) => {
     let req = {};
     req.deleteFilesPath = [];
+    req.app = {
+      storageFirebase: storage,
+    };
     let arrayImagenesID = [];
     console.log(
       "🚀 ~ file: pruebaContarDonaciones.js ~ line 115 ~ PublicacionesReportadas.Mascota.forEach ~  mascota.MascotasImagenes",
       mascota.MascotasImagenes
     );
-    let arrayImagenes = mascota.MascotasImagenes.map(
-      (x) => "public" + x.Ruta.replaceAll("\\", "/")
+    let arrayImagenes = mascota.MascotasImagenes.map((x) =>
+      x.Ruta.replaceAll("\\", "/")
     );
     let arrayID = mascota.MascotasImagenes.map((x) => x.ID);
     arrayImagenesID = arrayImagenesID.concat(arrayID);
@@ -466,15 +472,19 @@ function createPromiseEliminarImagen(id) {
   });
 }
 
-function deleteRegistroPromise(registro) {
+function deleteRegistroPromise(registro, storage) {
   return new Promise((resolve, reject) => {
     let documentos = registro.Documento_Identidad.split(";");
     let req = {
       deleteFilesPath: [],
+      app: {
+        storageFirebase: storage,
+      },
     };
+
     documentos.forEach((documento) => {
-      let pathCorrected = "public/" + documento;
-      if (pathCorrected != "public/") {
+      let pathCorrected = documento;
+      if (pathCorrected != "") {
         req.deleteFilesPath.push(pathCorrected);
       }
     });
@@ -489,7 +499,7 @@ function deleteRegistroPromise(registro) {
   });
 }
 
-function deleteUsuarioPromise(usuarioFind) {
+function deleteUsuarioPromise(usuarioFind, storage) {
   return new Promise((resolve, reject) => {
     let registroID = usuarioFind.FK_Registro;
     console.log(
@@ -498,6 +508,9 @@ function deleteUsuarioPromise(usuarioFind) {
     );
     let req = {};
     req.deleteFilesPath = [];
+    req.app = {
+      storageFirebase: storage,
+    };
     let arrayImagenesID = [];
 
     usuarioFind.Publicaciones.forEach((PublicacionUsuario) => {
@@ -508,8 +521,8 @@ function deleteUsuarioPromise(usuarioFind) {
             "🚀 ~ file: pruebaContarDonaciones.js ~ line 115 ~ PublicacionesReportadas.Mascota.forEach ~  mascota.MascotasImagenes",
             mascota.MascotasImagenes
           );
-          let arrayImagenes = mascota.MascotasImagenes.map(
-            (x) => "public" + x.Ruta.replaceAll("\\", "/")
+          let arrayImagenes = mascota.MascotasImagenes.map((x) =>
+            x.Ruta.replaceAll("\\", "/")
           );
           let arrayID = mascota.MascotasImagenes.map((x) => x.ID);
           arrayImagenesID = arrayImagenesID.concat(arrayID);
@@ -535,9 +548,7 @@ function deleteUsuarioPromise(usuarioFind) {
         req.deleteFilesPath = req.deleteFilesPath.concat(arrayArchivos);
       });
     }
-    if (
-      usuarioFind.Foto_Perfil != "/images/ImagenesPerfilUsuario/default.png"
-    ) {
+    if (usuarioFind.Foto_Perfil != "images/ImagenesPerfilUsuario/default.png") {
       req.deleteFilesPath.push(usuarioFind.Foto_Perfil);
     }
 
@@ -561,8 +572,8 @@ function deleteUsuarioPromise(usuarioFind) {
                   deleteFilesPath: [],
                 };
                 documentos.forEach((documento) => {
-                  let pathCorrected = "public/" + documento;
-                  if (pathCorrected != "public/") {
+                  let pathCorrected = documento;
+                  if (pathCorrected != "") {
                     req.deleteFilesPath.push(pathCorrected);
                   }
                 });

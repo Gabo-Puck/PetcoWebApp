@@ -439,6 +439,7 @@ function createPromisesArchivos(paso, path, storage) {
     storageRef = ref(storageRef, fileName);
     getDownloadURL(storageRef)
       .then((url) => {
+        paso.ArchivoRel = paso.Archivo;
         paso.Archivo = url;
         resolve("ok");
       })
@@ -620,7 +621,7 @@ function getPromisesUpsert(req, res, idProtocolo) {
   return PromisesUpsert;
 }
 
-function createDelete(path) {
+function createDelete(storage, path) {
   return new Promise((resolve, reject) => {
     // resolve(fs.promises.rm(path, { force: true }));
     let fullPath = path;
@@ -628,9 +629,10 @@ function createDelete(path) {
     let fileName = fragmentedPath.pop();
     let referencePath = fullPath.replace(fileName, "");
     console.log(
-      "🚀 ~ file: index.js ~ line 187 ~ returnnewPromise ~ referencePath",
+      "🚀 ~ file: ProtocoloController.js ~ line 630 ~ returnnewPromise ~ referencePath",
       referencePath
     );
+
     // console.log()
     let storageRef = ref(storage);
     fragmentedPath.forEach((route) => {
@@ -638,7 +640,7 @@ function createDelete(path) {
     });
     storageRef = ref(storageRef, fileName);
     deleteObject(storageRef).then((snapshot) => {
-      console.log("Arhcivo subido correctamente a la nube");
+      console.log("Arhcivo eliminado correctamente del la nube");
       resolve("ok");
     });
   }).catch((err) => {

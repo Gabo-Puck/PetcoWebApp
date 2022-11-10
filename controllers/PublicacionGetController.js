@@ -356,10 +356,30 @@ exports.donacionMetas = (req, res) => {
     .then((MascotaP) => {
       //id organizacion
       idOrganizacion = MascotaP[0].MascotasPublicacion.ID_Usuario;
+
       //console.log(MascotaP);
       meta = MascotaP[0].MascotasMetas.ID;
-      res.render("donacionMascota.ejs", {
-        MascotaRender: MascotaP,
+      let promises = [];
+      for (
+        let index = 0;
+        index < MascotaP[0].MascotasImagenes.length;
+        index++
+      ) {
+        const imagen = MascotaP[0].MascotasImagenes[index];
+        promises.push(
+          createPromisesImagenesMascotas(
+            MascotaP[0],
+            imagen.Ruta,
+            req.app.storageFirebase,
+            index
+          )
+        );
+      }
+      Promise.all(promises).then(() => {
+        res.render("donacionMascota.ejs", {
+          MascotaRender: MascotaP,
+          Tipo: req.session.Tipo,
+        });
       });
     });
 };
@@ -449,7 +469,7 @@ exports.paysuccess = (req, res) => {
         throw error;
       } else {
         console.log(JSON.stringify(payment));
-        res.redirect("/petco")
+        res.redirect("/petco");
       }
     }
   );
@@ -478,7 +498,7 @@ exports.paysuccess = (req, res) => {
         .findOne({ "usuario.ID": req.session.IdSession })
         .then((usuarioFind) => {
           let descripcion = `¡${usuarioFind.UsuarioRegistro.Nombre} ha aportado a una meta!`;
-          let origen = "/petco/perfil/Dusuario/"+idOrganizacion;
+          let origen = "/petco/perfil/Dusuario/" + idOrganizacion;
           sendNotificacion(descripcion, origen, idOrganizacion, req.app.io);
           isCompletadoMeta(meta, req.app.io);
         });
@@ -511,7 +531,9 @@ function isCompletadoMeta(idMeta, io) {
           .patch({ Completado: 1 })
           .then(() => {
             let descripcion = `¡Felicidades! la meta de la mascota: "${Meta.Mascota.Nombre} se ha completado"`;
-            let origen = "/petco/publicacion/adopciones/"+Meta.Mascota.MascotasPublicacion.ID;
+            let origen =
+              "/petco/publicacion/adopciones/" +
+              Meta.Mascota.MascotasPublicacion.ID;
             let usuario = Meta.MetasDonaciones[0].ID_Organizacion;
             sendNotificacion(descripcion, origen, usuario, io);
           });

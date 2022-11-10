@@ -1,6 +1,7 @@
 const Mascota = require("../models/Mascota");
 const Publicacion = require("../models/Publicacion");
 const Usuario_Bloqueado = require("../models/Usuario_Bloqueado");
+const { createPromisesImagenesMascotas } = require("./InicioController");
 
 // function containsWord(string, word) {
 //     return new RegExp('(?:[^.\w]|^|^\\W+)' + word + '(?:[^.\w]|\\W(?=\\W+|$)|$)').test(string);
@@ -9,7 +10,6 @@ const Usuario_Bloqueado = require("../models/Usuario_Bloqueado");
 function containsWord(str, word) {
   return str.match(new RegExp("\\b" + word + "\\b")) != null;
 }
-
 
 exports.pagina = (req, res) => {
   console.log("Increible");
@@ -37,12 +37,10 @@ exports.pagina = (req, res) => {
       .withGraphJoined("Mascota.MascotasImagenes")
       .then((result) => {
         var buscar = req.params.search.toString();
-        const words = buscar.split(' ');
+        const words = buscar.split(" ");
 
         for (let i = 0; i < result.length; i++) {
-    
           for (let j = 0; j < result[i].Mascota.length; j++) {
-
             for (let k = 0; k < words.length; k++) {
               if ( containsWord(result[i].Mascota[j].MascotasPublicacion.Titulo.toLowerCase()  , words[k].toLowerCase() ) == true ||  containsWord(result[i].Mascota[j].MascotasPublicacion.Descripcion.toLowerCase() , words[k].toLowerCase() ) )
               {
@@ -54,15 +52,11 @@ exports.pagina = (req, res) => {
           }
         }
 
+        console.log(mascotasfiltradas);
 
-        console.log(mascotasfiltradas)
-
-        if (mascotasfiltradas.length !=0)
-        {
-
+        if (mascotasfiltradas.length != 0) {
           //Filtrar mascotas bloqueadas
           for (let i = 0; i < mascotasfiltradas.length; i++) {
-            
             for (let k = 0; k < usuariosB.length; k++) {
          
             if (
@@ -86,22 +80,40 @@ exports.pagina = (req, res) => {
             }
           }
         }
-        
-      }
 
         //Filtrar mascotas por texto
-       
+
         for (let index = 0; index < words.length; index++) {
-        console.log( "OJO aqui es"+ words[index])
+          console.log("OJO aqui es" + words[index]);
         }
+        let promises = [];
+        for (let y = 0; y < mascotasfiltradas.length; y++) {
+          const mascota = mascotasfiltradas[y];
+          for (
+            let index = 0;
+            index < mascota.MascotasImagenes.length;
+            index++
+          ) {
+            promises.push(
+              createPromisesImagenesMascotas(
+                mascota,
+                mascota.MascotasImagenes[index].Ruta,
+                req.app.storageFirebase,
+                index
+              )
+            );
+          }
+        }
+        Promise.all(promises).then(() => {
+          res.render("busqueda.ejs", {
+            Iorden: req.params.orden,
+            MascotaRender: mascotasfiltradas,
+            Tipo: req.session.Tipo,
+          Itexto:req.params.search,
+          });
+        });
 
         //console.log(mascotasfiltradas);
-        res.render("busqueda.ejs", {
-          Iorden:req.params.orden,
-          MascotaRender: mascotasfiltradas,
-          Tipo: req.session.Tipo,
-          Itexto:req.params.search,
-        });
       });
   });
 };

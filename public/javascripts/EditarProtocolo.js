@@ -73,7 +73,7 @@ $(window).on("load", () => {
       ArchivoEliminarButton.addEventListener("click", (e) => {
         let pasoDOM = retrieveParent(ArchivoEliminarButton, "Paso");
         if (pasoDOM.querySelector("a") != null) {
-          archivosEliminados.push({ ID: paso.ID, path: paso.Archivo });
+          archivosEliminados.push({ ID: paso.ID, path: paso.ArchivoRel });
           // archivosEliminados[`f-${paso.ID}`] = paso.Archivo;
           pasoDOM.querySelector("a").remove();
           ArchivoEliminarButton.remove();

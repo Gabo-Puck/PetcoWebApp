@@ -112,14 +112,14 @@ function isLoggedModerador(req, res, next) {
   }
 }
 let previous = new Date(Date.now());
-const job = schedule.scheduleJob("*/5 * * * *", function (dated) {
+const job = schedule.scheduleJob("*/1 * * * *", function (dated) {
   console.log(dated);
   console.log("1 minuto");
   deleteNotificacionesMeses(dated);
-  deleteUsuarioInactividad(dated);
-  deleteUsuariosSinValidar(dated);
-  deleteMascotasInactivas(dated);
-  deleteProcesoPasoFueraTiempo(dated);
+  deleteUsuarioInactividad(dated, app.storageFirebase);
+  deleteUsuariosSinValidar(dated, app.storageFirebase);
+  deleteMascotasInactivas(dated, app.storageFirebase);
+  deleteProcesoPasoFueraTiempo(dated, app.storageFirebase);
   notificacionUsuarioInactividad(dated, previous);
   notificacionMascotasInactivas(dated, previous, app.io);
   notificacionProcesoPasoFueraTiempo(dated, previous, app.io);

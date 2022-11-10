@@ -3,7 +3,6 @@ var Usuario = require("../models/Usuario");
 var Municipio = require("../models/Municipio");
 var objection = require("objection");
 const Publicacion = require("../models/Publicacion");
-const { createPromisesImagenesMascotas } = require("./InicioController");
 
 //Configuracion de paypal
 const paypal = require("paypal-rest-sdk");
@@ -13,6 +12,8 @@ const Publicacion_Guardada = require("../models/Publicacion_Guardada");
 const Reporte_Publicacion = require("../models/Reporte_Publicacion");
 const Usuario_Bloqueado = require("../models/Usuario_Bloqueado");
 const { sendNotificacion } = require("./NotificacionesController");
+const { fetchInput, uploadFiles } = require("../utils/multipartRequestHandle");
+const { getDownloadURL, ref, deleteObject } = require("firebase/storage");
 
 paypal.configure({
   mode: "sandbox", //sandbox or live
@@ -35,6 +36,8 @@ let dateTime = date + " " + time;
 console.log(dateTime);
 
 exports.pagina = (req, res, next) => {
+  const { createPromisesImagenesMascotas } = require("./InicioController");
+
   idOrganizacion = req.params.idUsuario;
 
   console.log("w");
@@ -64,6 +67,10 @@ exports.pagina = (req, res, next) => {
         .withGraphJoined("UsuarioRegistro")
         .where("usuario.ID", "=", req.params.idUsuario)
         .then((result) => {
+          if (result.length == 0) {
+            res.redirect("/petco/inicio");
+            return;
+          }
           idu = result[0].UsuarioRegistro.ID;
 
           Publicacion.query()
@@ -98,15 +105,20 @@ exports.pagina = (req, res, next) => {
                   contador++;
                 }
               }
-
-              Promise.all(promises).then(() => {
-                mascotasUsuario.reverse();
-                res.render("perfil.ejs", {
-                  user: result,
-                  idUsuarioPublicacion: req.params.idUsuario,
-                  MascotaRender: mascotasUsuario,
-                  currentUser: req.session.IdSession,
-                  Tipo: req.session.Tipo,
+              createPromiseGetPfp(
+                result[0].Foto_Perfil,
+                req.app.storageFirebase
+              ).then((url) => {
+                result[0].Foto_Perfil = url;
+                Promise.all(promises).then(() => {
+                  mascotasUsuario.reverse();
+                  res.render("perfil.ejs", {
+                    user: result,
+                    idUsuarioPublicacion: req.params.idUsuario,
+                    MascotaRender: mascotasUsuario,
+                    currentUser: req.session.IdSession,
+                    Tipo: req.session.Tipo,
+                  });
                 });
               });
               //console.log("🚀 ~ file: PerfilController.js ~ line 26 ~ .then ~ mascotasUsuario", mascotasUsuario)
@@ -170,8 +182,8 @@ exports.pay = (req, res) => {
         },
 
         redirect_urls: {
-          return_url: process.env.SERVER_DOMAIN+"/petco/perfil/successP",
-          cancel_url: process.env.SERVER_DOMAIN+"/petco/perfil/cancelP",
+          return_url: process.env.SERVER_DOMAIN + "/petco/perfil/successP",
+          cancel_url: process.env.SERVER_DOMAIN + "/petco/perfil/cancelP",
         },
         transactions: [
           {
@@ -223,7 +235,7 @@ exports.paysuccess = (req, res) => {
         .findOne({ "usuario.ID": req.session.IdSession })
         .then((usuarioFind) => {
           let descripcion = `¡${usuarioFind.UsuarioRegistro.Nombre} te ha donado ${aporte}!`;
-          let origen = "/petco/perfil/Dusuario/"+idOrganizacion;
+          let origen = "/petco/perfil/Dusuario/" + idOrganizacion;
           sendNotificacion(descripcion, origen, idOrganizacion, req.app.io);
         });
       console.log(registroCreado);
@@ -253,8 +265,8 @@ exports.paysuccess = (req, res) => {
         throw error;
       } else {
         console.log(JSON.stringify(payment));
-        console.log("Success")
-        res.redirect("/petco/perfil/usuario/" +idOrganizacion )
+        console.log("Success");
+        res.redirect("/petco/perfil/usuario/" + idOrganizacion);
       }
     }
   );
@@ -263,3 +275,147 @@ exports.paysuccess = (req, res) => {
 exports.paycancel = (req, res) => {
   res.send("Cancelled");
 };
+
+const checkImagepfp = (req, res, next) => {
+  if (res.fileReadableStream) {
+    var min = 100,
+      max = 1100;
+    probe(res.fileReadableStream[0].stream).then((data) => {
+      if (
+        data.width < min ||
+        data.height < min ||
+        data.width > max ||
+        data.height > max
+      ) {
+        res.json({
+          warning: `<p>Las imagenes deben de tener una resolución:</p> <p>Mínima de ${min}px por ${min}px <p>Máxima de ${max}px por ${max}px</p>`,
+        });
+      } else {
+        next();
+      }
+      console.log(data);
+    });
+  } else {
+    res.json("error");
+  }
+};
+
+exports.cambiarpfp = [
+  fetchInput(
+    ["image/png", "image/jpeg", "image/jpg"],
+    "images/ImagenesPerfilUsuario"
+  ),
+  checkImagepfp,
+  (req, res, next) => {
+    if (res.errors.length > 0) {
+      res.json(res.errors);
+    } else {
+      Promise.all(uploadFiles(res, req.app.storageFirebase)).then(() => {
+        Usuario.query()
+          .findById(req.session.IdSession)
+          .then((usuario) => deletePromisePfp(usuario, req.app.storageFirebase))
+          .then((usuario) =>
+            usuario.$query().patchAndFetchById(req.session.IdSession, {
+              Foto_Perfil: req.body.pfp,
+            })
+          )
+          .then((usuario) =>
+            createPromiseGetPfp(usuario.Foto_Perfil, req.app.storageFirebase)
+          )
+          .then((url) => {
+            res.json({ url: url });
+          })
+          .catch((err) => {
+            console.log(err);
+            res.json("error");
+          });
+      });
+    }
+  },
+];
+
+const deletePromisePfp = (usuario, storage) => {
+  return new Promise((resolve, reject) => {
+    let fullPath = usuario.Foto_Perfil;
+    let fragmentedPath = fullPath.split("/");
+    let fileName = fragmentedPath.pop();
+    let referencePath = fullPath.replace(fileName, "");
+    let storageRef = ref(storage);
+    fragmentedPath.forEach((route) => {
+      storageRef = ref(storageRef, route);
+    });
+    storageRef = ref(storageRef, fileName);
+    deleteObject(storageRef)
+      .then(() => {
+        resolve(usuario);
+      })
+      .catch((error) => {
+        // A full list of error codes is available at
+        // https://firebase.google.com/docs/storage/web/handle-errors
+        console.log(error);
+        switch (error.code) {
+          case "storage/object-not-found":
+            // File doesn't exist
+            resolve(usuario);
+            break;
+          case "storage/unauthorized":
+            // User doesn't have permission to access the object
+            break;
+          case "storage/canceled":
+            // User canceled the upload
+            break;
+
+          // ...
+
+          case "storage/unknown":
+            // Unknown error occurred, inspect the server response
+            break;
+        }
+        resolve("wrong");
+      });
+    // getDownloadURL()
+  });
+};
+
+const createPromiseGetPfp = (path, storage) => {
+  return new Promise((resolve, reject) => {
+    let fullPath = path;
+    let fragmentedPath = fullPath.split("/");
+    let fileName = fragmentedPath.pop();
+    let referencePath = fullPath.replace(fileName, "");
+    let storageRef = ref(storage);
+    fragmentedPath.forEach((route) => {
+      storageRef = ref(storageRef, route);
+    });
+    storageRef = ref(storageRef, fileName);
+    getDownloadURL(storageRef)
+      .then((url) => {
+        resolve(url);
+      })
+      .catch((error) => {
+        // A full list of error codes is available at
+        // https://firebase.google.com/docs/storage/web/handle-errors
+        resolve("wrong");
+        switch (error.code) {
+          case "storage/object-not-found":
+            // File doesn't exist
+            break;
+          case "storage/unauthorized":
+            // User doesn't have permission to access the object
+            break;
+          case "storage/canceled":
+            // User canceled the upload
+            break;
+
+          // ...
+
+          case "storage/unknown":
+            // Unknown error occurred, inspect the server response
+            break;
+        }
+      });
+    // getDownloadURL()
+  });
+};
+
+exports.createPromiseGetPfp = createPromiseGetPfp;
