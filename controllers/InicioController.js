@@ -51,12 +51,12 @@ exports.Inicio = (req, res, next) => {
                         .count()
                         .as("numberOfReports")
                     )
-                    .orderBy("numberOfReports")
-                    .orderBy("numberOfLikes", "desc")
-                    .orderBy("Reportes_Peso")
                     .withGraphJoined("Mascota.MascotasPublicacion")
                     .withGraphJoined("Mascota.MascotasEstado")
                     .withGraphJoined("Mascota.MascotasImagenes")
+                    .orderBy("numberOfReports")
+                    .orderBy("numberOfLikes", "desc")
+                    .orderBy("Reportes_Peso")
                     .then((resultado) => {
                       //console.log('Separador ------------------------');
                       //console.log(resultado);

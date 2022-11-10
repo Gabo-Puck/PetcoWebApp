@@ -254,6 +254,8 @@
                                     <div class="mt-4 pb-2">
 
                                         <!-- Reportar -->
+                                        <% if (user[0].ID != currentUser) {%>
+
                                         <button type="button"
                                             class="btn btn-outline-primary btn-floating nav-item dropdown">
 
@@ -417,6 +419,8 @@
                                             </script>
 
                                         </button>
+                                        <% } %>
+
 
 
 

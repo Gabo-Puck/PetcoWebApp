@@ -359,7 +359,10 @@
 
 
                                                             <% if(MascotaRender[i].MascotasMetas !=null &&
-                                                                progreso<100){ %>
+                                                                progreso<100){%>
+
+                                                                    
+                                                                    <% if(MascotaRender[0].MP.PublicacionUsuario.AceptaDonaciones == 1 ){%>
                                                                 <h5 style="text-align: center;">
 
                                                                     <a href="/petco/publicacion/meta/<%=MascotaRender[i].ID%>"
@@ -372,6 +375,15 @@
                                                                         </i>
                                                                     </a>
                                                                 </h5>
+                                                                <% }else {%>
+                                                                        <h5 class="mt-3" style="text-align: center;">                                                                    
+                                                                            <strong>
+                                                                                El usuario no acepta donaciones por el momento                                                                    
+                                                                            </strong>
+                                                                            </h5>
+
+                                                                <% }%>
+
                                                                 <% }%>
                             </div>
 
@@ -410,7 +422,20 @@
                                             </h5>
 
                                             <h5><b>Edad:</b>
-                                                <%= MascotaRender[i].Edad%>
+                                                <%if(MascotaRender[i].Edad == 0){%>
+                                                    Menos de un año
+                                                    <%}%>
+
+                                                <%if(MascotaRender[i].Edad < 0){%>
+                                                    Edad Desconocida
+                                                    <% }%>
+
+                                                <%if(MascotaRender[i].Edad > 0){%>
+                                                    <%= MascotaRender[i].Edad%>
+                                                <%}%>
+
+
+                                               
                                             </h5>
                                             <h5><b>Descripcion:</b>
                                                 <%= MascotaRender[i].Descripcion%>

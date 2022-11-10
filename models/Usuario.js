@@ -69,6 +69,15 @@ class Usuario extends BaseModel {
           to: "registro.ID",
         },
       },
+
+      UR: {
+        relation: Model.HasOneRelation,
+        modelClass: Registro,
+        join: {
+          from: "usuario.FK_Registro",
+          to: "registro.ID",
+        },
+      },
       Notificaciones: {
         relation: Model.HasManyRelation,
         modelClass: Notificaciones,
