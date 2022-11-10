@@ -16,6 +16,7 @@ const {
 const Solicitudes = require("../models/Solicitudes");
 const { sendNotificacion } = require("./NotificacionesController");
 const { getDownloadURL, ref } = require("firebase/storage");
+const { createPromiseGetPfp } = require("./PerfilController");
 
 var acceptedTypes = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -64,6 +65,22 @@ exports.getProceso = [
               );
             }
           });
+          promises.push(
+            createPromiseGetPfp(
+              res.PeerProceso.Foto_Perfil,
+              req.app.storageFirebase
+            ).then((url) => {
+              res.PeerProceso.Foto_Perfil = url;
+            })
+          );
+          promises.push(
+            createPromiseGetPfp(
+              res.usuarioProceso.foto,
+              req.app.storageFirebase
+            ).then((url) => {
+              res.usuarioProceso.foto = url;
+            })
+          );
           Promise.all(promises).then(() => {
             res.render("procesoAdopcion", {
               PasosProceso: PasosProceso[0].MascotasPasos,
