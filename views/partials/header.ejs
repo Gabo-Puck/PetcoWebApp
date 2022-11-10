@@ -181,10 +181,10 @@
     .addEventListener("click", myFunction);
   function myFunction() {
     Swal.fire({
-      html: `<form action="/petco/busqueda/ingreso" method="post">
+      html: `<form action="/petco/busqueda/ingreso" method="post" autocomplete="off">
     <div class="row container">
 
-          <input class="form-control me-sm-2 mb-4" type="text" name="Btexto"placeholder="¿Que deseas buscar?">
+          <input class="form-control me-sm-2 mb-4" type="text" name="Btexto"placeholder="¿Que deseas buscar?"  required>
 
           <select class="form-select" name="Borden"  id="ordenes" style="display: table-cell;">
               <option value="0">Ordenar Cronologicamente</option>

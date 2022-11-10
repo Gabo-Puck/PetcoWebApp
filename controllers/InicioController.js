@@ -84,16 +84,7 @@ exports.Inicio = (req, res, next) => {
                       //Filtrado de publicaciones bloqueadas
                       for (let i = 0; i < prueba.length; i++) {
                         for (let k = 0; k < usuariosB.length; k++) {
-                          console.log(
-                            "a " +
-                              prueba[i].MascotasPublicacion.ID_Usuario +
-                              " d " +
-                              prueba[i].MascotasPublicacion.ID +
-                              " b " +
-                              usuariosB[k].ID_Usuario +
-                              " c " +
-                              usuariosB[k].ID_Bloqueado
-                          );
+                         
                           if (
                             (prueba[i].MascotasPublicacion.ID_Usuario ==
                               usuariosB[k].ID_Usuario &&
@@ -105,6 +96,11 @@ exports.Inicio = (req, res, next) => {
                           ) {
                             prueba.splice(i, 1);
                             i = 0;
+                            console.log("ESTO MIDE MASCOTAS FILTRADAS " + prueba.length)
+                            if(prueba.length == 1)
+                            {
+                              break;
+                            }
                           }
                         }
                       }
@@ -307,16 +303,7 @@ exports.Pguardadas = (req, res, next) => {
         //Filtrado de Bloqueo
         for (let i = 0; i < prueba.length; i++) {
           for (let k = 0; k < usuariosB.length; k++) {
-            console.log(
-              "a " +
-                prueba[i].MascotasPublicacion.ID_Usuario +
-                " d " +
-                prueba[i].MascotasPublicacion.ID +
-                " b " +
-                usuariosB[k].ID_Usuario +
-                " c " +
-                usuariosB[k].ID_Bloqueado
-            );
+          
             if (
               (prueba[i].MascotasPublicacion.ID_Usuario ==
                 usuariosB[k].ID_Usuario &&
@@ -327,6 +314,11 @@ exports.Pguardadas = (req, res, next) => {
             ) {
               prueba.splice(i, 1);
               i = 0;
+              console.log("ESTO MIDE MASCOTAS FILTRADAS " + prueba.length)
+              if(prueba.length == 1)
+              {
+                break;
+              }
             }
           }
         }

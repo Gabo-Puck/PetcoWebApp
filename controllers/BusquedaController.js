@@ -2,8 +2,12 @@ const Mascota = require("../models/Mascota");
 const Publicacion = require("../models/Publicacion");
 const Usuario_Bloqueado = require("../models/Usuario_Bloqueado");
 
-function containsWord(string, word) {
-    return new RegExp('(?:[^.\w]|^|^\\W+)' + word + '(?:[^.\w]|\\W(?=\\W+|$)|$)').test(string);
+// function containsWord(string, word) {
+//     return new RegExp('(?:[^.\w]|^|^\\W+)' + word + '(?:[^.\w]|\\W(?=\\W+|$)|$)').test(string);
+// }
+
+function containsWord(str, word) {
+  return str.match(new RegExp("\\b" + word + "\\b")) != null;
 }
 
 
@@ -18,30 +22,7 @@ exports.pagina = (req, res) => {
     orden = "numberOfLikes";
   }
   
-  // Mascota.query()
-  //     .withGraphJoined("MascotasPublicacion")
-  //     .withGraphJoined("MascotasEstado")
-  //     .withGraphJoined("MascotasImagenes")
-  //     .orderBy(orden)
-  //     .andWhere("mascota.ID_Especie", indicador[0], req.params.especie)
-  //     .andWhere("mascota.ID_Tamano",indicador[1], req.params.tamano)
-  //     .andWhere("mascota.ID_Castrado",indicador[2], req.params.castrado)
-  //     .andWhere("mascota.ID_Salud", indicador[3], req.params.salud)
-  //     .andWhere("mascota.ID_Estado",indicador[4], req.params.estado)
-  //     .andWhere("mascota.Edad", indicador[5],req.params.edad)
-  //     .then((resultado) => {
-  //         console.log(resultado);
-  //         res.render("busqueda.ejs", {
-  //             Iespecie: req.params.especie,
-  //             Itamano: req.params.tamano,
-  //             Icastrado: req.params.castrado,
-  //             Isalud: req.params.salud,
-  //             Iestado: req.params.estado,
-  //             Iedad:req.params.edad,
-  //             Iorden:req.params.orden,
-  //             MascotaRender: resultado
-  //         });
-  //     })
+
   Usuario_Bloqueado.query().then((usuariosB) => {
     Publicacion.query()
       .where("publicacion.Activo", "=", 1)
@@ -63,10 +44,11 @@ exports.pagina = (req, res) => {
           for (let j = 0; j < result[i].Mascota.length; j++) {
 
             for (let k = 0; k < words.length; k++) {
-              if ( containsWord(result[i].Mascota[j].MascotasPublicacion.Titulo , words[k]) == true)
+              if ( containsWord(result[i].Mascota[j].MascotasPublicacion.Titulo.toLowerCase()  , words[k].toLowerCase() ) == true ||  containsWord(result[i].Mascota[j].MascotasPublicacion.Descripcion.toLowerCase() , words[k].toLowerCase() ) )
               {
                 mascotasfiltradas[contador] = result[i].Mascota[j];
                 contador++;
+                break;
               }
             }
           }
@@ -91,12 +73,16 @@ exports.pagina = (req, res) => {
                 usuariosB[k].ID_Bloqueado &&
                 usuariosB[k].ID_Usuario == req.session.IdSession)
             ) {
-              mascotasfiltradas.splice(i, 1);
+
               i = 0;
-              if(mascotasfiltradas.length == 0)
+              mascotasfiltradas.splice(i, 1);
+              console.log("ESTO MIDE MASCOTAS FILTRADAS " + mascotasfiltradas.length)
+              if(mascotasfiltradas.length == 1)
               {
+
                 break;
               }
+
             }
           }
         }
@@ -114,6 +100,7 @@ exports.pagina = (req, res) => {
           Iorden:req.params.orden,
           MascotaRender: mascotasfiltradas,
           Tipo: req.session.Tipo,
+          Itexto:req.params.search,
         });
       });
   });

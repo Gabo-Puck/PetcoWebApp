@@ -97,10 +97,10 @@
     <%- include ("partials/header") %>
 
     <div class="container mt-4" style="text-align: center">
-      <form action="/petco/busqueda/ingreso" method="post">
+      <form action="/petco/busqueda/ingreso" method="post" autocomplete="off">
         <div class="row">
           <div class="col">
-            <input class="form-control me-sm-2" name="Btexto" type="text" placeholder="Search">
+            <input class="form-control me-sm-2" name="Btexto" type="text" placeholder="¿Que deseas buscar?" value="<%=Itexto%>" required>
           </div>
         </div>
 
