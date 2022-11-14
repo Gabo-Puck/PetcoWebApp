@@ -427,13 +427,17 @@ io.on("connection", (socket) => {
       .then((resultado) => {
         console.log(resultado.ID);
         //Se emite el comentario por parte del cliente dentro del contexto de la publicacion
-
+        
+        createPromiseGetPfp(imagen, app.storageFirebase).then((url) => {
+          imagen = url
         io.to("publicacion" + id).emit("comentario", {
           msg: msg,
           nombre: nombre,
           imagen: imagen,
           fecha: fecha,
           idcomentario: resultado.ID,
+        });
+        
         });
         if (idDueno != socket.userID) {
           let descripcion = `${nombre} ha comentado en tu publicacion: "${msg}"`;
@@ -450,7 +454,7 @@ io.on("connection", (socket) => {
       console.log(msg);
       console.log(idP);
       console.log(idcomentario);
-      console.log(nombre);
+      console.log(nombre);    
       console.log(imagen);
       console.log(fecha);
 
@@ -464,7 +468,6 @@ io.on("connection", (socket) => {
         })
         .then((resultado) => {
           console.log(resultado.ID);
-          let promises = [];
 
           createPromiseGetPfp(imagen, app.storageFirebase).then((url) => {
             imagen = url
