@@ -406,13 +406,14 @@ exports.pay = (req, res) => {
   aporte = req.body.aporte;
   mensaje = req.body.mensaje;
 
-  Registro.query()
-    .withGraphJoined("RegistroUsuario")
-    .where("RegistroUsuario.FK_Registro", "=", idOrganizacion)
+  Usuario.query()
+    .withGraphJoined("UsuarioRegistro")
+    .where("usuario.ID", "=", idOrganizacion)
     .then((query) => {
+      console.log(query);
       //id organizacion
-      correopago = query[0].Correo;
-      console.log(query[0].Correo);
+      correopago = query[0].UsuarioRegistro.Correo;
+      console.log(query[0].UsuarioRegistro.Correo);
 
       const create_payment_json = {
         intent: "sale",

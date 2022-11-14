@@ -16,7 +16,7 @@ class Usuario_Bloqueado extends Model {
                 modelClass: Usuario,
                 relation: Model.BelongsToOneRelation,
                 join: {
-                    from: "usuario_bloqueado.ID_Usuario",
+                    from: "usuario_bloqueado.ID_Bloqueado",
                     to: "usuario.ID",
                 },
             },

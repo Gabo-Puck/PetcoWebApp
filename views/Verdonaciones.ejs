@@ -44,7 +44,6 @@
                             <th scope="col">Donante</th>
                             <th scope="col">Cantidad</th>
                             <th scope="col">Fecha</th>
-                            <th scope="col">Mensaje</th>
 
                         </tr>
                     </thead>
@@ -73,13 +72,11 @@
 
 
                                             <td>
-                                                <%= myDate.getFullYear() + '-' + myDate.getMonth() + '-' +
-                                                    myDate.getDate() +' ' +myDate.getHours() + ' :' +myDate.getMinutes()
+                                                <%= myDate.getFullYear() + '-' + (myDate.getMonth()+1) + '-' +
+                                                    myDate.getDate() +' ' +myDate.getHours() + ':' +myDate.getMinutes()
                                                     + ':' +myDate.getSeconds() %>
                                             </td>
-                                            <td>
-                                                <%=donacionesPerfil[i].Mensaje%>
-                                            </td>
+                                            
                                 </tr>
                                 <% } %>
 
@@ -133,8 +130,8 @@
 
 
                                             <td>
-                                                <%= myDate.getFullYear() + '-' + myDate.getMonth() + '-' +
-                                                    myDate.getDate() +' ' +myDate.getHours() + ' :' +myDate.getMinutes()
+                                                <%= myDate.getFullYear() + '-' +(myDate.getMonth()+1) + '-' +
+                                                    myDate.getDate() +' ' +myDate.getHours() + ':' +myDate.getMinutes()
                                                     + ':' +myDate.getSeconds() %>
                                             </td>
                                             <td>

@@ -7,6 +7,9 @@ router.get("/usuario/:idUsuario", PerfilRouter.pagina);
 router.post("/donarperfilP", PerfilRouter.pay);
 router.post("/cambiarpfp", PerfilRouter.cambiarpfp);
 
+router.get("/usuariosbloqueados", PerfilRouter.UsuariosBlocked);
+router.get("/desbloquear/:idbloqueo", PerfilRouter.UsuariosDesbloquear);
+
 router.get("/successP", PerfilRouter.paysuccess);
 router.get("/cancelP", PerfilRouter.paycancel);
 router.get("/Adonaciones/:bandera", PerfilRouter.fetchDonation);

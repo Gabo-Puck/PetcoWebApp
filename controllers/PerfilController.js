@@ -129,6 +129,40 @@ exports.pagina = (req, res, next) => {
   });
 };
 
+exports.UsuariosBlocked = (req, res, next) => {
+Usuario_Bloqueado.query()
+.withGraphFetched("UsuarioBloqueado.UsuarioRegistro")
+.where("usuario_bloqueado.ID_Usuario", "=", req.session.IdSession)
+.then((results)=>
+{
+  res.render("usuariosbloqueados.ejs", {
+    Tipo: req.session.Tipo,
+    bloqueos: results
+
+  });
+})
+}
+
+exports.UsuariosDesbloquear = (req, res, next) => {
+
+  console.log("El usuario a desbloquear es " +  req.params.idbloqueo)
+
+  Usuario_Bloqueado.query()
+  .where("usuario_bloqueado.ID_Usuario", "=", req.session.IdSession)
+  .andWhere("usuario_bloqueado.ID_Bloqueado", "=", req.params.idbloqueo)
+  .delete()
+  .then((result)=>{
+    res.json("Se Borro");
+  })
+
+
+
+
+}
+
+
+
+
 exports.DonacionesUser = (req, res, next) => {
   Donaciones.query()
     .where("donaciones.ID_Organizacion", "=", req.params.idUsuario)

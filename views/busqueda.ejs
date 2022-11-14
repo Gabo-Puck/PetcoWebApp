@@ -34,6 +34,11 @@
 
     <title>Buscar</title>
     <style>
+
+      body
+      {
+        overflow-x: hidden;
+      }
       .contenedor {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
@@ -97,13 +102,13 @@
     <%- include ("partials/header") %>
 
     <div class="container mt-4" style="text-align: center">
-      <form action="/petco/busqueda/ingreso" method="post" autocomplete="off">
+      <form action="/petco/busqueda/ingreso" method="post" autocomplete="off" onsubmit="validateMyForm();">
 
     
 
         <div class="row">
           <div class="col">
-            <input class="form-control me-sm-2" name="Btexto" type="text" placeholder="¿Que deseas buscar?" value="<%=Itexto%>" required>
+            <input class="form-control me-sm-2" name="Btexto" type="text" placeholder="¿Que deseas buscar?" id="textos" >
           </div>
           
           <div class="col-md-auto">
@@ -238,25 +243,55 @@
       </form>
     </div>
 
-    <div class="contenedor">
-        <div class="carta templateFeed" style="display: none;">
-            <a href="#" style="text-decoration: none;">
-            
-                
-            <img src="https://thumbs.gfycat.com/MadeupWillingKronosaurus-max-1mb.gif"
-                style="object-fit: cover; height: 300px;" />
-            <h3 style="color: white;">Card tittle</h3>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <p style="background-color: rgba(0, 0, 0, 0.5); vertical-align: bottom;"><b>Estado:</b>
-                Oowo
-            </p>
-        </a>
+    <div class="row">
+      <div class="col col-lg-2 mt-5" style="text-align: center;">
+        <h4><strong>Clasificaciones</strong> </h4>
+        <h6><a href="#" id="cerca">Cerca de ti</a></h6>
+        <h6><a href="#" id="organizacion">Procediente de organizaciones</a></h6>
+        <h6><a href="#" id="comun">Procediente de usuarios comunes</a> </h6>
+        <h6><a href="#" id="sin">Sin solicitudes</a> </h6>
+
       </div>
+
+      <!-- Poner urls xd -->
+      <script>
+        var clasificacionLink = window.location.href;
+        clasificacionLink = clasificacionLink.substring(0, clasificacionLink.length - 1)
+
+        document.getElementById("cerca").href= clasificacionLink+ "1"
+        document.getElementById("organizacion").href= clasificacionLink+ "2"
+        document.getElementById("comun").href= clasificacionLink+ "3"
+
+
+        document.getElementById("sin").href= clasificacionLink+ "4"
+      </script>
+
+      <div class="col">
+        
+    <div class="contenedor">
+      <div class="carta templateFeed" style="display: none;">
+          <a href="#" style="text-decoration: none;">
+          
+              
+          <img src="https://thumbs.gfycat.com/MadeupWillingKronosaurus-max-1mb.gif"
+              style="object-fit: cover; height: 300px;" />
+          <h3 style="color: white;">Card tittle</h3>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <p style="background-color: rgba(0, 0, 0, 0.5); vertical-align: bottom;"><b>Estado:</b>
+              Oowo
+          </p>
+      </a>
     </div>
+  </div>
+        
+      </div>
+
+    </div>
+
 
     <% if(MascotaRender.length == 0 ){ %>
     <script>
@@ -268,11 +303,34 @@
     </script>
     <% } %>
 
+    <script type="text/javascript">
+
+      function validateMyForm()
+      {
+        if(document.getElementById("animales").selectedIndex == 0 
+        && document.getElementById("tamanos").selectedIndex == 0 
+        && document.getElementById("castrados").selectedIndex == 0 
+        && document.getElementById("saludes").selectedIndex == 0 
+        && document.getElementById("edades").selectedIndex == 0 
+        && document.getElementById("textos").value == ""
+        
+        
+        )
+        { 
+          event.preventDefault();
+          Swal.fire(
+        "¿Que quieres buscar?",
+        "Se un poco mas especifico",
+        "warning"
+                    );
+        }
+      
+      }
+      
+      </script>
+      
+
     <script>
-
-
-
-
 
           //Cargar elementos
           var template = document.querySelector(".templateFeed"); //Se obtiene el formato del comentario de un template
@@ -290,7 +348,12 @@
 
           window.onload = function () { //Se ejecuta al terminar de cargar la pagina
             //Determinar longitud principal
-            select1= document.getElementById("animales").selectedIndex = '<%=Iespecie%>' ;
+            if ("<%=Itexto%>" != "*")
+            {
+              document.getElementById("textos").value = "<%=Itexto%>";
+
+            }
+              select1= document.getElementById("animales").selectedIndex = '<%=Iespecie%>' ;
               select2= document.getElementById("tamanos").selectedIndex = '<%=Itamano%>';
               select3= document.getElementById("castrados").selectedIndex = '<%=Icastrado%>';
               select4= document.getElementById("saludes").selectedIndex = '<%=Isalud%>';
@@ -332,12 +395,12 @@
 
             let InitialLoading = 0;
 
-            if (Mlenght < 6) {
+            if (Mlenght < 8) {
               InitialLoading = Mlenght;
               banLoad = false;
             }
             else {
-              InitialLoading = 6;
+              InitialLoading = 8;
               banLoad = true
             }
 

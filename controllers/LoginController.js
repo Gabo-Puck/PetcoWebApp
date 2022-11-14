@@ -73,6 +73,7 @@ exports.CheckDB = (req, res, next) => {
 
   Registro.query()
     .withGraphJoined("RegistroUsuario")
+    .withGraphJoined("muni")
     .where("registro.Contrasena", "=", req.body.Password)
     .andWhere("registro.Correo", "=", req.body.Correo)
     .then((Results) => {
@@ -91,6 +92,7 @@ exports.CheckDB = (req, res, next) => {
             req.session.Logged = true;
             req.session.IdSession = Results[0].RegistroUsuario.ID;
             req.session.Tipo = Results[0].Tipo_Usuario;
+            req.session.Municipio= Results[0].muni.ID;
             console.log(Results[0]);
             console.log(req.session.Tipo);
 

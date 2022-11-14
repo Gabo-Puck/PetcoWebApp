@@ -359,10 +359,10 @@
 
 
                                                             <% if(MascotaRender[i].MascotasMetas !=null &&
-                                                                progreso<100){%>
+                                                                progreso<100 && MascotaRender[i].MascotasMetas.Completado == 0){%>
 
                                                                     
-                                                                    <% if(MascotaRender[0].MP.PublicacionUsuario.AceptaDonaciones == 1 ){%>
+                                                                    <% if(MascotaRender[0].MP.PublicacionUsuario.AceptaDonaciones == 1){%>
                                                                 <h5 style="text-align: center;">
 
                                                                     <a href="/petco/publicacion/meta/<%=MascotaRender[i].ID%>"
