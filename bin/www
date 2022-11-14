@@ -19,6 +19,7 @@ const Pasos_Mascota = require("../models/Pasos_Mascota");
 const { sendNotificacion } = require("../controllers/NotificacionesController");
 const Publicacion = require("../models/Publicacion");
 const Solicitudes = require("../models/Solicitudes");
+const { createPromiseGetPfp } = require("../controllers/PerfilController");
 
 /**
  * Get port from environment and store in Express.
@@ -463,15 +464,26 @@ io.on("connection", (socket) => {
         })
         .then((resultado) => {
           console.log(resultado.ID);
-          //Se emite el comentario por parte del cliente dentro del contexto de la publicacion
-          io.to("publicacion" + idP).emit("respuesta", {
-            msg: msg,
-            idP: idP,
-            idcomentario: idcomentario,
-            nombre: nombre,
-            imagen: imagen,
-            fecha: fecha,
+          let promises = [];
+
+          createPromiseGetPfp(imagen, app.storageFirebase).then((url) => {
+            imagen = url
+
+
+            io.to("publicacion" + idP).emit("respuesta", {
+              msg: msg,
+              idP: idP,
+              idcomentario: idcomentario,
+              nombre: nombre,
+              imagen: imagen,
+              fecha: fecha,
+            });
           });
+
+
+          //Se emite el comentario por parte del cliente dentro del contexto de la publicacion
+
+
           if (idDueno != socket.userID) {
             let descripcion = `${nombre} ha comentado en tu publicacion: "${msg}"`;
             let origen = `/petco/publicacion/adopciones/${idP}`;
