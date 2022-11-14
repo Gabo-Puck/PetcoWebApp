@@ -1006,9 +1006,33 @@ Date.prototype.substractDays = function (days) {
 //     // });
 //   });
 
-let a = "images/ImagenesMascotas/imagen.png";
-let b = a.split("/");
-let c = b.pop();
-console.log(a.replace(c, ""));
-console.log(b);
-console.log(c);
+// let a = "images/ImagenesMascotas/imagen.png";
+// let b = a.split("/");
+// let c = b.pop();
+// console.log(a.replace(c, ""));
+// console.log(b);
+// console.log(c);
+
+Publicacion.query()
+  // .where("publicacion.ID", "=", req.params.idP)
+  .select(
+    "publicacion.*",
+    Publicacion.relatedQuery("PublicacionReporte").count().as("numeroReportes")
+  )
+  .having("numeroReportes", ">", 0)
+  .orHaving("Activo", "=", 0)
+  .orderBy("numeroReportes", "DESC")
+  .debug()
+  // .whereNot("numeroReportes", "=", 0)
+  .then((PublicacionesReportadas) => {
+    // console.log(PublicacionesReportadas);
+    // res.render("Moderador/verPublicacionesReportadas.ejs", {
+    //   Tipo: req.session.Tipo,
+    //   PublicacionesReportadas: PublicacionesReportadas,
+    // });
+    console.log(PublicacionesReportadas);
+    // resolve(countLikes);
+  })
+  .catch((err) => {
+    console.log(err);
+  });

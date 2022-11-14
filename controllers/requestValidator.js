@@ -126,6 +126,7 @@ module.exports.validateRequestFiles = (folder) => {
             res.fileReadableStream.push({
               path: folder + "/" + fileN2,
               byteArray: req.files[indexFile].buffer,
+              type: req.files[indexFile].mimetype,
             });
             req.body.pathFilesSaved =
               req.body.pathFilesSaved + folder + "/" + fileN2 + ";";

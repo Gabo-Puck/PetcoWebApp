@@ -43,7 +43,7 @@ exports.verPublicacionesReportadasGet = (req, res, next) => {
         .as("numeroReportes")
     )
     .having("numeroReportes", ">", 0)
-    // .where("numeroReportes", ">", 0)
+    .orHaving("Activo", "=", 0)
     .orderBy("numeroReportes", "DESC")
     .debug()
     // .whereNot("numeroReportes", "=", 0)

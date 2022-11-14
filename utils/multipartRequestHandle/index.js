@@ -136,6 +136,7 @@ exports.fetchInput = (acceptedTypes, folderPath) => {
             res.fileReadableStream.push({
               path: saveTo,
               stream: readable,
+              type: fileData.mimeType,
               byteArray: Buffer.concat(dataList),
             });
             req.body[fieldname] = saveTo;
@@ -185,7 +186,8 @@ exports.uploadFiles = (res, storage) => {
         createPromisesSubirArchivos(
           storage,
           fileArray.path,
-          fileArray.byteArray
+          fileArray.byteArray,
+          fileArray.type
         )
       );
     });
@@ -193,7 +195,7 @@ exports.uploadFiles = (res, storage) => {
   return arrayProm;
 };
 
-function createPromisesSubirArchivos(storage, path, fileArray) {
+function createPromisesSubirArchivos(storage, path, fileArray, type) {
   return new Promise((resolve, reject) => {
     let fullPath = path;
     let fragmentedPath = fullPath.split("/");
@@ -209,7 +211,10 @@ function createPromisesSubirArchivos(storage, path, fileArray) {
       storageRef = ref(storageRef, route);
     });
     storageRef = ref(storageRef, fileName);
-    uploadBytes(storageRef, fileArray).then((snapshot) => {
+    let metadata = {
+      contentType: type,
+    };
+    uploadBytes(storageRef, fileArray, metadata).then((snapshot) => {
       console.log("Archivo subido correctamente");
       resolve("ok");
     });

@@ -358,18 +358,23 @@ exports.registro_estado = (req, res, next) => {
     .withGraphJoined("muni.[estado]")
     .findOne({ "registro.ID": req.params.registroID })
     .then((RegistroEncontrado) => {
-      if (RegistroEncontrado) {
-        RegistroEncontrado = secureRegistro(RegistroEncontrado, [
-          "Correo",
-          "Telefono",
-          "Contrasena",
-          "Pendiente",
-          "Municipio",
-        ]);
-        res.json({ RegistroEncontrado: RegistroEncontrado });
-      } else {
-        res.json("failed");
-      }
+      createPromisesImagenesRegistro2(
+        RegistroEncontrado,
+        req.app.storageFirebase
+      ).then(() => {
+        if (RegistroEncontrado) {
+          RegistroEncontrado = secureRegistro(RegistroEncontrado, [
+            "Correo",
+            "Telefono",
+            "Contrasena",
+            "Pendiente",
+            "Municipio",
+          ]);
+          res.json({ RegistroEncontrado: RegistroEncontrado });
+        } else {
+          res.json("failed");
+        }
+      });
     })
     .catch((err) => {
       console.log("Algo ha salido mal en registro_estado");
@@ -532,14 +537,19 @@ exports.registro_edit_get = [
         isModerador = true;
       }
       console.log(res.RegistroPrevio);
-      res.render("HacerRegistro", {
-        title: "Editar Registro",
-        EstadosMunicipios: res.stuff,
-        errors: res.errors,
-        RegistroPrevio: res.RegistroPrevio,
-        urlVerificarReq: `/registro/verifyEditar/${req.params.registroID}`,
-        urlGrabarReq: `/registro/editarPatch/${req.params.registroID}`,
-        isModerador: isModerador,
+      createPromisesImagenesRegistro2(
+        res.RegistroPrevio,
+        req.app.storageFirebase
+      ).then(() => {
+        res.render("HacerRegistro", {
+          title: "Editar Registro",
+          EstadosMunicipios: res.stuff,
+          errors: res.errors,
+          RegistroPrevio: res.RegistroPrevio,
+          urlVerificarReq: `/registro/verifyEditar/${req.params.registroID}`,
+          urlGrabarReq: `/registro/editarPatch/${req.params.registroID}`,
+          isModerador: isModerador,
+        });
       });
     } else {
       res.redirect("/login");
@@ -646,7 +656,7 @@ exports.registro_editar_patch = [
             let filesPathCorrected = [];
             filesPath.forEach((path) => {
               if (path != "") {
-                let newFilePath = `public/${path}`;
+                let newFilePath = `${path}`;
                 filesPathCorrected.push(newFilePath);
               }
             });
@@ -744,26 +754,16 @@ exports.registros_pendientes_list = (req, res, next) => {
     // .whereNot("RegistroUsuario.ID", ">", "0")
     .andWhere("registro.Pendiente", "=", "1")
     .then((registrosPendientes) => {
-      let promises = [];
-      for (let index = 0; index < registrosPendientes.length; index++) {
-        const element = registrosPendientes[index];
-        promises.push(
-          createPromisesImagenesRegistro2(element, req.app.storageFirebase)
-        );
-      }
-      Promise.all(promises)
-        .then(() => {
-          res.render("listaRegistros", {
-            registros: registrosPendientes,
-            Tipo: req.session.Tipo,
-          });
-          // res.json(Result);
-        })
-        .catch((err) => {
-          console.log("Algo ha salido mal en registros_pendientes_list");
-          console.log(err);
-          next(err);
-        });
+      res.render("listaRegistros", {
+        registros: registrosPendientes,
+        Tipo: req.session.Tipo,
+      });
+      // res.json(Result);
+    })
+    .catch((err) => {
+      console.log("Algo ha salido mal en registros_pendientes_list");
+      console.log(err);
+      next(err);
     });
 };
 
