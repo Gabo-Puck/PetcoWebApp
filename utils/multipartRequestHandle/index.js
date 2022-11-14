@@ -136,7 +136,7 @@ exports.fetchInput = (acceptedTypes, folderPath) => {
             res.fileReadableStream.push({
               path: saveTo,
               stream: readable,
-              type: fileData.mimetype,
+              type: fileData.mimeType,
               byteArray: Buffer.concat(dataList),
             });
             req.body[fieldname] = saveTo;

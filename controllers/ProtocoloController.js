@@ -654,10 +654,15 @@ function createDelete(storage, path) {
       storageRef = ref(storageRef, route);
     });
     storageRef = ref(storageRef, fileName);
-    deleteObject(storageRef).then((snapshot) => {
-      console.log("Arhcivo eliminado correctamente del la nube");
-      resolve("ok");
-    });
+    deleteObject(storageRef)
+      .then((snapshot) => {
+        console.log("Arhcivo eliminado correctamente del la nube");
+        resolve("ok");
+      })
+      .catch((err) => {
+        console.log(err);
+        resolve("notok");
+      });
   }).catch((err) => {
     console.log(err);
     resolve("notok");
