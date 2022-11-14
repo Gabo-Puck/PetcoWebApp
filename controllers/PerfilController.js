@@ -137,10 +137,11 @@ exports.UsuariosBlocked = (req, res, next) => {
       let promises = [];
 
       results.forEach((result) => {
-        promises.push(createPromiseGetPfp(result.UsuarioBloqueado.Foto_Perfil, req.app.storageFirebase));
+        promises.push(createPromiseGetPfp(result.UsuarioBloqueado.Foto_Perfil, req.app.storageFirebase).then((url)=> {result.UsuarioBloqueado.Foto_Perfil= url}));
 
       })
       Promise.all(promises).then(() => {
+
         res.render("usuariosbloqueados.ejs", {
           Tipo: req.session.Tipo,
           bloqueos: results
