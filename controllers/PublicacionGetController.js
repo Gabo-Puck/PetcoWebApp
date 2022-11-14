@@ -443,7 +443,7 @@ exports.pay = (req, res) => {
               currency: "MXN",
               total: aporte,
             },
-            payee: { email: query[0].Correo },
+            payee: { email: query[0].UsuarioRegistro.Correo },
           },
         ],
       };

@@ -130,30 +130,38 @@ exports.pagina = (req, res, next) => {
 };
 
 exports.UsuariosBlocked = (req, res, next) => {
-Usuario_Bloqueado.query()
-.withGraphFetched("UsuarioBloqueado.UsuarioRegistro")
-.where("usuario_bloqueado.ID_Usuario", "=", req.session.IdSession)
-.then((results)=>
-{
-  res.render("usuariosbloqueados.ejs", {
-    Tipo: req.session.Tipo,
-    bloqueos: results
+  Usuario_Bloqueado.query()
+    .withGraphFetched("UsuarioBloqueado.UsuarioRegistro")
+    .where("usuario_bloqueado.ID_Usuario", "=", req.session.IdSession)
+    .then((results) => {
+      let promises = [];
 
-  });
-})
+      results.forEach((result) => {
+        promises.push(createPromiseGetPfp(result.UsuarioBloqueado.Foto_Perfil, req.app.storageFirebase));
+
+      })
+      Promise.all(promises).then(() => {
+        res.render("usuariosbloqueados.ejs", {
+          Tipo: req.session.Tipo,
+          bloqueos: results
+
+        });
+
+      })
+    })
 }
 
 exports.UsuariosDesbloquear = (req, res, next) => {
 
-  console.log("El usuario a desbloquear es " +  req.params.idbloqueo)
+  console.log("El usuario a desbloquear es " + req.params.idbloqueo)
 
   Usuario_Bloqueado.query()
-  .where("usuario_bloqueado.ID_Usuario", "=", req.session.IdSession)
-  .andWhere("usuario_bloqueado.ID_Bloqueado", "=", req.params.idbloqueo)
-  .delete()
-  .then((result)=>{
-    res.json("Se Borro");
-  })
+    .where("usuario_bloqueado.ID_Usuario", "=", req.session.IdSession)
+    .andWhere("usuario_bloqueado.ID_Bloqueado", "=", req.params.idbloqueo)
+    .delete()
+    .then((result) => {
+      res.json("Se Borro");
+    })
 
 
 
@@ -183,7 +191,7 @@ exports.bloquear = (req, res, next) => {
       ID_Usuario: req.session.IdSession,
       ID_Bloqueado: req.params.idB,
     })
-    .then(() => {});
+    .then(() => { });
   res.json("Se hizo la query");
 };
 
@@ -266,7 +274,7 @@ exports.paysuccess = (req, res) => {
     })
     .then((registroCreado) => {
       Usuario.query()
-        .withGraphFetched("UsuarioRegistro")
+        .withGraphFetched("UsuarioRegistro.muni.estado")
         .findOne({ "usuario.ID": req.session.IdSession })
         .then((usuarioFind) => {
           let descripcion = `¡${usuarioFind.UsuarioRegistro.Nombre} te ha donado ${aporte}!`;
