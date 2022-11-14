@@ -25,7 +25,7 @@
         var idUsuarioPublicacion = <%=MascotaRender[0].MP.ID_Usuario %>;
 
         var nombreuser = '<%= usuario[0].Nombre%>';
-        var imagenperfil = ' <%= usuario[0].RegistroUsuario.Foto_Perfil%>';
+        var imagenperfil = '<%= usuario[0].RegistroUsuario.Foto_Perfil%>';
         //Script para respuestas
         var ncomentarios = <%=comentarios.length%>;
         const comentariosJS = <%-JSON.stringify(comentarios)%>;
