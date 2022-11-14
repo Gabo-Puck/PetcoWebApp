@@ -349,35 +349,39 @@ const deletePromisePfp = (usuario, storage) => {
     fragmentedPath.forEach((route) => {
       storageRef = ref(storageRef, route);
     });
-    storageRef = ref(storageRef, fileName);
-    deleteObject(storageRef)
-      .then(() => {
-        resolve(usuario);
-      })
-      .catch((error) => {
-        // A full list of error codes is available at
-        // https://firebase.google.com/docs/storage/web/handle-errors
-        console.log(error);
-        switch (error.code) {
-          case "storage/object-not-found":
-            // File doesn't exist
-            resolve(usuario);
-            break;
-          case "storage/unauthorized":
-            // User doesn't have permission to access the object
-            break;
-          case "storage/canceled":
-            // User canceled the upload
-            break;
+    if (usuario.Foto_Perfil == "images/ImagenesPerfilUsuario/default.png") {
+      resolve(usuario);
+    } else {
+      storageRef = ref(storageRef, fileName);
+      deleteObject(storageRef)
+        .then(() => {
+          resolve(usuario);
+        })
+        .catch((error) => {
+          // A full list of error codes is available at
+          // https://firebase.google.com/docs/storage/web/handle-errors
+          console.log(error);
+          switch (error.code) {
+            case "storage/object-not-found":
+              // File doesn't exist
+              resolve(usuario);
+              break;
+            case "storage/unauthorized":
+              // User doesn't have permission to access the object
+              break;
+            case "storage/canceled":
+              // User canceled the upload
+              break;
 
-          // ...
+            // ...
 
-          case "storage/unknown":
-            // Unknown error occurred, inspect the server response
-            break;
-        }
-        resolve("wrong");
-      });
+            case "storage/unknown":
+              // Unknown error occurred, inspect the server response
+              break;
+          }
+          resolve("wrong");
+        });
+    }
     // getDownloadURL()
   });
 };
