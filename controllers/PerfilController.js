@@ -137,24 +137,26 @@ exports.UsuariosBlocked = (req, res, next) => {
       let promises = [];
 
       results.forEach((result) => {
-        promises.push(createPromiseGetPfp(result.UsuarioBloqueado.Foto_Perfil, req.app.storageFirebase).then((url)=> {result.UsuarioBloqueado.Foto_Perfil= url}));
-
-      })
+        promises.push(
+          createPromiseGetPfp(
+            result.UsuarioBloqueado.Foto_Perfil,
+            req.app.storageFirebase
+          ).then((url) => {
+            result.UsuarioBloqueado.Foto_Perfil = url;
+          })
+        );
+      });
       Promise.all(promises).then(() => {
-
         res.render("usuariosbloqueados.ejs", {
           Tipo: req.session.Tipo,
-          bloqueos: results
-
+          bloqueos: results,
         });
-
-      })
-    })
-}
+      });
+    });
+};
 
 exports.UsuariosDesbloquear = (req, res, next) => {
-
-  console.log("El usuario a desbloquear es " + req.params.idbloqueo)
+  console.log("El usuario a desbloquear es " + req.params.idbloqueo);
 
   Usuario_Bloqueado.query()
     .where("usuario_bloqueado.ID_Usuario", "=", req.session.IdSession)
@@ -162,15 +164,8 @@ exports.UsuariosDesbloquear = (req, res, next) => {
     .delete()
     .then((result) => {
       res.json("Se Borro");
-    })
-
-
-
-
-}
-
-
-
+    });
+};
 
 exports.DonacionesUser = (req, res, next) => {
   Donaciones.query()
@@ -192,7 +187,7 @@ exports.bloquear = (req, res, next) => {
       ID_Usuario: req.session.IdSession,
       ID_Bloqueado: req.params.idB,
     })
-    .then(() => { });
+    .then(() => {});
   res.json("Se hizo la query");
 };
 
@@ -322,7 +317,7 @@ exports.paycancel = (req, res) => {
 
 const checkImagepfp = (req, res, next) => {
   if (res.fileReadableStream) {
-    var min = 100,
+    var min = 10,
       max = 10000;
     probe(res.fileReadableStream[0].stream).then((data) => {
       if (

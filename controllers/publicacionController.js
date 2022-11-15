@@ -335,7 +335,7 @@ exports.checkImage = [
   fetchInput(acceptedTypes, "./public/images/ImagenesMascotas"),
   (req, res, next) => {
     if (res.fileReadableStream) {
-      var min = 4000,
+      var min = 10,
         max = 8000;
       probe(res.fileReadableStream[0].stream).then((data) => {
         if (
