@@ -335,8 +335,8 @@ exports.checkImage = [
   fetchInput(acceptedTypes, "./public/images/ImagenesMascotas"),
   (req, res, next) => {
     if (res.fileReadableStream) {
-      var min = 450,
-        max = 1600;
+      var min = 4000,
+        max = 8000;
       probe(res.fileReadableStream[0].stream).then((data) => {
         if (
           data.width < min ||
