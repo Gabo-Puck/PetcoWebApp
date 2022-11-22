@@ -11,6 +11,7 @@ const {
 const Mascota = require("../models/Mascota");
 const Usuario = require("../models/Usuario");
 const { createPromisesImagenesMascotas } = require("./InicioController");
+const { createPromiseGetPfp } = require("./PerfilController");
 
 Date.prototype.addDays = function (days) {
   var date = new Date(this.valueOf());
@@ -73,14 +74,22 @@ exports.getListaSolicitudesMascota = (req, res, next) => {
       .withGraphJoined("Usuario.[UsuarioRegistro]")
       .where("solicitudes.ID_Mascota", "=", req.params.MascotaID)
       .then((SolicitudesUsuario) => {
+        let promises = [];
         SolicitudesUsuario.forEach((solicitud) => {
+          promises.push(
+            createPromiseGetPfp(solicitud.Usuario.Foto_Perfil).then(
+              (url) => (solicitud.Usuario.Foto_Perfil = url)
+            )
+          );
           solicitud.Usuario.UsuarioRegistro = secureRegistro(
             solicitud.Usuario.UsuarioRegistro,
             ["Contrasena", "Correo", "Documento_Identidad"]
           );
         });
+        Promise.all(promises).then(() => {
+          return res.json(SolicitudesUsuario);
+        });
         // console.log(SolicitudesUsuario[0].Usuario.UsuarioRegistro);
-        return res.json(SolicitudesUsuario);
       })
       .catch((err) => {
         console.log(err);
