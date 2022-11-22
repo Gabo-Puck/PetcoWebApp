@@ -77,9 +77,10 @@ exports.getListaSolicitudesMascota = (req, res, next) => {
         let promises = [];
         SolicitudesUsuario.forEach((solicitud) => {
           promises.push(
-            createPromiseGetPfp(solicitud.Usuario.Foto_Perfil).then(
-              (url) => (solicitud.Usuario.Foto_Perfil = url)
-            )
+            createPromiseGetPfp(
+              solicitud.Usuario.Foto_Perfil,
+              req.app.storageFirebase
+            ).then((url) => (solicitud.Usuario.Foto_Perfil = url))
           );
           solicitud.Usuario.UsuarioRegistro = secureRegistro(
             solicitud.Usuario.UsuarioRegistro,
