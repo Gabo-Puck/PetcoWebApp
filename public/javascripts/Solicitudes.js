@@ -35,6 +35,7 @@ mascotas.forEach((mascota) => {
   offCanvasMenuMascotas.appendChild(mascotaElement);
   mascotaElement.appendChild(mascotaTexto);
   mascotaElement.appendChild(foto);
+  mascotaElement.click();
 });
 
 function addEventListenerToMascotaButton(buttonMascota) {
@@ -134,13 +135,6 @@ function renderSolicitudes(solicitudes) {
     if (solicitudFetch.Estado == 1) {
       updateSolicitudes(solicitud.querySelector(".progresoButton"));
     }
-
-    // solicitud
-    //   .querySelector(".rechazarButton")
-    //   .setAttribute("data-bs-solicitud", solicitudFetch.ID);
-    // solicitud
-    //   .querySelector(".progresoButton")
-    //   .setAttribute("data-bs-solicitud", solicitudFetch.ID);
     solicitud
       .querySelector(".verSolicitudButton")
       .setAttribute("data-bs-solicitud", solicitudFetch.ID);
