@@ -39,6 +39,7 @@ exports.getProceso = [
           "=",
           req.params.MascotaID
         )
+        .orderBy("MascotasPasos:PasoProceso.ID_Paso")
         .then((PasosProceso) => {
           // isProcesoCompleted(res, PasosProceso);
           console.log("ESTOA QUI");

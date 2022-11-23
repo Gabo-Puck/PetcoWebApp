@@ -1,106 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" , href="/stylesheets/style.css" />
-    <link href="https://fonts.googleapis.com/css?family=Poppins:400,700" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css?family=Poppins:400,700"
+      rel="stylesheet"
+    />
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js"
-        integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT"
-        crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"
-        integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js"
+      integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"
+      integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
     <title>Usuarios que bloqueaste</title>
-</head>
+  </head>
 
-<body>
+  <body>
     <%- include ("partials/header") %>
 
-        <div class="container mt-5">
+    <div class="container mt-5">
+      <table class="table table-danger table-hover table-borderless">
+        <thead>
+          <tr>
+            <th scope="col">Foto</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Desbloquear</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for(var i=0; i < bloqueos.length; i++) { %>
 
-            <table class="table table-danger table-hover table-borderless">
-                <thead>
-                    <tr>
-                        <th scope="col">Foto</th>
-                        <th scope="col">Nombre</th>
-                        <th scope="col">Desbloquear</th>
+          <tr class="table-light" id="R<%=bloqueos[i].ID_Bloqueado%>">
+            <th scope="row" style="text-align: center">
+              <img
+                alt="Qries"
+                id="ImagenUsuario"
+                style="
+                  float: left;
+                  width: 75px;
+                  height: 75px;
+                  object-fit: cover;
+                  border-radius: 50%;
+                "
+                src="<%= bloqueos[i].UsuarioBloqueado.Foto_Perfil%>"
+              />
+            </th>
+            <td><%= bloqueos[i].UsuarioBloqueado.UsuarioRegistro.Nombre%></td>
+            <td>
+              <button
+                type="button"
+                class="btn btn-outline-success"
+                id="U<%=bloqueos[i].ID_Bloqueado%>"
+              >
+                <i class="fa-solid fa-user-check"></i>
+              </button>
+            </td>
+          </tr>
+          <% } %>
 
-                    </tr>
-                </thead>
-                <tbody>
-                    <% for(var i=0; i < bloqueos.length; i++) { %>
+          <script>
+            const Bjs = <%-JSON.stringify(bloqueos) %>;
 
+            for (let i = 0; i < Bjs.length; i++) {
 
+                document.getElementById("U" + Bjs[i].ID_Bloqueado).addEventListener("click", myFunction);
 
-                        <tr class="table-light" id="R<%=bloqueos[i].ID_Bloqueado%>">
-                            <th scope="row" style="text-align: center;">
-                                <img alt="Qries" id="ImagenUsuario" style="
-                              float: left;
-                              width: 75px;
-                              height: 75px;
-                              object-fit: cover;
-                              border-radius: 50%;
-                            " src="<%= bloqueos[i].UsuarioBloqueado.Foto_Perfil%>" />
-                            </th>
-                            <td>
-                                <%= bloqueos[i].UsuarioBloqueado.UsuarioRegistro.Nombre%>
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-outline-success"
-                                    id="U<%=bloqueos[i].ID_Bloqueado%>"><i class="fa-solid fa-user-check"></i></button>
-                            </td>
+                function myFunction() {
+                    Swal.fire({
+                                    title: '¿Seguro que quieres desbloquear este usuario?',
+                                    text: "El usuario bloqueado podra ver las publicaciones de ahora en adelante.",
+                                    icon: 'warning',
+                                    showCancelButton: true,
+                                    cancelButtonText: "Cancelar",
+                                    confirmButtonColor: '#3085d6',
+                                    cancelButtonColor: '#d33',
+                                    confirmButtonText: 'Si, estoy seguro.'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
 
+                                 fetch(`/petco/perfil/desbloquear/${Bjs[i].ID_Bloqueado}`)
+                                    .then((res) => res.json())
+                                    .then((res) => {
+                                        console.log(res);
+                                    })
 
+                                Swal.fire('¡Usuario Desbloqueado!', '', 'success')
+                                document.getElementById("R"+Bjs[i].ID_Bloqueado).remove();
 
-                        </tr>
-                        <% } %>
-
-                            <script>
-                                const Bjs = <%-JSON.stringify(bloqueos) %>;
-
-                                for (let i = 0; i < Bjs.length; i++) {
-
-                                    document.getElementById("U" + Bjs[i].ID_Bloqueado).addEventListener("click", myFunction);
-
-                                    function myFunction() {
-                                        Swal.fire({
-                                                        title: '¿Seguro que quieres desbloquear este usuario?',
-                                                        text: "El usuario bloqueado podra ver las publicaciones de ahora en adelante.",
-                                                        icon: 'warning',
-                                                        showCancelButton: true,
-                                                        cancelButtonText: "Cancelar",
-                                                        confirmButtonColor: '#3085d6',
-                                                        cancelButtonColor: '#d33',
-                                                        confirmButtonText: 'Si, estoy seguro.'
-                                                    }).then((result) => {
-                                                        if (result.isConfirmed) {
-
-                                                     fetch(`/petco/perfil/desbloquear/${Bjs[i].ID_Bloqueado}`)
-                                                        .then((res) => res.json())
-                                                        .then((res) => {
-                                                            console.log(res);
-                                                        })
-
-                                                    Swal.fire('¡Usuario Desbloqueado!', '', 'success')
-                                                    document.getElementById("R"+Bjs[i].ID_Bloqueado).remove();
-
-                                                        }
-                                                    })
                                     }
+                                })
+                }
 
-                                }
-
-                            </script>
-
-
-                </tbody>
-            </table>
-
-        </div>
-</body>
-
+            }
+          </script>
+        </tbody>
+      </table>
+    </div>
+    <script type="module" src="/javascripts/feed.js"></script>
+  </body>
 </html>
